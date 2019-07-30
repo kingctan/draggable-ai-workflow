@@ -21,10 +21,16 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "cz": "git-cz"
   },
   "eslintConfig": {
     "extends": "react-app"
+  },
+  "config": {
+    "ghooks": {
+      "commit-msg": "validate-commit-msg"
+    }
   },
   "browserslist": {
     "production": [
@@ -47,6 +53,7 @@
     "ghooks": "^2.0.4",
     "react-app-rewire-hot-loader": "^2.0.1",
     "react-app-rewire-stylus-modules": "^0.0.2",
-    "react-app-rewired": "^2.1.3"
+    "react-app-rewired": "^2.1.3",
+    "validate-commit-msg": "^2.14.0"
   }
 }
