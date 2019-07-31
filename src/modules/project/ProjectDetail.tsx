@@ -1,4 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import WorkflowBrick from '../workflow/WorkflowBrick';
+import WorkflowStage from '../workflow/WorkflowStage';
+import WorkflowConf from '../workflow/WorkflowConf';
 
 type Props = {
 
@@ -6,9 +9,16 @@ type Props = {
 
 const ProjectDetail: React.FC<Props> = (props) => {
   const { } = props;
+
+  useEffect(() => {
+
+  }, []);
+
   return (
-    <div>
-      666
+    <div className="workflow">
+      <WorkflowBrick />
+      <WorkflowStage />
+      <WorkflowConf />
     </div>
   );
 };

@@ -1,7 +1,6 @@
 import React, { FC } from 'react';
 import { HashRouter, Route, Switch, Redirect } from 'react-router-dom';
 import Layout from '../components/Layout';
-import Workflow from '../modules/workflow/Workflow';
 import ProjectList from '../modules/project/ProjectList';
 import ProjectDetail from '../modules/project/ProjectDetail';
 import InstanceList from '../modules/instance/InstanceList';
@@ -50,6 +49,7 @@ export const Routes = () =>
   <HashRouter>
     <Switch>
       <LayoutRoute path="/" exact navmark="project" component={ProjectList} />
+      <LayoutRoute path="/project-list" exact navmark="project" component={ProjectList} />
       <LayoutRoute path="/project-detail" exact navmark="project" component={ProjectDetail} />
       <LayoutRoute path="/instance-list" exact navmark="instance" component={InstanceList} />
       <LayoutRoute path="/instance-detail" exact navmark="instance" component={InstanceDetail} />

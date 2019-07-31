@@ -1,6 +1,13 @@
 @import "_variables";                 // preset variables including color, font, etc.
 @import "~antd/dist/antd.css";        // Ant Design
 @import "_partial/layout";
+@import "_partial/table";
+@import "_partial/workflow";
 
 body
   font-family: "PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑","Helvetica Neue",Helvetica,Arial,sans-serif;
+
+button, input
+  border-radius: 0 !important;
+  &:focus
+    outline: none !important;

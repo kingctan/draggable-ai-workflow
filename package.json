@@ -3,11 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@ant-design/aliyun-theme": "^0.0.3",
     "@types/jest": "24.0.16",
     "@types/node": "12.6.8",
     "@types/react": "16.8.23",
     "@types/react-dom": "16.8.5",
     "antd": "^3.20.7",
+    "axios": "^0.19.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-router-dom": "^5.0.1",
@@ -20,7 +22,9 @@
   },
   "scripts": {
     "start": "react-app-rewired start",
+    "start:prod": "env-cmd -f .env.production react-app-rewired start",
     "build": "react-app-rewired build",
+    "build:dev": "env-cmd -f .env.development react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject",
     "cz": "git-cz"
@@ -46,11 +50,13 @@
     ]
   },
   "devDependencies": {
+    "@types/axios": "^0.14.0",
     "@types/react-router-dom": "^4.3.4",
     "@types/redux": "^3.6.0",
     "@types/redux-logger": "^3.0.7",
     "commitizen": "^4.0.3",
     "cz-customizable": "^6.2.0",
+    "env-cmd": "^9.0.3",
     "ghooks": "^2.0.4",
     "react-app-rewire-hot-loader": "^2.0.1",
     "react-app-rewire-stylus-modules": "^0.0.2",

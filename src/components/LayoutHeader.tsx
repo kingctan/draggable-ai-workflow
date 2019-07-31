@@ -31,6 +31,7 @@ const LayoutHeader: SFC<Props> = (props) => {
           className="trigger"
           type={collapsed ? 'menu-unfold' : 'menu-fold'}
           onClick={toggleSidebar}
+          style={{ fontSize: 16 }}
         />
 
         <div className="header-account">
