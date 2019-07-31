@@ -17,7 +17,10 @@ const ProjectDetail: React.FC<Props> = (props) => {
   return (
     <div className="workflow">
       <WorkflowBrick />
-      <WorkflowStage />
+      {
+        //@ts-ignore
+        <WorkflowStage />
+      }
       <WorkflowConf />
     </div>
   );
