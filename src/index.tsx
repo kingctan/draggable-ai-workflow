@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { StoreContext } from 'redux-react-hook';
+import { LocaleProvider } from 'antd';
+import zhCN from 'antd/es/locale-provider/zh_CN';
 
 import './styles/style.styl';
 import { Routes } from './routes';
@@ -11,7 +13,9 @@ const store = configureStore();
 
 ReactDOM.render(
   <StoreContext.Provider value={store}>
-    <Routes />
+    <LocaleProvider locale={zhCN}>
+      <Routes />
+    </LocaleProvider>
   </StoreContext.Provider>,
   document.getElementById('root')
 );

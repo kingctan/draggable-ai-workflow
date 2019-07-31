@@ -1,0 +1,71 @@
+#header
+  position: fixed
+  z-index: z-index-header
+  width: 100%
+  padding: 0 24px
+  background-color: #fff
+  box-shadow: 0 2px 4px #dfe2e8
+  // box-shadow: 0 0.125rem 0.3125rem rgba(0,0,0,.26)
+  transition: width .2s, left .2s
+  #header-inner
+    display: flex
+    align-items: center
+  .header-link
+    white-space: nowrap
+    margin-left: 20px
+    a
+      margin-left: 40px
+      position: relative
+      color: #333
+      &:hover
+        color: color-blue
+       
+  .header-account
+    margin-left: auto
+    white-space: nowrap
+    color: #333
+    .logout-btn
+      cursor: pointer
+      color: #999
+      transition: 0.2s
+      &:hover
+        color: #333
+
+
+#sidebar
+  overflow: auto
+  height: 100vh
+  position: fixed
+  z-index: z-index-sidebar
+  left: 0
+  #logo
+    position: fixed
+    z-index: z-index-logo
+    width: 100%
+    height: header-height
+    line-height: header-height
+    word-break: keep-all
+    padding: 0 20px
+    color: #fff
+    font-size: 20px
+    border-bottom: 1px solid #404854
+  .ant-menu-item
+    height: 45px
+    line-height: 45px
+    margin: 0
+    font-size: 15px
+    i
+      margin-right: 26px !important
+  .ant-menu-item-disabled
+    >a
+      opacity: 1
+      color: rgba(255, 255, 255, 0.65) !important
+  .anticon
+    font-size: 15px
+
+#main
+   background: #fff
+   padding: main-padding
+
+table
+  background: #fff !important
