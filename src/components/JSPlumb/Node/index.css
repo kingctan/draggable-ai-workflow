@@ -1,0 +1,20 @@
+.node {
+  position: absolute;
+  white-space: nowrap;
+}
+
+.node:hover {
+  cursor: pointer;
+}
+
+.node:hover:active {
+  cursor: grab;
+}
+
+.node-anchor-disabled {
+  pointer-events: none;
+}
+
+.node-anchor-enabled {
+  pointer-events: initial;
+}

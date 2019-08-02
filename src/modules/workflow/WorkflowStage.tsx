@@ -4,6 +4,8 @@ import CSSModules from 'react-css-modules';
 import Graph from '../../components/JSPlumb/Graph';
 import { debounce } from 'lodash';
 import { Connections } from 'jsplumb';
+import NodeContent from '../../components/JSPlumb/NodeContent';
+import Node from '../../components/JSPlumb/Node';
 
 type Props = {
 
@@ -67,6 +69,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
   };
 
   const handleZoom = (x?: number, y?: number, scale?: number) => {
+    console.log(scale);
     if (scale) setScale(scale);
   };
 
@@ -95,12 +98,23 @@ const WorkflowStage: React.FC<Props> = (props) => {
     // }
   };
 
-  const handleDrop = (id: string, x?: number, y?: number) => {
+  const handleDrop = (id: string, x: number, y: number) => {
     setNodes({
       ...nodes,
       [id]: { ...nodes[id], x, y }
     });
-  }
+  };
+
+  const children = (id: string, drag: boolean) => (
+    <NodeContent
+      id={id}
+      label={nodes[id].label}
+      // onRemoveNode={handleClose}
+      style={{ height: 50 }}
+    >
+      {nodes[id].label || id}
+    </NodeContent>
+  );
 
 
   return (
@@ -123,32 +137,22 @@ const WorkflowStage: React.FC<Props> = (props) => {
         xOffset={xOffset}
         yOffset={yOffset}
       >
-        {/* {
+        {
           Object.keys(nodes).map((id) => {
             return (
+              //@ts-ignore
               <Node
                 id={id}
                 key={id}
                 onDrop={handleDrop}
                 style={nodes[id].style}
-                styleName="node"
+                className="node"
               >
-                {
-                  ({ id, drag }: any) => (
-                    <NodeContent
-                      id={id}
-                      label={nodes[id].label}
-                      onRemoveNode={handleClose}
-                      style={{ height: 50 }}
-                    >
-                      {nodes[id].label || id}
-                    </NodeContent>
-                  )
-                }
+                {children as any}
               </Node>
             );
           })
-        } */}
+        }
       </Graph>
     </div>
   );

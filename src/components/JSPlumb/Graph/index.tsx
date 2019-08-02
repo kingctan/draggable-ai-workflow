@@ -4,6 +4,8 @@ import panAndZoomHoc from 'react-pan-and-zoom-hoc';
 
 import settings from '../settings';
 import { generateGraphId, generateNodeId } from '../util';
+import './index.css';
+import Nodes from '../Nodes';
 
 const PanAndZoom = panAndZoomHoc('div');
 
@@ -82,6 +84,7 @@ const Graph: React.FC<Props> = (props) => {
   };
 
   const handlePanAndZoom = (xOffset: number, yOffset: number, newScale: number) => {
+    console.log('✨ 滚动', xOffset, yOffset);
 
     const zoomXOffset = stateXOffset + (stateXOffset - xOffset);
     const zoomYOffset = stateYOffset + (stateYOffset - yOffset);
@@ -151,6 +154,12 @@ const Graph: React.FC<Props> = (props) => {
     }
   };
 
+  const nodes: { [key: string]: boolean } = {};
+
+  const readyNode = (id: string) => {
+    nodes[id] = true;
+  };
+
   useEffect(() => {
     JsPlumb.ready(() => {
 
@@ -176,9 +185,8 @@ const Graph: React.FC<Props> = (props) => {
   return (
     <>
       <PanAndZoom
-        className={className}
+        className={`${className} ${styleName || ''} container`}
         id={generateGraphId(id)}
-        // styleName={`${styleName} container`}
         style={styles}
         maxScale={maxScale}
         minScale={minScale}
@@ -196,7 +204,7 @@ const Graph: React.FC<Props> = (props) => {
         <div
           onMouseDown={handleMouseDown}
           style={panStyle}
-          styleName='panAndZoom'
+          className="panAndZoom"
         >
           {/* <Nodes
             id={id}
@@ -204,9 +212,8 @@ const Graph: React.FC<Props> = (props) => {
             onRender={readyNode}
             onSelect={onSelect}
           >
-            <div>2</div>
-          </Nodes> */}
-          <div>2</div>
+          </Nodes>
+          <div>2</div> */}
         </div>
 
       </PanAndZoom>

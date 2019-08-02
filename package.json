@@ -69,6 +69,7 @@
     "cz-customizable": "^6.2.0",
     "env-cmd": "^9.0.3",
     "ghooks": "^2.0.4",
+    "react-app-rewire-css-modules": "KaplanTestPrep/react-app-rewire-css-modules",
     "react-app-rewire-hot-loader": "^2.0.1",
     "react-app-rewire-stylus-modules": "^0.0.2",
     "react-app-rewired": "^2.1.3",
