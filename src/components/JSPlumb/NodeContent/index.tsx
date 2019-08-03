@@ -28,7 +28,7 @@ const NodeContent: SFC<Props> = (props) => {
 
   return (
     <div
-      className={`className ${styleName ? styleName : ''} node-content ${(selected ? 'node-selected' : '')}`}
+      className={`${className} ${styleName ? styleName : ''} node-content ${(selected ? 'node-selected' : '')}`}
       style={style}
     >
       <div>

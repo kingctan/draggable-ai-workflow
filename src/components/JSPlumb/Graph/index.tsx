@@ -24,7 +24,7 @@ type Props = {
   onPanMove?: () => void
   onPanStart?: () => void
   onRemoveConnection?: () => void
-  onSelect?: (arg: any) => void
+  onSelect?: (args: any) => void
   onZoom: (newScale: number) => void
   passOnProps?: boolean
   renderOnChange?: boolean
@@ -37,28 +37,29 @@ type Props = {
 };
 
 const Graph: React.FC<Props> = (props) => {
-  const {
-    id,
-    className,
-    connections,
-    style,
-    styleName,
-    maxScale,
-    minScale,
+  let {
+    id = '',
+    className = '',
+    connections = [],
+    style = {},
+    styleName = '',
+    maxScale = 2,
+    minScale = 0.5,
     onSelect,
     onZoom,
     onPanStart,
     onPanEnd,
     onPanAndZoom,
-    passOnProps,
-    renderOnChange,
-    scale,
-    scaleFactor,
-    width,
-    height,
-    xOffset,
-    yOffset,
+    passOnProps = false,
+    renderOnChange = false,
+    scale = 1,
+    scaleFactor = Math.sqrt(1.5),
+    width = 500,
+    height = 500,
+    xOffset = 0.0,
+    yOffset = 0.0,
   } = props;
+
 
   const [stateXOffset, setStateXOffset] = useState<number>(0.0);
   const [stateYOffset, setStateYOffset] = useState<number>(0.0);
@@ -66,7 +67,7 @@ const Graph: React.FC<Props> = (props) => {
   const JsPlumb: jsPlumbInstance = jsPlumb.getInstance({
     ...settings,
     ...props.settings,
-    container: generateGraphId(props.id),
+    container: generateGraphId(id),
   });
 
   const timeout = setTimeout(
@@ -161,6 +162,12 @@ const Graph: React.FC<Props> = (props) => {
   };
 
   useEffect(() => {
+    //@ts-ignore
+    JsPlumb.setZoom(scale);
+    JsPlumb.repaintEverything();
+  }, [scale]);
+
+  useEffect(() => {
     JsPlumb.ready(() => {
 
       JsPlumb.bind('connectionDragStop', (connection: any) => {
@@ -178,6 +185,8 @@ const Graph: React.FC<Props> = (props) => {
       JsPlumb.setSuspendDrawing(true);
 
       // Try and make first paint less spastic
+
+      JsPlumb.repaintEverything();
 
     })
   }, []);
@@ -206,14 +215,17 @@ const Graph: React.FC<Props> = (props) => {
           style={panStyle}
           className="panAndZoom"
         >
-          {/* <Nodes
-            id={id}
-            jsPlumb={jsPlumb}
-            onRender={readyNode}
-            onSelect={onSelect}
-          >
-          </Nodes>
-          <div>2</div> */}
+          {
+            //@ts-ignore
+            <Nodes
+              id={id}
+              jsPlumb={JsPlumb}
+              onRender={readyNode}
+              onSelect={onSelect}
+            >
+              {props.children}
+            </Nodes>
+          }
         </div>
 
       </PanAndZoom>

@@ -1,6 +1,9 @@
-import React, { useState, useEffect, CSSProperties, SyntheticEvent, Children, cloneElement, PureComponent, SFC } from 'react';
-import { generateNodeId } from '../util';
+import React, { useState, useEffect, CSSProperties, SFC } from 'react';
 import { jsPlumbInstance } from 'jsplumb';
+
+import './index.css'
+import { generateNodeId } from '../util';
+
 
 type Props = {
   allowLoopback?: boolean
@@ -18,7 +21,7 @@ type Props = {
   }
   styleName?: string
   type?: 'both' | 'source' | 'target',
-  dragSettings?: {}
+  dragSettings?: any
   sourceSettings?: any
   targetSettings?: any
 };
@@ -30,22 +33,37 @@ const defaultTargetSettings = {};
 //@ts-ignore
 const Node: SFC<Props> = (props) => {
 
-  const { children, className, diagramId, id, styleName } = props;
+  const {
+    allowLoopback,
+    children = () => (<div />),
+    className = 'jsplumb-react-node',
+    diagramId = '',
+    dragSettings = defaultDragSettings,
+    id,
+    sourceSettings = defaultSourceSettings,
+    targetSettings = defaultTargetSettings,
+    jsPlumb,
+    style = {
+      left: 0,
+      top: 0,
+    },
+    styleName = 'node',
+    type = 'both',
+  } = props;
 
-  const [drag, setDrag] = useState<boolean>(false);
+  const [drag, setDrag] = useState<boolean>(true);
 
   const connectionFilter = ':not(.jsplumb-react-node)';
   const dragFilter = ':not(.jsplumb-react-node)';
 
-  let style: CSSProperties = {};
-  let node: HTMLElement;
+  let localStyle: CSSProperties = {};
+  let node: HTMLElement | undefined;
   let timeout: NodeJS.Timer;
   let drop: boolean = false;
   let ref = (currentNode: HTMLDivElement) => (node = currentNode);
 
   const makeNodeDraggable = () => {
-    const { dragSettings, id, jsPlumb } = props;
-    jsPlumb.draggable(node, {
+    jsPlumb.draggable(node!, {
       filter: dragFilter,
       ...dragSettings,
       drag: handleDrag,
@@ -56,22 +74,8 @@ const Node: SFC<Props> = (props) => {
     });
   };
 
-  const handleDrag = (params: any) => {
-    drop = true;
-    if (
-      props.style.left !== params.pos[0] ||
-      props.style.top !== params.pos[1]
-    ) {
-      if (props.onDrag) {
-        props.onDrag(id, params.pos[0], params.pos[1]);
-      }
-    }
-  };
-
   const addSourceEndPoints = () => {
-    const { sourceSettings, id, jsPlumb } = props;
-
-    jsPlumb.makeSource(node, {
+    jsPlumb.makeSource(node!, {
       filter: connectionFilter,
       ...sourceSettings,
       parameters: {
@@ -81,46 +85,8 @@ const Node: SFC<Props> = (props) => {
     });
   };
 
-  const handlePrevent = (event: any) => {
-    if (
-      // @ts-ignore
-      !(
-        event.ctrlKey ||
-        (event.touches && event.targetTouches.length > 1)
-      ) &&
-      (
-        !drop &&
-        style.left === props.style.left &&
-        style.top === props.style.top
-      )
-    ) {
-      setDrag(false);
-      clearTimeout(timeout);
-      timeout = setTimeout(
-        () => {
-          return node && setDrag(true);
-        },
-        500
-      );
-    }
-  };
-
-  const handleDrop = (params: any) => {
-    drop = false;
-    if (
-      props.style.left !== params.pos[0] ||
-      props.style.top !== params.pos[1]
-    ) {
-      if (props.onDrop) {
-        props.onDrop(props.id, params.pos[0], params.pos[1]);
-      }
-    }
-  };
-
   const addTargetEndPoints = () => {
-    const { allowLoopback, id, jsPlumb, targetSettings } = props;
-
-    jsPlumb.makeTarget(node, {
+    jsPlumb.makeTarget(node!, {
       allowLoopback,
       ...targetSettings,
       dropOptions: {
@@ -134,8 +100,59 @@ const Node: SFC<Props> = (props) => {
     });
   };
 
+  const handlePrevent = (event: any) => {
+    // console.log('handlePrevent');
+    // if (
+    //   !(
+    //     event.ctrlKey ||
+    //     (event.touches && event.targetTouches.length > 1)
+    //   ) &&
+    //   (
+    //     !drop &&
+    //     localStyle.left === style.left &&
+    //     localStyle.top === style.top
+    //   )
+    // ) {
+    //   setDrag(false);
+    //   clearTimeout(timeout);
+    //   timeout = setTimeout(
+    //     () => {
+    //       return node && setDrag(true);
+    //     },
+    //     500
+    //   );
+    // }
+  };
+
+  const handleDrag = (params: any) => {
+    // console.log('handleDrag');
+    drop = true;
+    if (
+      style.left !== params.pos[0] ||
+      style.top !== params.pos[1]
+    ) {
+      if (props.onDrag) {
+        props.onDrag(id, params.pos[0], params.pos[1]);
+      }
+    }
+  };
+
+  const handleDrop = (params: any) => {
+    // console.log('handleDrop');
+    drop = false;
+    if (
+      style.left !== params.pos[0] ||
+      style.top !== params.pos[1]
+    ) {
+      if (props.onDrop) {
+        props.onDrop(props.id, params.pos[0], params.pos[1]);
+      }
+    }
+  };
+
   const handlePointerDown = (event: any) => {
-    style = props.style;
+    // console.log('handlePointerDown');
+    localStyle = style;
     handleSelect(
       event.ctrlKey ||
       (event.touches && event.targetTouches.length > 1)
@@ -143,6 +160,7 @@ const Node: SFC<Props> = (props) => {
   };
 
   const handleSelect = (multiSelect?: boolean) => {
+    // console.log('handleSelect');
     const { jsPlumb, onSelect } = props;
 
     if (!multiSelect) {
@@ -165,29 +183,56 @@ const Node: SFC<Props> = (props) => {
     }
   };
 
-  useEffect(() => {
-    const { type } = props;
+  const handleDeselect = () => {
+    const { id, jsPlumb, onSelect } = props;
 
+    // @ts-ignore
+    jsPlumb.removeFromDragSelection(this.node);
+
+    if (onSelect) {
+      // @ts-ignore
+      const selections: string[] = jsPlumb._katavorio_main
+        .getSelection()
+        .map((node: any) => (
+          node.params.id
+        ))
+        .filter((nodeId: string) => {
+          return (nodeId !== id);
+        });
+
+      onSelect(selections);
+    }
+  };
+
+  useEffect(() => {
     if (type === 'both' || type === 'source') { addSourceEndPoints(); }
     if (type === 'both' || type === 'target') { addTargetEndPoints(); }
 
     makeNodeDraggable();
 
-    style = props.style;
+    localStyle = style;
+
+    return () => {
+      clearTimeout(timeout);
+      handleDeselect();
+      props.jsPlumb.removeAllEndpoints(node!);
+      node = undefined;
+    };
 
   }, []);
 
   return (
     <div
-      className={className}
+      className={`${className} ${styleName ? styleName : ''}`}
       id={generateNodeId(diagramId, id)}
       onPointerUp={handlePrevent}
       onPointerDown={handlePointerDown}
       ref={ref}
-      style={props.style}
-      styleName={styleName}
+      style={localStyle}
     >
-      <div styleName={`node-anchor-${(drag ? 'disabled' : 'enabled')}`}>
+      <div
+        className={`node-anchor-${(drag ? 'disabled' : 'enabled')}`}
+      >
         {children(id, drag)}
       </div>
     </div>
