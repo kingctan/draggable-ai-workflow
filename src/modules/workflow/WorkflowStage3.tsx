@@ -1,11 +1,10 @@
 import React, { useState, CSSProperties } from 'react';
 import { AutoSizer } from 'react-virtualized';
 import CSSModules from 'react-css-modules';
-import Graph from '../../components/JSPlumb/Graph';
+import Graph from 'jsplumb-react';
 import { debounce } from 'lodash';
-import { Connections } from 'jsplumb';
-import NodeContent from '../../components/JSPlumb/NodeContent';
-import Node from '../../components/JSPlumb/Node';
+import NodeContent from 'jsplumb-react';
+import Node from 'jsplumb-react';
 
 type Props = {
 
@@ -106,15 +105,33 @@ const WorkflowStage: React.FC<Props> = (props) => {
   };
 
   const children = (id: string, drag: boolean) => (
+    //@ts-ignore
     <NodeContent
       id={id}
       label={nodes[id].label}
-      // onRemoveNode={handleClose}
+      onRemoveNode={handleClose}
       style={{ height: 50 }}
     >
       {nodes[id].label || id}
     </NodeContent>
   );
+
+  const RenderNodes = Object.keys(nodes).map((id) => {
+    const { label, type } = nodes[id];
+
+    return (
+      //@ts-ignore
+      <Node
+        id={id}
+        key={id}
+        onDrop={handleDrop}
+        style={nodes[id].style}
+        className='node'
+      >
+        {children}
+      </Node>
+    );
+  });
 
 
   return (
@@ -122,38 +139,28 @@ const WorkflowStage: React.FC<Props> = (props) => {
       <AutoSizer onResize={handleResize}>
         {() => null}
       </AutoSizer>
-      <Graph
-        connections={connections}
-        height={height}
-        id={'simpleDiagram'}
-        maxScale={maxScale}
-        minScale={minScale}
-        onAddConnection={handleAddConnection}
-        onRemoveConnection={handleRemoveConnection}
-        onPanEnd={handlePanEnd}
-        onZoom={handleZoom}
-        scale={scale}
-        width={width}
-        xOffset={xOffset}
-        yOffset={yOffset}
-      >
-        {
-          Object.keys(nodes).map((id) => {
-            return (
-              //@ts-ignore
-              <Node
-                id={id}
-                key={id}
-                onDrop={handleDrop}
-                style={nodes[id].style}
-                className="node"
-              >
-                {children as any}
-              </Node>
-            );
-          })
-        }
-      </Graph>
+      {
+        //@ts-ignore
+        <Graph
+          connections={connections}
+          height={height}
+          id={'simpleDiagram'}
+          maxScale={maxScale}
+          minScale={minScale}
+          onAddConnection={handleAddConnection}
+          onRemoveConnection={handleRemoveConnection}
+          onPanEnd={handlePanEnd}
+          onZoom={handleZoom}
+          scale={scale}
+          width={width}
+          xOffset={xOffset}
+          yOffset={yOffset}
+        >
+          {RenderNodes}
+        </Graph>
+
+      }
+
     </div>
   );
 };

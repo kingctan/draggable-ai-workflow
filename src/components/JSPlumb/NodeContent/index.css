@@ -1,0 +1,15 @@
+.node-content {
+  position: relative;
+  z-index: 1;
+  margin: 0 auto;
+  padding: 5px;
+  border: 1px solid black;
+  border-radius: 5px;
+  background-color: #fff;
+  background-clip: border-box;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+.node-selected {
+  box-shadow: 0 3px 6px rgba(0, 0, 255, 0.16), 0 3px 6px rgba(0, 0, 255, 0.23);
+}
