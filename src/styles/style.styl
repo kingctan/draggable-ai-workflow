@@ -1,13 +1,19 @@
-@import "_variables";                 // preset variables including color, font, etc.
-@import "~antd/dist/antd.css";        // Ant Design
-@import "_partial/layout";
-@import "_partial/table";
-@import "_partial/workflow";
+@import '_variables'; // preset variables including color, font, etc.
+@import '~antd/dist/antd.css'; // Ant Design
+@import '_partial/layout';
+@import '_partial/table';
+@import '_partial/workflow';
+@import '_partial/jsPlumb';
+@import 'iconfont/iconfont.css';
 
-body
-  font-family: "PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑","Helvetica Neue",Helvetica,Arial,sans-serif;
+body {
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
 
-button, input
+button, input {
   border-radius: 0 !important;
-  &:focus
+
+  &:focus {
     outline: none !important;
+  }
+}

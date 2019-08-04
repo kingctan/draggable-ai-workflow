@@ -1,11 +1,10 @@
 import React, { useState, CSSProperties } from 'react';
 import { AutoSizer } from 'react-virtualized';
 import CSSModules from 'react-css-modules';
-import Graph from '../../components/JSPlumb/Graph';
+import { Graph, Node, NodeContent } from '../../components/JSPlumb';
 import { debounce } from 'lodash';
 import { Connections } from 'jsplumb';
-import NodeContent from '../../components/JSPlumb/NodeContent';
-import Node from '../../components/JSPlumb/Node';
+import FlowNode from '../../components/FlowNode';
 
 type Props = {
 
@@ -13,19 +12,26 @@ type Props = {
 
 const flowNodes: {
   [key: string]: {
+    id?: string
     label: string,
+    icon: string
     style: CSSProperties
+    type: 'both' | 'source' | 'target'
   }
 } = {
   node1: {
-    label: 'node 1',
+    label: '数据',
+    icon: 'icon-database',
+    type: 'source',
     style: {
       left: 272.5,
       top: 233
-    }
+    },
   },
   node2: {
-    label: 'node 2',
+    label: '模型',
+    icon: 'icon-ziyuanshezhi',
+    type: 'target',
     style: {
       left: 372.5,
       top: 233
@@ -34,19 +40,20 @@ const flowNodes: {
 };
 
 const flowConnections: any = [
-  {
-    id: 'connection1',
-    source: 'node1',
-    target: 'node2'
-  },
+  // {
+  //   id: 'connection1',
+  //   source: 'node1',
+  //   target: 'node2'
+  // },
 ];
 
 const WorkflowStage: React.FC<Props> = (props) => {
   const { } = props;
 
+  const MAX_SCALE = 2;
+  const MIN_SCALE = 0.5;
+
   const [scale, setScale] = useState<number>(1);
-  const [maxScale, setMaxScale] = useState<number>(2);
-  const [minScale, setMinScale] = useState<number>(0.25);
   const [width, setWidth] = useState<number>(500);
   const [height, setHeight] = useState<number>(500);
   const [nodes, setNodes] = useState<any>(flowNodes);
@@ -68,9 +75,9 @@ const WorkflowStage: React.FC<Props> = (props) => {
     yOffset && setYOffset(yOffset);
   };
 
-  const handleZoom = (scale: number) => {
+  const handleZoom = (scale?: number | undefined) => {
     console.log(scale);
-    setScale(scale);
+    setScale(scale!);
   };
 
   const handleClose = (id: string | undefined) => {
@@ -83,7 +90,8 @@ const WorkflowStage: React.FC<Props> = (props) => {
     }
   };
 
-  const handleAddConnection = (source: string, id: string, target: string) => {
+  const handleAddConnection = (id: string, source: string, target: string) => {
+    console.log({ id, source, target })
     setConnections([
       ...connections,
       { id, source, target }
@@ -105,18 +113,6 @@ const WorkflowStage: React.FC<Props> = (props) => {
     });
   };
 
-  const children = (id: string, drag: boolean) => (
-    <NodeContent
-      id={id}
-      label={nodes[id].label}
-      // onRemoveNode={handleClose}
-      style={{ height: 50 }}
-    >
-      {nodes[id].label || id}
-    </NodeContent>
-  );
-
-
   return (
     <div className="workflow-stage">
       <AutoSizer onResize={handleResize}>
@@ -126,8 +122,8 @@ const WorkflowStage: React.FC<Props> = (props) => {
         connections={connections}
         height={height}
         id={'simpleDiagram'}
-        maxScale={maxScale}
-        minScale={minScale}
+        maxScale={MAX_SCALE}
+        minScale={MIN_SCALE}
         onAddConnection={handleAddConnection}
         onRemoveConnection={handleRemoveConnection}
         onPanEnd={handlePanEnd}
@@ -147,8 +143,8 @@ const WorkflowStage: React.FC<Props> = (props) => {
                 onDrop={handleDrop}
                 style={nodes[id].style}
                 className="node"
+                {...nodes[id]}
               >
-                {children as any}
               </Node>
             );
           })

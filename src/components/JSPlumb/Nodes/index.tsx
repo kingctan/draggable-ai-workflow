@@ -1,15 +1,19 @@
-import React, { useState, useEffect, CSSProperties, SyntheticEvent, Children, cloneElement, PureComponent } from 'react';
-import { jsPlumbInstance, } from 'jsplumb';
-import panAndZoomHoc from 'react-pan-and-zoom-hoc';
+import PropTypes from 'prop-types';
+import {
+  Children,
+  cloneElement,
+  PureComponent
+} from 'react';
+import { NodesProps } from 'jsplumb-react';
 
-type Props = {
-  id: string
-  jsPlumb: jsPlumbInstance
-  onRender: (id: string) => void
-  onSelect?: (args: any) => void
-};
+export default class Nodes extends PureComponent<NodesProps> {
+  public static propTypes = {
+    id: PropTypes.string.isRequired,
+    jsPlumb: PropTypes.object.isRequired,
+    onRender: PropTypes.func.isRequired,
+    onSelect: PropTypes.func
+  };
 
-export default class Nodes extends PureComponent<Props> {
   public render() {
     return Children.map(
       this.props.children,
@@ -26,32 +30,4 @@ export default class Nodes extends PureComponent<Props> {
       }
     );
   }
-};
-
-
-// //@ts-ignore
-// const Nodes: PureComponent<Props, any> = ({ props, state }: any) => {
-
-//   const { id, jsPlumb, onRender, onSelect, children } = props;
-
-//   useEffect(() => {
-
-//   }, []);
-
-//   return Children.map(
-//     children,
-//     (child: any) => {
-//       onRender(child.props.id);
-
-//       const props = {
-//         diagramId: id,
-//         jsPlumb,
-//         onSelect: child.props.onSelect || onSelect
-//       };
-
-//       return (cloneElement(child, props));
-//     }
-//   );
-// };
-
-// export default Nodes;
+}

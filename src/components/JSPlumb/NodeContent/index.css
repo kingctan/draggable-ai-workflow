@@ -1,15 +1,20 @@
 .node-content {
-  position: relative;
-  z-index: 1;
-  margin: 0 auto;
-  padding: 5px;
-  border: 1px solid black;
-  border-radius: 5px;
-  background-color: #fff;
-  background-clip: border-box;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  /* display: inline-block;
+  padding: 8px;
+  border: solid 1px #ccc;
+  border-radius: 8px;
+  cursor: pointer !important;
+  color: #c4c4c4;
+  min-width: 100px;
+  padding-right: 20px;
+  background: #fff;
+  z-index: 20;
+  white-space: nowrap; */
+  /* position: absolute;
+  z-index: 19; */
 }
 
-.node-selected {
-  box-shadow: 0 3px 6px rgba(0, 0, 255, 0.16), 0 3px 6px rgba(0, 0, 255, 0.23);
+.node-content:hover {
+  /* border: solid 1px #5C87FF;
+  color: #5C87FF; */
 }

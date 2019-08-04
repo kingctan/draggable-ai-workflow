@@ -1,167 +1,207 @@
-import React, { useState, useEffect, CSSProperties, SFC } from 'react';
-import { jsPlumbInstance } from 'jsplumb';
-
-import './index.css'
+import PropTypes, { string } from 'prop-types';
+import React, {
+  CSSProperties,
+  PureComponent
+} from 'react';
 import { generateNodeId } from '../util';
+import './index.css';
+import { NodeProps, NodeState } from 'jsplumb-react';
 
+const defaultDragSettings = {
 
-type Props = {
-  allowLoopback?: boolean
-  children: (id: string, drag: boolean) => Element
-  className: string
-  diagramId: string
-  id: string
-  jsPlumb: jsPlumbInstance
-  onDrag?: (id: string, pos0: any, pos1: any) => void
-  onDrop?: (id: string, pos0: any, pos1: any) => void
-  onSelect: (selections: any) => void
-  style: {
-    left: number,
-    top: number,
+};
+const defaultSourceSettings = {
+  anchor: 'BottomCenter',
+  connector: ["Bezier", { curviness: 50 }],
+  isSource: true,
+  endpoint: "Dot",
+  connectorStyle: {
+    strokeWidth: 2,
+    stroke: "#c4c4c4",
+    joinstyle: "round",
+    outlineStroke: "transparent",
+    outlineWidth: 4
+  },
+  connectorHoverStyle: {
+    strokeWidth: 3,
+    stroke: "#216477",
+  },
+  paintStyle: {
+    radius: 7,
+    strokeWidth: 5
+  },
+  hoverPaintStyle: {
+    fill: "#5C87FF",
+    stroke: "#5C87FF"
+  },
+  maxConnections: -1,
+  dragOptions: {},
+};
+const defaultTargetSettings = {
+  anchor: 'TopCenter',
+  isTarget: true,
+  endpoint: "Dot",
+  paintStyle: {
+    radius: 7,
+    strokeWidth: 5
+  },
+  hoverPaintStyle: {
+    fill: "#5C87FF",
+    stroke: "#5C87FF",
   }
-  styleName?: string
-  type?: 'both' | 'source' | 'target',
-  dragSettings?: any
-  sourceSettings?: any
-  targetSettings?: any
 };
 
-const defaultDragSettings = {};
-const defaultSourceSettings = {};
-const defaultTargetSettings = {};
+type NodePropsFData = {
+  selected: boolean
+  type: 'both' | 'source' | 'target'
+  icon: string
+  label: string
+}
 
-//@ts-ignore
-const Node: SFC<Props> = (props) => {
+export default class Node extends PureComponent<NodeProps & NodePropsFData, NodeState> {
+  public static propTypes = {
+    allowLoopback: PropTypes.bool,
+    children: PropTypes.func,
+    className: PropTypes.string,
+    diagramId: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
+    jsPlumb: PropTypes.object,
+    onDrag: PropTypes.func,
+    onDrop: PropTypes.func,
+    onSelect: PropTypes.func,
+    style: PropTypes.object,
+    styleName: PropTypes.string,
+    targetSettings: PropTypes.object,
+    label: PropTypes.string,
+    icon: PropTypes.string,
+    selected: PropTypes.bool,
+    type: PropTypes.oneOf([
+      'both',
+      'source',
+      'target'
+    ])
+  };
 
-  const {
-    allowLoopback,
-    children = () => (<div />),
-    className = 'jsplumb-react-node',
-    diagramId = '',
-    dragSettings = defaultDragSettings,
-    id,
-    sourceSettings = defaultSourceSettings,
-    targetSettings = defaultTargetSettings,
-    jsPlumb,
-    style = {
+  public static defaultProps: NodeProps = {
+    allowLoopback: false,
+    children: () => (<div />),
+    className: 'jsplumb-react-node',
+    diagramId: '',
+    dragSettings: defaultDragSettings,
+    id: '',
+    sourceSettings: defaultSourceSettings,
+    style: {
       left: 0,
-      top: 0,
+      top: 0
     },
-    styleName = 'node',
-    type = 'both',
-  } = props;
+    styleName: '',
+    targetSettings: defaultTargetSettings,
+    type: 'both',
+  };
 
-  const [drag, setDrag] = useState<boolean>(true);
+  public state = {
+    drag: true
+  };
 
-  const connectionFilter = ':not(.jsplumb-react-node)';
-  const dragFilter = ':not(.jsplumb-react-node)';
+  private connectionFilter = ':not(.jsplumb-react-node)';
+  private dragFilter = ':not(.jsplumb-react-node)';
+  //@ts-ignore
+  private timeout: NodeJS.Timer;
+  private style: CSSProperties = {};
+  private drop: boolean = false;
+  //@ts-ignore
+  private node: HTMLElement;
 
-  let localStyle: CSSProperties = {};
-  let node: HTMLElement | undefined;
-  let timeout: NodeJS.Timer;
-  let drop: boolean = false;
-  let ref = (currentNode: HTMLDivElement) => (node = currentNode);
+  public componentDidMount() {
+    const { type } = this.props;
 
-  const makeNodeDraggable = () => {
-    jsPlumb.draggable(node!, {
-      filter: dragFilter,
-      ...dragSettings,
-      drag: handleDrag,
-      // Hacky, but only way found to pass id to `.getSelection()`
+    if (type === 'both' || type === 'source') { this.addSourceEndPoints(); }
+    if (type === 'both' || type === 'target') { this.addTargetEndPoints(); }
+
+    this.makeNodeDraggable();
+    //@ts-ignore
+    this.style = this.props.style;
+  }
+
+  public componentWillUnmount() {
+    clearTimeout(this.timeout);
+    this.handleDeselect();
+    this.props.jsPlumb!.removeAllEndpoints(this.node);
+    //@ts-ignore
+    this.node = undefined;
+  }
+
+  public render() {
+    const { children, className, diagramId, id, style, styleName, type, label, selected, icon } = this.props;
+    const { drag } = this.state;
+
+    return (
+      <div
+        className={`${className} ${styleName ? styleName : ''}`}
+        id={generateNodeId(diagramId!, id)}
+        onPointerUp={this.handlePrevent}
+        onPointerDown={this.handlePointerDown}
+        ref={this.ref}
+        style={style}
+      >
+        <div className="node-anchor-disabled">
+          {(type === 'target' || type === 'both') && <div className="dot-rect-top"></div>}
+          {(type === 'source' || type === 'both') && <div className="dot-rect-bottom"></div>}
+          <div>
+            {children}
+          </div>
+          <div className="right-keyword-wrapper" style={{ display: 'none' }}>
+            <div className="delete-icon">删除</div>
+            <div>不可用</div></div>
+          <strong>
+            <i className={`iconfont ${icon} node-icon`}></i>
+            <span>{label}</span>
+          </strong>
+          <span className="node-meta el-tooltip" >
+            ...
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  private ref = (node: HTMLDivElement) => (this.node = node);
+
+  private handlePrevent = (event: any) => {
+    if (
       // @ts-ignore
-      id,
-      stop: handleDrop
-    });
-  };
-
-  const addSourceEndPoints = () => {
-    jsPlumb.makeSource(node!, {
-      filter: connectionFilter,
-      ...sourceSettings,
-      parameters: {
-        ...sourceSettings.parameters,
-        source: id
-      }
-    });
-  };
-
-  const addTargetEndPoints = () => {
-    jsPlumb.makeTarget(node!, {
-      allowLoopback,
-      ...targetSettings,
-      dropOptions: {
-        hoverClass: 'dragHover',
-        ...targetSettings.dropOptions
-      },
-      parameters: {
-        ...targetSettings.parameters,
-        target: id
-      }
-    });
-  };
-
-  const handlePrevent = (event: any) => {
-    // console.log('handlePrevent');
-    // if (
-    //   !(
-    //     event.ctrlKey ||
-    //     (event.touches && event.targetTouches.length > 1)
-    //   ) &&
-    //   (
-    //     !drop &&
-    //     localStyle.left === style.left &&
-    //     localStyle.top === style.top
-    //   )
-    // ) {
-    //   setDrag(false);
-    //   clearTimeout(timeout);
-    //   timeout = setTimeout(
-    //     () => {
-    //       return node && setDrag(true);
-    //     },
-    //     500
-    //   );
-    // }
-  };
-
-  const handleDrag = (params: any) => {
-    // console.log('handleDrag');
-    drop = true;
-    if (
-      style.left !== params.pos[0] ||
-      style.top !== params.pos[1]
+      !(
+        event.ctrlKey ||
+        (event.touches && event.targetTouches.length > 1)
+      ) &&
+      (
+        !this.drop &&
+        this.style.left === this.props.style!.left &&
+        this.style.top === this.props.style!.top
+      )
     ) {
-      if (props.onDrag) {
-        props.onDrag(id, params.pos[0], params.pos[1]);
-      }
+      this.setState({ drag: false });
+      clearTimeout(this.timeout);
+      this.timeout = setTimeout(
+        () => {
+          return this.node && this.setState({ drag: true });
+        },
+        500
+      );
     }
-  };
+  }
 
-  const handleDrop = (params: any) => {
-    // console.log('handleDrop');
-    drop = false;
-    if (
-      style.left !== params.pos[0] ||
-      style.top !== params.pos[1]
-    ) {
-      if (props.onDrop) {
-        props.onDrop(props.id, params.pos[0], params.pos[1]);
-      }
-    }
-  };
-
-  const handlePointerDown = (event: any) => {
-    // console.log('handlePointerDown');
-    localStyle = style;
-    handleSelect(
+  private handlePointerDown = (event: any) => {
+    //@ts-ignore
+    this.style = this.props.style;
+    this.handleSelect(
       event.ctrlKey ||
       (event.touches && event.targetTouches.length > 1)
     );
-  };
+  }
 
-  const handleSelect = (multiSelect?: boolean) => {
-    // console.log('handleSelect');
-    const { jsPlumb, onSelect } = props;
+  private handleSelect = (multiSelect?: boolean) => {
+    const { jsPlumb, onSelect } = this.props;
 
     if (!multiSelect) {
       // @ts-ignore
@@ -169,7 +209,7 @@ const Node: SFC<Props> = (props) => {
     }
 
     // @ts-ignore
-    jsPlumb.addToDragSelection(node);
+    jsPlumb.addToDragSelection(this.node);
 
     if (onSelect) {
       // @ts-ignore
@@ -181,10 +221,10 @@ const Node: SFC<Props> = (props) => {
 
       onSelect(selections);
     }
-  };
+  }
 
-  const handleDeselect = () => {
-    const { id, jsPlumb, onSelect } = props;
+  private handleDeselect = () => {
+    const { id, jsPlumb, onSelect } = this.props;
 
     // @ts-ignore
     jsPlumb.removeFromDragSelection(this.node);
@@ -202,42 +242,77 @@ const Node: SFC<Props> = (props) => {
 
       onSelect(selections);
     }
-  };
+  }
 
-  useEffect(() => {
-    if (type === 'both' || type === 'source') { addSourceEndPoints(); }
-    if (type === 'both' || type === 'target') { addTargetEndPoints(); }
+  private addSourceEndPoints = () => {
+    const { sourceSettings, id, diagramId, jsPlumb } = this.props;
 
-    makeNodeDraggable();
+    // jsPlumb!.makeSource(this.node, {
+    //   filter: this.connectionFilter,
+    //   ...sourceSettings,
+    //   parameters: {
+    //     ...sourceSettings!.parameters,
+    //     source: id
+    //   }
+    // });
 
-    localStyle = style;
+    jsPlumb!.addEndpoint(
+      generateNodeId(diagramId!, id),
+      sourceSettings as any,
+    )
+  }
 
-    return () => {
-      clearTimeout(timeout);
-      handleDeselect();
-      props.jsPlumb.removeAllEndpoints(node!);
-      node = undefined;
-    };
+  private addTargetEndPoints = () => {
+    const { allowLoopback, id, jsPlumb, targetSettings } = this.props;
 
-  }, []);
+    jsPlumb!.makeTarget(this.node, {
+      allowLoopback,
+      ...targetSettings,
+      dropOptions: {
+        hoverClass: 'dragHover',
+        ...targetSettings!.dropOptions
+      },
+      parameters: {
+        ...targetSettings!.parameters,
+        target: id
+      }
+    });
+  }
 
-  return (
-    <div
-      className={`${className} ${styleName ? styleName : ''}`}
-      id={generateNodeId(diagramId, id)}
-      onPointerUp={handlePrevent}
-      onPointerDown={handlePointerDown}
-      ref={ref}
-      style={localStyle}
-    >
-      <div
-        className={`node-anchor-${(drag ? 'disabled' : 'enabled')}`}
-      >
-        {children(id, drag)}
-      </div>
-    </div>
+  private makeNodeDraggable = () => {
+    const { dragSettings, id, jsPlumb } = this.props;
+    jsPlumb!.draggable(this.node, {
+      filter: this.dragFilter,
+      ...dragSettings,
+      drag: this.handleDrag,
+      // Hacky, but only way found to pass id to `.getSelection()`
+      // @ts-ignore
+      id,
+      stop: this.handleDrop
+    });
+  }
 
-  );
-};
+  private handleDrag = (params: Katavorio_DragEventOptions) => {
+    this.drop = true;
+    if (
+      this.props.style!.left !== params.pos[0] ||
+      this.props.style!.top !== params.pos[1]
+    ) {
+      if (this.props.onDrag) {
+        this.props.onDrag(this.props.id, params.pos[0], params.pos[1]);
+      }
+    }
+  }
 
-export default Node;
+  private handleDrop = (params: Katavorio_DragEventOptions) => {
+    this.drop = false;
+    if (
+      this.props.style!.left !== params.pos[0] ||
+      this.props.style!.top !== params.pos[1]
+    ) {
+      if (this.props.onDrop) {
+        this.props.onDrop(this.props.id, params.pos[0], params.pos[1]);
+      }
+    }
+  }
+}
