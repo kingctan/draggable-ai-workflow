@@ -1,10 +1,12 @@
 import React, { useState, BaseSyntheticEvent } from 'react';
-import { Tree, Modal, Input } from 'antd';
+import { Tree, Input, Icon } from 'antd';
 import { nodeData, NodeData } from './gData';
+import { useDrag, DragSourceMonitor } from 'react-dnd';
 
 type Props = {
 
 };
+
 
 const formatData = (nodeData: NodeData[], prevKey?: string) => {
   for (let i = 0; i < nodeData.length; i += 1) {
@@ -46,7 +48,35 @@ const generateList = (data: any) => {
   }
 };
 generateList(gData);
-// console.log(dataList);
+
+const DraggableItem: React.SFC<any> = (props) => {
+  const { data } = props;
+  const name = data;
+  const [{ isDragging }, drag, preview] = useDrag({
+    item: { name, type: 'box' },
+    end: (dropResult?: { name: string, monitor: DragSourceMonitor }) => {
+      if (dropResult) {
+        // console.log('✨', dropResult);
+        // console.log(`You dropped ${name} into ${dropResult.name}!`)
+      }
+    },
+    collect: monitor => ({
+      isDragging: monitor.isDragging(),
+    }),
+  })
+  // const opacity = isDragging ? 0.6 : 1;
+  return (
+    <div
+      ref={drag}
+      className="draggable-tree-node"
+      style={{
+        opacity: 1,
+      }}
+    >
+      {data.title}
+    </div>
+  )
+};
 
 const WorkflowBrick: React.FC<Props> = (props) => {
   const { } = props;
@@ -75,6 +105,8 @@ const WorkflowBrick: React.FC<Props> = (props) => {
     setAutoExpandParent(true);
   };
 
+
+
   const loop = (data: any) =>
     data.map((item: any) => {
       const index = item.title.indexOf(searchValue);
@@ -92,12 +124,21 @@ const WorkflowBrick: React.FC<Props> = (props) => {
           );
       if (item.children) {
         return (
-          <Tree.TreeNode key={item.key} title={title}>
+          <Tree.TreeNode key={item.key} title={title} icon={<Icon type="folder" />} selectable={false}>
             {loop(item.children)}
           </Tree.TreeNode>
         );
       }
-      return <Tree.TreeNode key={item.key} title={title} isLeaf />;
+      return (
+        <Tree.TreeNode
+          draggable
+          isLeaf
+          key={item.key}
+          title={<DraggableItem data={item} />}
+          icon={<Icon type="file-text" />}
+          selectable={false}
+        />
+      );
     });
 
   return (

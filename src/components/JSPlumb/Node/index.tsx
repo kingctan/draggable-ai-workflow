@@ -1,4 +1,4 @@
-import PropTypes, { string } from 'prop-types';
+import PropTypes from 'prop-types';
 import React, {
   CSSProperties,
   PureComponent
@@ -132,8 +132,8 @@ export default class Node extends PureComponent<NodeProps & NodePropsFData, Node
   }
 
   public render() {
-    const { children, className, diagramId, id, style, styleName, type, label, selected, icon } = this.props;
-    const { drag } = this.state;
+    const { children, className, diagramId, id, style, styleName, type, label, icon } = this.props;
+    // const { drag } = this.state;
 
     return (
       <div

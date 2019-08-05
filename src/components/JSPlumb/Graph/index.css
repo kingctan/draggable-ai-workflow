@@ -35,11 +35,11 @@
 }
 
 .container .workflow-node-label {
-  z-index: 21;
+  z-index: 19;
 }
 
 .container .workflow-node-delete {
-  z-index: 21;
+  z-index: 19;
 }
 
 .container:active {

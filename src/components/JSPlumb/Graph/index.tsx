@@ -1,4 +1,4 @@
-import React, { useState, useEffect, CSSProperties, SyntheticEvent, PureComponent } from 'react';
+import React, { CSSProperties, SyntheticEvent, PureComponent } from 'react';
 import { jsPlumb, jsPlumbInstance, ConnectionMadeEventInfo, ConnectParams, Connection } from 'jsplumb';
 import panAndZoomHoc from 'react-pan-and-zoom-hoc';
 
@@ -7,7 +7,6 @@ import settings from '../settings';
 import { generateGraphId, generateNodeId } from '../util';
 import './index.css';
 import Nodes from '../Nodes';
-import { usePrevious } from '../../../utils/hooks';
 import { GraphProps, GraphState } from 'jsplumb-react';
 import Close from '../Close';
 import Portals from '../Portals';
@@ -107,9 +106,9 @@ export default class Graph extends PureComponent<GraphProps, GraphState> {
     this.jsPlumb.ready(() => {
       // @ts-ignore
       this.jsPlumb.endpointAnchorClass = 'rja_';
-      this.jsPlumb.bind('connection', this.handleNewConnection);
+      // this.jsPlumb.bind('connection', this.handleNewConnection);
       // @ts-ignore
-      this.jsPlumb.bind('connectionDetached', this.handleDetachedConnection);
+      // this.jsPlumb.bind('connectionDetached', this.handleDetachedConnection);
 
       this.jsPlumb.bind('connectionDragStop', (connection: any) => {
         connection.getOverlay("label-connector").show();

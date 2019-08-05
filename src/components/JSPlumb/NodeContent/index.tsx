@@ -1,12 +1,6 @@
-import React, { useState, useEffect, CSSProperties, SyntheticEvent, Children, cloneElement, PureComponent, SFC } from 'react';
-import { jsPlumb, jsPlumbInstance, ConnectionMadeEventInfo } from 'jsplumb';
-import panAndZoomHoc from 'react-pan-and-zoom-hoc';
+import React, { useEffect, CSSProperties, SFC } from 'react';
 
-import settings from '../settings';
-import { generateGraphId, generateNodeId } from '../util';
 import './index.css';
-
-const PanAndZoom = panAndZoomHoc('div');
 
 type Props = {
   className?: string

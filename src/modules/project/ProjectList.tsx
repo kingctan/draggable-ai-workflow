@@ -111,9 +111,9 @@ const ProjectList: React.FC<Props> = (props) => {
         <Link to="/project-detail">
           <Button type="primary"><Icon type="plus-square" /> 新增项目</Button>
         </Link>
-        <Button type="danger" >
+        <Button  >
           <Icon type="delete" /> 批量删除
-          </Button>
+        </Button>
         <Button onClick={handleRefresh}><Icon type="reload" /> 刷新</Button>
         <div className="toolbar-right">
           <Input.Search value={filterVal} onChange={(e) => setFilterVal(e.target.value)} placeholder="搜索" />
