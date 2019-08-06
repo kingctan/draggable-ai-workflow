@@ -17,7 +17,7 @@ const LayoutSidebar: SFC<Props | any> = (props) => {
     <Sider width={220} id="sidebar" trigger={null} collapsible collapsed={collapsed}>
       <Link to="/">
         <div id="logo">
-          {collapsed ? "海聪" : "海聪 AI 工作流"}
+          {collapsed ? "海聪" : "海聪 AI Flow"}
         </div>
       </Link>
       <Menu

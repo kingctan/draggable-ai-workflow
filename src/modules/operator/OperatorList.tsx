@@ -14,13 +14,21 @@ const Operator: React.FC<{ title: string, icon?: string, isDirectory: boolean }>
       <div className="operator-icon">
         {
           isDirectory ?
-            <Icon type={icon || 'code'} style={{ color: '#1890ff', fontSize: 40 }} /> :
+            <Icon type={icon || 'code'} style={{ color: 'rgba(0,0,0,.6)', fontSize: 40 }} /> :
             <Icon type="folder" theme="filled" style={{ color: '#00cdea' }} />
         }
       </div>
       <div className="operator-text">
         {title || 'Unknown'}
       </div>
+    </div>
+  )
+};
+
+const NotFound: React.FC<{ content: string }> = ({ content }) => {
+  return (
+    <div style={{ color: '#ccc' }}>
+      {content}
     </div>
   )
 };
@@ -64,14 +72,14 @@ const OperatorList: React.FC<Props> = (props) => {
 
   return (
     <div>
-      <div className="table-toolbar">
+      <div className="main-toolbar">
         <Link to="/operator-detail">
           <Button type="primary">
             <Icon type="plus-square" /> 新增算子
           </Button>
         </Link>
         <Button onClick={handleRefresh}><Icon type="reload" /> 刷新</Button>
-        <div className="table-toolbar-right">
+        <div className="main-toolbar-right">
           <Input.Search value={filterVal} onChange={(e) => setFilterVal(e.target.value)} placeholder="搜索" />
         </div>
       </div>
@@ -104,6 +112,9 @@ const OperatorList: React.FC<Props> = (props) => {
                 />
               </Link>
             ))
+        }
+        {
+          filter(list).length === 0 && <NotFound content={`Oops.. 找不到名字包含 “${filterVal}” 的文件`} />
         }
       </div>
     </div>

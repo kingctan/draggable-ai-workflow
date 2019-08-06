@@ -25,18 +25,6 @@ const EndpointHoverStyleTarget = {
   stroke: COLOR_ENDPOINT,
 };
 
-// const PaintStyle = {
-//   lineWidth: 3,
-//   radius: 5,
-//   stroke: 'black',
-//   strokeWidth: 1
-// };
-
-// const HoverPaintStyle = {
-//   stroke: 'red',
-//   strokeWidth: 2
-// };
-
 const renderOverlay = (component: any) => {
   component._jsPlumb.parameters.id = component._jsPlumb.parameters.id || v4();
   const el = document.createElement('div');
@@ -78,10 +66,10 @@ export default {
         visible: false,
         events: {
           tap: function (e: any) {
-            // //@ts-ignore
-            // const plumb = this._jsPlumb.instance;
-            // //@ts-ignore
-            // plumb.deleteConnection(this.component)
+            //@ts-ignore
+            const plumb = this._jsPlumb.instance;
+            //@ts-ignore
+            plumb.deleteConnection(this.component)
             // console.log(this);
           }
         },
