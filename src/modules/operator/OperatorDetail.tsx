@@ -2,6 +2,11 @@ import React, { useState, SyntheticEvent } from 'react';
 import { Form, Radio, Input, Select, Tabs, Icon, Button, Divider } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
 import { v4 } from 'uuid';
+import AceEditor from 'react-ace';
+import 'brace/mode/python';
+import 'brace/theme/tomorrow';
+import 'brace/ext/language_tools';
+import 'brace/snippets/python';
 import { formItemLayout, tailFormItemLayout } from '../../utils/FormLayout';
 import { Link } from 'react-router-dom';
 import { OperatorConfigParam } from './OperatorProps';
@@ -44,7 +49,7 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
           <Button><Icon type="caret-left" /> 返回列表</Button>
         </Link>
         <Divider type="vertical" />
-        <Button type="primary" style={{ marginLeft: 20 }}>
+        <Button type="primary" style={{ marginLeft: 10 }}>
           <Icon type="check" /> 确认保存
         </Button>
         {
@@ -146,12 +151,84 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
             }
           </Tabs.TabPane>
           <Tabs.TabPane tab="输出配置" key="output" style={styles.tabPaneStyle}>
+            {
+              confOutput.map((outputName: string, index: number) => (
+                <div key={index}>
+                  <Form.Item {...tailFormItemLayout}>
+                    <h3 style={styles.H3}>
+                      {outputName}
+                      <Icon
+                        type="close-square"
+                        className="config-delete-btn"
+                        onClick={() => setConfOutput([...confOutput.slice(0, index), ...confOutput.slice(index + 1)])}
+                      />
+                    </h3>
+                  </Form.Item>
+                  <Form.Item label="输出名称" required {...formItemLayout}>
+                    {getFieldDecorator(`input[${index}].name`, {
+                      initialValue: outputName,
+                      rules: [
+                        { required: true, message: '请填写输出名称' },
+                      ],
+                    })(
+                      <Input onChange={(e) => { confOutput[index] = e.target.value; setConfOutput(confOutput); }} />
+                    )}
+                  </Form.Item>
+                  <Form.Item label="输出类型" required {...formItemLayout}>
+                    {getFieldDecorator(`input[${index}].type`, {
+                      initialValue: 'data',
+                      rules: [
+                        { required: true, message: '请选择输出类型' },
+                      ],
+                    })(
+                      <Input />
+                    )}
+                  </Form.Item>
+                  <Form.Item label="输出描述" required {...formItemLayout}>
+                    {getFieldDecorator(`input[${index}].note`, {
+                      initialValue: '',
+                      rules: [
+                        { required: true, message: '请选择输出描述' },
+                      ],
+                    })(
+                      <Input.TextArea autosize={{ minRows: 3, maxRows: 8 }} />
+                    )}
+                  </Form.Item>
+                  {
+                    index !== confOutput.length - 1 &&
+                    <Form.Item {...tailFormItemLayout}>
+                      <Divider />
+                    </Form.Item>
+                  }
 
+                </div>
+              ))
+            }
           </Tabs.TabPane>
           <Tabs.TabPane tab="可调参数" key="param" style={styles.tabPaneStyle}>
 
           </Tabs.TabPane>
           <Tabs.TabPane tab="代码" key="code" style={styles.tabPaneStyle}>
+            <Form.Item >
+              {getFieldDecorator('code', {
+                initialValue: '',
+                rules: [
+                  { required: true, message: '请填写代码' },
+                ],
+              })(
+                <AceEditor
+                  mode="python"
+                  theme="tomorrow"
+                  wrapEnabled
+                  name="UNIQUE_ID_OF_ACE_EDITOR"
+                  style={{ height: 600, lineHeight: 1.4 }}
+                  editorProps={{ $blockScrolling: true }}
+                  enableBasicAutocompletion={true}
+                  enableLiveAutocompletion={true}
+                />
+              )}
+
+            </Form.Item>
 
           </Tabs.TabPane>
         </Tabs>
