@@ -30,7 +30,7 @@ export type OperatorModelProps = {
 
 export type OperatorProps = {
   title: string
-  directory: string
+  path: string
   children?: OperatorProps[]
   icon?: string
   model?: OperatorModelProps

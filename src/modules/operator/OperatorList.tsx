@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Icon, message, Input } from 'antd';
+import { Button, Icon, message, Input, Spin } from 'antd';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { OperatorProps } from './OperatorProps';
@@ -13,7 +13,9 @@ const Operator: React.FC<{ title: string, icon?: string, isDirectory: boolean }>
     <div className="operator">
       <div className="operator-icon">
         {
-          isDirectory ? <Icon type={icon} theme="filled" /> : <Icon type="folder" theme="filled" />
+          isDirectory ?
+            <Icon type={icon || 'code'} style={{ color: '#1890ff', fontSize: 40 }} /> :
+            <Icon type="folder" theme="filled" style={{ color: '#00cdea' }} />
         }
       </div>
       <div className="operator-text">
@@ -29,16 +31,16 @@ const OperatorList: React.FC<Props> = (props) => {
   const currentPath = (props as any).match.params.currentPath ? decodeURIComponent((props as any).match.params.currentPath) : '';
 
   const [list, setList] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [filterVal, setFilterVal] = useState('');
 
-  // const filter = (list: OperatorProps[]) => list.filter((item: OperatorProps) => item.title.includes(filterVal));
+  const filter = (list: OperatorProps[]) => list.filter((item: OperatorProps) => item.title.includes(filterVal));
 
   const handleRefresh = () => getList();
 
   const getList = () => {
-    console.log(currentPath);
-    axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/component/tree`)
+    setLoading(true);
+    axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/component/list?path=/${currentPath}`)
       .then((res) => {
         if (res.data.code === 200) {
           console.log(res.data.data);
@@ -89,28 +91,19 @@ const OperatorList: React.FC<Props> = (props) => {
       </div>
       <div className="operator-list">
         {
-          list.map((item: OperatorProps, index: number) => (
-            // <Link to={`/operator-list/${formatPath(item.directory)}`}>
-            <Operator
-              icon={item.icon}
-              key={index}
-              title={item.title}
-              isDirectory={!!item.model}
-            />
-            // </Link>
-          ))
-        }
-        {
-          list.map((item: OperatorProps, index: number) => (
-            // <Link to={`/operator-list/${formatPath(item.directory)}`}>
-            <Operator
-              icon={item.icon}
-              key={index}
-              title={item.title}
-              isDirectory={!!item.model}
-            />
-            // </Link>
-          ))
+          loading ? <Spin tip="加载中..." className="spin" style={{ color: '#fff' }} /> :
+            filter(list).map((item: OperatorProps, index: number) => (
+              <Link
+                to={`/operator-list/${item.model ? encodeURIComponent(currentPath) : encodeURIComponent(item.path)}`}
+                key={index}
+              >
+                <Operator
+                  icon={item.icon}
+                  title={item.title}
+                  isDirectory={!!item.model}
+                />
+              </Link>
+            ))
         }
       </div>
     </div>
