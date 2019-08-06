@@ -37,12 +37,7 @@ export type OperatorModelProps = {
 };
 
 
-export type OperatorConfigInputOutput = {
-  [name: string]: {
-    type: string
-    note: string
-  }
-};
+// export type OperatorConfigInputOutput = string
 
 export type OperatorConfigParam = {
   [type: string]: {

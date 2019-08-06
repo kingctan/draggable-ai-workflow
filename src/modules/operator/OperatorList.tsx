@@ -100,21 +100,21 @@ const OperatorList: React.FC<Props> = (props) => {
       <div className="operator-list">
         {
           loading ? <Spin tip="加载中..." className="spin" style={{ color: '#fff' }} /> :
-            filter(list).map((item: OperatorProps, index: number) => (
-              <Link
-                to={`/operator-list/${item.model ? encodeURIComponent(currentPath) : encodeURIComponent(item.path)}`}
-                key={index}
-              >
-                <Operator
-                  icon={item.icon}
-                  title={item.title}
-                  isDirectory={!!item.model}
-                />
-              </Link>
-            ))
-        }
-        {
-          filter(list).length === 0 && <NotFound content={`Oops.. 找不到名字包含 “${filterVal}” 的文件`} />
+            (
+              filter(list).length === 0 ? <NotFound content={`Oops.. 找不到名字包含 “${filterVal}” 的文件`} /> :
+                filter(list).map((item: OperatorProps, index: number) => (
+                  <Link
+                    to={`/operator-list/${item.model ? encodeURIComponent(currentPath) : encodeURIComponent(item.path)}`}
+                    key={index}
+                  >
+                    <Operator
+                      icon={item.icon}
+                      title={item.title}
+                      isDirectory={!!item.model}
+                    />
+                  </Link>
+                ))
+            )
         }
       </div>
     </div>
