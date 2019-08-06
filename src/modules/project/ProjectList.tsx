@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Button, Icon, Table, Modal, Divider, Input } from 'antd';
@@ -18,11 +18,13 @@ const ProjectList: React.FC<Props> = (props) => {
 
   const getList = () => {
     setLoading(true);
-    axios.get(`${process.env.REACT_APP_JAVA_SERVER_URL}/v1.0/project/allEngaged?userId=${sessionStorage.getItem('t-passport')}`, {
+    axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/project/list`, {
       withCredentials: true
     }).then((res) => {
-      setLoading(false);
-      setList([]);
+      if (res.data.code === 200) {
+        setList(res.data.data);
+        setLoading(false);
+      }
     }).catch((err) => {
       console.error(err);
     });
@@ -32,40 +34,18 @@ const ProjectList: React.FC<Props> = (props) => {
 
   const handleRefresh = () => getList();
 
+  useEffect(() => {
+    getList();
+  }, []);
+
   const columns = [{
-    title: 'ID',
-    key: 'id',
-    dataIndex: 'id',
-  }, {
     title: '名称',
-    key: 'name',
-    dataIndex: 'name',
-    render: (text: string, row: ProjectProps) => (
-      <Link to={`/file-list/${row.id}`} className="table-column-link">
-        <Icon type="appstore" theme="filled" /> {text}
-      </Link>
-    )
+    key: 'projectName',
+    dataIndex: 'projectName',
   }, {
     title: '描述',
-    key: 'projectDesc',
-    dataIndex: 'projectDesc',
-    render: (text: string) => (
-      <span className="table-column-desc">
-        {text}
-      </span>
-    ),
-  }, {
-    title: '管理员',
-    key: 'admin',
-    dataIndex: 'admin',
-    // render: (text: string[]) => {
-    //   const firstLetter = text[0][0].toUpperCase() || '?';
-    //   return (
-    //     <span style={{ whiteSpace: 'nowrap' }}>
-    //       {/* <Avatar size="small" style={letterColor[firstLetter]}>{firstLetter}</Avatar> {text[0]} */}
-    //     </span>
-    //   )
-    // }
+    key: 'note',
+    dataIndex: 'note',
   }, {
     title: '操作',
     key: 'operate',
@@ -86,14 +66,6 @@ const ProjectList: React.FC<Props> = (props) => {
               title: "删除项目",
               content: <span>确定删除项目：<b>{row.name}</b> ？</span>,
               onOk() {
-                // deleteItems(row.id).then((res) => {
-                //   if ((res as any).data.errno === 0) {
-                //     getList();
-                //     message.success('删除成功！');
-                //   } else {
-                //     message.error('删除失败！');
-                //   }
-                // }).catch(() => message.error('删除失败！'));
               },
             });
           }}
@@ -107,7 +79,7 @@ const ProjectList: React.FC<Props> = (props) => {
 
   return (
     <div>
-      <div className="toolbar">
+      <div className="table-toolbar">
         <Link to="/project-detail">
           <Button type="primary"><Icon type="plus-square" /> 新增项目</Button>
         </Link>
@@ -115,7 +87,7 @@ const ProjectList: React.FC<Props> = (props) => {
           <Icon type="delete" /> 批量删除
         </Button>
         <Button onClick={handleRefresh}><Icon type="reload" /> 刷新</Button>
-        <div className="toolbar-right">
+        <div className="table-toolbar-right">
           <Input.Search value={filterVal} onChange={(e) => setFilterVal(e.target.value)} placeholder="搜索" />
         </div>
       </div>

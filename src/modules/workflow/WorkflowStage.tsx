@@ -15,24 +15,24 @@ type Props = {
 };
 
 const flowNodes: FlowNodeProps = {
-  [v4()]: {
-    label: '数据',
-    icon: 'icon-database',
-    type: 'source',
-    style: {
-      left: 272.5,
-      top: 233
-    },
-  },
-  [v4()]: {
-    label: '模型',
-    icon: 'icon-ziyuanshezhi',
-    type: 'target',
-    style: {
-      left: 372.5,
-      top: 233
-    }
-  }
+  // [v4()]: {
+  //   label: '数据',
+  //   icon: 'icon-database',
+  //   type: 'source',
+  //   style: {
+  //     left: 272.5,
+  //     top: 233
+  //   },
+  // },
+  // [v4()]: {
+  //   label: '模型',
+  //   icon: 'icon-ziyuanshezhi',
+  //   type: 'target',
+  //   style: {
+  //     left: 372.5,
+  //     top: 233
+  //   }
+  // }
 };
 
 const flowConnections: any = [
@@ -137,10 +137,10 @@ const WorkflowStage: React.FC<Props> = (props) => {
       const relativeXOffset = clientOffset!.x - dropPlaceOffset.left;
       const relativeYOffset = clientOffset!.y - dropPlaceOffset.top;
 
-      console.log(item);
+      // console.log(item);
 
-      console.log(`横坐标相对便宜：`, relativeXOffset);
-      console.log(`纵坐标相对便宜：`, relativeYOffset);
+      // console.log(`横坐标相对便宜：`, relativeXOffset);
+      // console.log(`纵坐标相对便宜：`, relativeYOffset);
       setNodes({
         ...nodes,
         [v4()]: {

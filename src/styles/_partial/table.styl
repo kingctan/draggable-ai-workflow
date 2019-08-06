@@ -1,12 +1,54 @@
-.toolbar {
+.table-toolbar {
   display: flex;
   margin-bottom: 20px;
 
-  .toolbar-right {
+  .table-toolbar-right {
     margin-left: auto;
   }
 
   button {
     margin-right: 10px !important;
+  }
+}
+
+// 面包屑导航
+.bread-nav {
+  display: flex;
+  align-items: center;
+  margin: 30px 0;
+  padding: 6px 10px;
+  background: #f9f9fa;
+
+  i {
+    color: color-blue2;
+    font-style: normal;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .bread-arrow {
+    margin: 0 5px;
+    color: #999;
+    font-size: 8px !important;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  span {
+    cursor: pointer;
+    font-size: 13px;
+    max-width: 120px;
+    display: inline-block;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 }

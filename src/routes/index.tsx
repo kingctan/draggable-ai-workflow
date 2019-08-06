@@ -5,8 +5,8 @@ import ProjectList from '../modules/project/ProjectList';
 import ProjectDetail from '../modules/project/ProjectDetail';
 import InstanceList from '../modules/instance/InstanceList';
 import InstanceDetail from '../modules/instance/InstanceDetail';
-import BrickList from '../modules/brick/BrickList';
-import BrickDetail from '../modules/brick/BrickDetail';
+import OperatorList from '../modules/operator/OperatorList';
+import OperatorDetail from '../modules/operator/OperatorDetail';
 
 const isAuthenticated = () => {
   return true;
@@ -53,7 +53,8 @@ export const Routes = () =>
       <LayoutRoute path="/project-detail" exact navmark="project" component={ProjectDetail} />
       <LayoutRoute path="/instance-list" exact navmark="instance" component={InstanceList} />
       <LayoutRoute path="/instance-detail" exact navmark="instance" component={InstanceDetail} />
-      <LayoutRoute path="/brick-list" exact navmark="brick" component={BrickList} />
-      <LayoutRoute path="/brick-detail" exact navmark="brick" component={BrickDetail} />
+      <LayoutRoute path="/operator-list" exact navmark="operator" component={OperatorList} />
+      <LayoutRoute path="/operator-list/:currentPath" exact navmark="operator" component={OperatorList} />
+      <LayoutRoute path="/operator-detail" exact navmark="operator" component={OperatorDetail} />
     </Switch>
   </HashRouter>;

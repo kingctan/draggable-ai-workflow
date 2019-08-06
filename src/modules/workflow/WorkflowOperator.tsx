@@ -78,7 +78,7 @@ const DraggableItem: React.SFC<any> = (props) => {
   )
 };
 
-const WorkflowBrick: React.FC<Props> = (props) => {
+const WorkflowOperator: React.FC<Props> = (props) => {
   const { } = props;
 
   const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
@@ -142,7 +142,7 @@ const WorkflowBrick: React.FC<Props> = (props) => {
     });
 
   return (
-    <div className="workflow-brick">
+    <div className="workflow-operator">
       <Input.Search style={{ marginBottom: 8 }} placeholder="搜索组件" onChange={handleFilter} />
       <Tree.DirectoryTree
         showIcon
@@ -157,4 +157,4 @@ const WorkflowBrick: React.FC<Props> = (props) => {
   );
 };
 
-export default WorkflowBrick;
+export default WorkflowOperator;

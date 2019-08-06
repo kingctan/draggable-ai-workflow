@@ -1,0 +1,34 @@
+.operator-list {
+  .operator {
+    float: left;
+    width: 80px;
+    height: 90px;
+    // border: 1px solid #eee;
+    margin-right: 30px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.63, 0, 0.39, 0.99);
+
+    &:hover {
+      transform: scale(1.1);
+    }
+
+    .operator-icon {
+      display: flex;
+      align-items: center;
+      font-size: 48px;
+      height: 60px;
+      color: #00cdea;
+      // border: 1px solid red;
+    }
+
+    .operator-text {
+      // border: 1px solid green;
+      font-size: 12px;
+    }
+  }
+}
