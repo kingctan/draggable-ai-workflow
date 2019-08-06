@@ -4,7 +4,7 @@ type Props = {
 
 };
 
-const BrickDetail: React.FC<Props> = (props) => {
+const OperatorDetail: React.FC<Props> = (props) => {
   const { } = props;
   return (
     <div>
@@ -13,4 +13,4 @@ const BrickDetail: React.FC<Props> = (props) => {
   );
 };
 
-export default BrickDetail;
+export default OperatorDetail;

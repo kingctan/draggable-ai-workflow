@@ -40,8 +40,8 @@ const LayoutSidebar: SFC<Props | any> = (props) => {
               <span>实例管理</span>
             </Link>
           </Menu.Item>
-          <Menu.Item key="brick">
-            <Link to="/brick-list">
+          <Menu.Item key="operator">
+            <Link to="/operator-list">
               <Icon type="build" />
               <span>算子管理</span>
             </Link>

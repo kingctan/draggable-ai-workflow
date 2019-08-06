@@ -1,12 +1,6 @@
-import React, { useState, useEffect, CSSProperties, SyntheticEvent, Children, cloneElement, PureComponent, SFC } from 'react';
-import { jsPlumb, jsPlumbInstance, ConnectionMadeEventInfo } from 'jsplumb';
-import panAndZoomHoc from 'react-pan-and-zoom-hoc';
+import React, { useEffect, CSSProperties, SFC } from 'react';
 
-import settings from '../settings';
-import { generateGraphId, generateNodeId } from '../util';
 import './index.css';
-
-const PanAndZoom = panAndZoomHoc('div');
 
 type Props = {
   className?: string
@@ -16,11 +10,13 @@ type Props = {
   selected?: boolean
   style: CSSProperties
   styleName?: string
+  icon: string
+  type: 'both' | 'source' | 'target'
 };
 
-const NodeContent: SFC<Props> = (props) => {
+const JsplumbNodeContent: SFC<Props> = (props) => {
 
-  const { className, children, id, selected, style, styleName } = props;
+  const { className, children, icon, label, selected, style, styleName, type } = props;
 
   useEffect(() => {
 
@@ -31,11 +27,23 @@ const NodeContent: SFC<Props> = (props) => {
       className={`${className} ${styleName ? styleName : ''} node-content ${(selected ? 'node-selected' : '')}`}
       style={style}
     >
+      {(type === 'target' || type === 'both') && <div className="dot-rect-top"></div>}
+      {(type === 'source' || type === 'both') && <div className="dot-rect-bottom"></div>}
       <div>
         {children}
       </div>
+      <div className="right-keyword-wrapper" style={{ display: 'none' }}>
+        <div className="delete-icon">删除</div>
+        <div>不可用</div></div>
+      <strong>
+        <i className={`iconfont ${icon} node-icon`}></i>
+        <span>{label}</span>
+      </strong>
+      <span className="node-meta el-tooltip" >
+        ...
+        </span>
     </div>
   );
 };
 
-export default NodeContent;
+export default JsplumbNodeContent;

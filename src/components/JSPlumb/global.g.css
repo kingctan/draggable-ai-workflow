@@ -1,0 +1,28 @@
+.jtk-connector {
+  z-index: 4;
+}
+
+.jtk-endpoint {
+  opacity: 0.3;
+  z-index: 21;
+}
+
+.jtk-drag-selected {
+  z-index: 3;
+  border: solid 1px #5C87FF;
+  color: #5C87FF;
+}
+
+.jtk-connector.jtk-dragging,
+.jtk-endpoint.jtk-dragging {
+  /* z-index: 2; */
+  cursor: grab;
+}
+
+.jtk-endpoint.jtk-dragging::after {
+  position: absolute;
+  margin: -50px;
+  padding: 50px;
+  content: '';
+  cursor: grab;
+}

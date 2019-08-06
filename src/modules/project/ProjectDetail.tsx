@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
-import WorkflowBrick from '../workflow/WorkflowBrick';
+import { DndProvider } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
+import WorkflowOperator from '../workflow/WorkflowOperator';
 import WorkflowStage from '../workflow/WorkflowStage';
 import WorkflowConf from '../workflow/WorkflowConf';
 
@@ -16,12 +18,15 @@ const ProjectDetail: React.FC<Props> = (props) => {
 
   return (
     <div className="workflow">
-      <WorkflowBrick />
-      {
-        //@ts-ignore
-        <WorkflowStage />
-      }
-      <WorkflowConf />
+      <DndProvider backend={HTML5Backend}>
+        <WorkflowOperator />
+        {
+          //@ts-ignore
+          <WorkflowStage />
+        }
+        <WorkflowConf />
+      </DndProvider>
+
     </div>
   );
 };

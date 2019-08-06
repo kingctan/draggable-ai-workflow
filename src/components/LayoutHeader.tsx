@@ -1,5 +1,5 @@
 import React, { SFC } from 'react';
-import { Layout as AntLayout, Icon, Divider, Button } from 'antd';
+import { Layout as AntLayout, Icon, Divider } from 'antd';
 
 const { Header } = AntLayout;
 

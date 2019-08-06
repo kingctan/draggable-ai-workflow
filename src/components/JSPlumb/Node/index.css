@@ -1,14 +1,112 @@
 .node {
   position: absolute;
   white-space: nowrap;
+  display: inline-block;
+  padding: 8px;
+  border: solid 1px #ccc;
+  border-radius: 8px;
+  cursor: pointer !important;
+  color: #c4c4c4;
+  min-width: 100px;
+  padding-right: 20px;
+  background: #fff;
+  z-index: 20;
+  white-space: nowrap;
 }
 
 .node:hover {
   cursor: pointer;
+  border: solid 1px #5C87FF;
+  color: #5C87FF;
 }
 
 .node:hover:active {
   cursor: grab;
+}
+
+.node:hover .node-meta  {
+  background: #5C87FF;
+}
+
+.node:hover .dot-rect-top,
+.node:hover .dot-rect-bottom {
+  border-color: #5C87FF;
+}
+
+.node strong {
+  word-break: break-word;
+}
+
+.node strong .node-icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  font-size: workflow-node-font-size;
+  line-height: 20px;
+  margin-right: 4px;
+}
+
+.node .node-meta {
+  position: absolute;
+  right: -1px;
+  top: 0;
+  height: 100%;
+  width: 10px;
+  padding: 6px 4px;
+  word-wrap: break-word;
+  white-space: pre-line;
+  line-height: 6px;
+  box-sizing: border-box;
+  background: #c4c4c4;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+  color: #fff;
+}
+
+.node .dot-rect-top,
+.node .dot-rect-bottom {
+  border-bottom: solid 1px #c4c4c4;
+  border-left: solid 1px #c4c4c4;
+  border-right: solid 1px #c4c4c4;
+  background: #fff;
+  position: absolute;
+  width: 10px;
+  height: 4px;
+  left: 50%;
+  margin-left: -6px;
+  z-index: 10;
+}
+
+.node .dot-rect-top {
+  top: -1px;
+}
+
+.node .dot-rect-bottom {
+  bottom: -4px;
+}
+
+.node .jtk-endpoint {
+  opacity: 0.3;
+  z-index: 21;
+}
+
+.node.jtk-drag-selected {
+  z-index: 3;
+  border: solid 1px #5C87FF;
+  color: #5C87FF;
+}
+
+.node .jtk-connector {
+  z-index: 4;
+}
+
+.node.jtk-drag-selected .dot-rect-top,
+.node.jtk-drag-selected .dot-rect-bottom {
+  border-color: #5C87FF;
+}
+
+.node.jtk-drag-selected .node-meta {
+  background: #5C87FF;
 }
 
 .node-anchor-disabled {

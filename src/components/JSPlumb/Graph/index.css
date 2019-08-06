@@ -7,6 +7,41 @@
     width 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 
+.container .error-icon-connect {
+  position: relative;
+  right: -20px;
+  background: orange;
+  border-radius: 20px;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  text-align: center;
+  color: #fff;
+  font-size: 14px;
+  line-height: 18px;
+  cursor: pointer;
+}
+
+.container .error-icon-connect.green-icon {
+  background: #7ED321;
+}
+
+.container .delete-icon-connect {
+  color: #5C87FF;
+  background: #fff;
+  border-radius: 50%;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.container .workflow-node-label {
+  z-index: 19;
+}
+
+.container .workflow-node-delete {
+  z-index: 19;
+}
+
 .container:active {
   cursor: grabbing;
 }
