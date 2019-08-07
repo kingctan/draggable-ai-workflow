@@ -1,5 +1,6 @@
-import React, { useState, BaseSyntheticEvent } from 'react';
-import { Tree, Input, Icon } from 'antd';
+import React, { useState, BaseSyntheticEvent, useEffect } from 'react';
+import { Tree, Input, Icon, message } from 'antd';
+import axios from 'axios';
 import { nodeData, NodeData } from './gData';
 import { useDrag, DragSourceMonitor } from 'react-dnd';
 
@@ -7,11 +8,10 @@ type Props = {
 
 };
 
-
 const formatData = (nodeData: NodeData[], prevKey?: string) => {
   for (let i = 0; i < nodeData.length; i += 1) {
     const title = nodeData[i].title;
-    nodeData[i].key = prevKey ? `${prevKey}-${title}` : title;
+    nodeData[i].key = prevKey ? `${prevKey}/${title}` : title;
     if (nodeData[i].children) {
       formatData(nodeData[i].children as any, nodeData[i].key);
     }
@@ -36,7 +36,7 @@ const getParentKey = (key: string, tree: NodeData[]) => {
   return parentKey;
 };
 
-const dataList: NodeData[] = [];
+let dataList: NodeData[] = [];
 const generateList = (data: any) => {
   for (let i = 0; i < data.length; i++) {
     const node = data[i];
@@ -50,30 +50,22 @@ const generateList = (data: any) => {
 generateList(gData);
 
 const DraggableItem: React.SFC<any> = (props) => {
-  const { data } = props;
+  const { data, title } = props;
   const name = data;
   const [{ isDragging }, drag, preview] = useDrag({
     item: { name, type: 'box' },
     end: (dropResult?: { name: string, monitor: DragSourceMonitor }) => {
       if (dropResult) {
         // console.log('✨', dropResult);
-        // console.log(`You dropped ${name} into ${dropResult.name}!`)
       }
     },
     collect: monitor => ({
       isDragging: monitor.isDragging(),
     }),
-  })
-  // const opacity = isDragging ? 0.6 : 1;
+  });
   return (
-    <div
-      ref={drag}
-      className="draggable-tree-node"
-      style={{
-        opacity: 1,
-      }}
-    >
-      {data.title}
+    <div ref={drag} className="draggable-tree-node">
+      {title}
     </div>
   )
 };
@@ -81,9 +73,11 @@ const DraggableItem: React.SFC<any> = (props) => {
 const WorkflowOperator: React.FC<Props> = (props) => {
   const { } = props;
 
+  const [nodes, setNodes] = useState<NodeData[]>(gData);
   const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
   const [autoExpandParent, setAutoExpandParent] = useState(true);
   const [searchValue, setSearchValue] = useState('');
+
 
   const onExpand = (expandedKeys: any) => {
     setExpandedKeys(expandedKeys);
@@ -95,7 +89,7 @@ const WorkflowOperator: React.FC<Props> = (props) => {
     const expandedKeys = dataList
       .map((item: NodeData) => {
         if (item.title.indexOf(value) > -1) {
-          return getParentKey(item.key!, gData);
+          return getParentKey(item.key!, nodes);
         }
         return null;
       })
@@ -105,7 +99,24 @@ const WorkflowOperator: React.FC<Props> = (props) => {
     setAutoExpandParent(true);
   };
 
+  const getOperators = () => {
+    axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/component/tree`)
+      .then((res) => {
+        if (res.data.code === 200) {
+          const newNodes = [...formatData(res.data.data), ...nodes];
+          setNodes(newNodes);
+          dataList = [];
+          generateList(newNodes);
+          // console.log(dataList);
+        }
+      }).catch((err) => {
+        message.error('服务器被吃了..');
+      });
+  };
 
+  useEffect(() => {
+    getOperators();
+  }, []);
 
   const loop = (data: any) =>
     data.map((item: any) => {
@@ -134,7 +145,10 @@ const WorkflowOperator: React.FC<Props> = (props) => {
           draggable
           isLeaf
           key={item.key}
-          title={<DraggableItem data={item} />}
+          title={
+            // title（不用item.title）是为了显示搜索有红色高亮的
+            <DraggableItem data={item} title={title} />
+          }
           icon={<Icon type="file-text" />}
           selectable={false}
         />
@@ -151,7 +165,7 @@ const WorkflowOperator: React.FC<Props> = (props) => {
         autoExpandParent={autoExpandParent}
         className="tree"
       >
-        {loop(gData)}
+        {loop(nodes)}
       </Tree.DirectoryTree>
     </div>
   );

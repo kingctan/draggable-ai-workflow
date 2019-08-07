@@ -80,17 +80,16 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
   const handleAddParam = () => setConfParam([...confParam, generateUniqueName('param')]);
 
   const handleRemoveInput = (index: number) => {
-    if (confInput.length <= 1) return message.warning('请保证至少存在一个输入');
+    if (confInput.length + confOutput.length <= 1) return message.warning('请保证至少存在一个输入或输出');
     setConfInput([...confInput.slice(0, index), ...confInput.slice(index + 1)]);
   };
 
   const handleRemoveOutput = (index: number) => {
-    if (confOutput.length <= 1) return message.warning('请保证至少存在一个输出');
+    if (confOutput.length + confInput.length <= 1) return message.warning('请保证至少存在一个输入或输出');
     setConfOutput([...confOutput.slice(0, index), ...confOutput.slice(index + 1)]);
   };
 
   const handleRemoveParam = (index: number) => {
-    if (confParam.length <= 1) return message.warning('请保证至少存在一个可调参数');
     setConfParam([...confParam.slice(0, index), ...confParam.slice(index + 1)]);
   };
 
@@ -99,7 +98,7 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
       .then((res) => {
         if (res.data.code === 200) {
           const values = res.data.data;
-          console.log(values);
+          // console.log(values);
           setConfInput(Object.keys(values.inputs));
           setConfOutput(Object.keys(values.outputs));
           setConfParam(Object.keys(values.params));
@@ -122,18 +121,24 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
             });
           });
           values.outputs = outputs;
-          Object.keys(values.params).forEach((name: string) => {
+          Object.keys(values.params).forEach((key: string) => {
             params.push({
-              name,
-              title: values.params[name].title,
-              type: values.params[name].type,
-              default: values.params[name].default,
+              key,
+              name: values.params[key].name,
+              type: values.params[key].type,
+              default: values.params[key].default,
             });
           });
           values.params = params;
           setFieldsValue({
             ...values,
             directory: values.directory ? values.directory.slice(values.directory.lastIndexOf('/') + 1) : '',
+            code: '',
+          });
+          values.code && axios.get(values.code).then((res) => {
+            setFieldsValue({
+              code: res.data,
+            });
           });
         }
       }).catch((err) => {
@@ -148,21 +153,22 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
       const inputs: any = {};
       const outputs: any = {};
       const params: any = {};
-      formValues.inputs.forEach((item: { name: string, type: string, note: string }) => {
+      console.log(formValues);
+      formValues.inputs && formValues.inputs.forEach((item: { name: string, type: string, note: string }) => {
         inputs[item.name] = {
           type: item.type,
           note: item.note,
         }
       });
-      formValues.outputs.forEach((item: { name: string, type: string, note: string }) => {
+      formValues.outputs && formValues.outputs.forEach((item: { name: string, type: string, note: string }) => {
         outputs[item.name] = {
           type: item.type,
           note: item.note,
         }
       });
-      formValues.params.forEach((item: { name: string, title: string, type: string, default: string }) => {
-        params[item.name] = {
-          title: item.title,
+      formValues.params && formValues.params.forEach((item: { key: string, name: string, type: string, default: string }) => {
+        params[item.key] = {
+          name: item.name,
           type: item.type,
           default: item.default,
         }
@@ -385,7 +391,7 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
                     handleClick={() => handleRemoveParam(index)}
                   />
                   <Form.Item label="参数名称" required {...formItemLayout}>
-                    {getFieldDecorator(`params[${index}].name`, {
+                    {getFieldDecorator(`params[${index}].key`, {
                       initialValue: paramName,
                       rules: [
                         { required: true, message: '请填写参数名称' },
@@ -395,7 +401,7 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
                     )}
                   </Form.Item>
                   <Form.Item label="参数标题（展示）" required {...formItemLayout}>
-                    {getFieldDecorator(`params[${index}].title`, {
+                    {getFieldDecorator(`params[${index}].name`, {
                       initialValue: '',
                       rules: [
                         { required: true, message: '请填写参数标题（展示）' },

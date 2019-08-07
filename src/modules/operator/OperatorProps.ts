@@ -11,18 +11,18 @@ export type OperatorModelProps = {
   componentName: string
   directory: string
   params: {
-    train_data: string
-    val_data: string
-    lr: number
+    [k: string]: any
   },
   inputs: {
-    data: {
+    [key: string]: {
       type: string
+      note: string
     }
   },
   outputs: {
-    model: {
+    [key: string]: {
       type: string
+      note: string
     }
   },
   admin: {

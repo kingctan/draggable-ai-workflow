@@ -1,11 +1,17 @@
 import { CSSProperties } from "react";
+import { OperatorModelProps } from "../operator/OperatorProps";
+
 
 export type FlowNodeProps = {
-  [key: string]: {
-    id?: string
-    label: string,
-    icon: string
-    style: CSSProperties
-    type: 'both' | 'source' | 'target'
-  }
+  id?: string
+  label: string
+  icon: string
+  style: CSSProperties
+  type: 'both' | 'source' | 'target'
+  model?: OperatorModelProps
+};
+
+
+export type FlowNodesProps = {
+  [key: string]: FlowNodeProps
 };

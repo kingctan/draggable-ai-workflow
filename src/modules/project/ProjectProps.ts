@@ -1,8 +1,14 @@
+import { OperatorModelProps } from "../operator/OperatorProps";
+
 export type ProjectProps = {
-  id: number;          // id
-  name: string;        // 项目名
-  bizModel: string;    // 业务模块
-  projectDesc: string; // 项目介绍
-  admin: string[],     // 项目管理员
-  members: string[],   // 项目成员
+  projectID: number // id
+  projectName: string // 项目名
+  note: string // 描述
+  updateTime: number // 更新时间
+  graph: GraphProps
+};
+
+export type GraphProps = {
+  graph: OperatorModelProps[]
+  version: string
 };
