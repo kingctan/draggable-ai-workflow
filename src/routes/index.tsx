@@ -56,5 +56,6 @@ export const Routes = () =>
       <LayoutRoute path="/operator-list" exact navmark="operator" component={OperatorList} />
       <LayoutRoute path="/operator-list/:currentPath" exact navmark="operator" component={OperatorList} />
       <LayoutRoute path="/operator-detail" exact navmark="operator" component={OperatorDetail} />
+      <LayoutRoute path="/operator-detail/:componentId" exact navmark="operator" component={OperatorDetail} />
     </Switch>
   </HashRouter>;

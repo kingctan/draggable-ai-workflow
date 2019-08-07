@@ -1,3 +1,11 @@
+export type OperatorProps = {
+  title: string
+  path: string
+  children?: OperatorProps[]
+  icon?: string
+  model?: OperatorModelProps
+};
+
 export type OperatorModelProps = {
   componentID: number
   componentName: string
@@ -28,10 +36,13 @@ export type OperatorModelProps = {
   note: string
 };
 
-export type OperatorProps = {
-  title: string
-  directory: string
-  children?: OperatorProps[]
-  icon?: string
-  model?: OperatorModelProps
+
+// export type OperatorConfigInputOutput = string
+
+export type OperatorConfigParam = {
+  [type: string]: {
+    name: string
+    type: string
+    default: string
+  }
 };

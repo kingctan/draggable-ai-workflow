@@ -12,7 +12,7 @@ body {
   font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
-button, input {
+button, input, textarea, label, .ant-select-selection {
   border-radius: 0 !important;
 
   &:focus {
@@ -20,10 +20,20 @@ button, input {
   }
 }
 
-.ft-left {
-  float: left;
+.spin {
+  margin: 30px;
 }
 
-.ft-right {
-  float: right;
+#UNIQUE_ID_OF_ACE_EDITOR {
+  width: 100% !important;
+  border: 1px solid #d9d9d9;
+  font-size: 14px;
+
+  .ace_print-margin-layer {
+    display: none !important;
+  }
+
+  *, div {
+    font-family: font-family-code;
+  }
 }

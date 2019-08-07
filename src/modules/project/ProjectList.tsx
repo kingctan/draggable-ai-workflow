@@ -79,7 +79,7 @@ const ProjectList: React.FC<Props> = (props) => {
 
   return (
     <div>
-      <div className="table-toolbar">
+      <div className="main-toolbar">
         <Link to="/project-detail">
           <Button type="primary"><Icon type="plus-square" /> 新增项目</Button>
         </Link>
@@ -87,7 +87,7 @@ const ProjectList: React.FC<Props> = (props) => {
           <Icon type="delete" /> 批量删除
         </Button>
         <Button onClick={handleRefresh}><Icon type="reload" /> 刷新</Button>
-        <div className="table-toolbar-right">
+        <div className="main-toolbar-right">
           <Input.Search value={filterVal} onChange={(e) => setFilterVal(e.target.value)} placeholder="搜索" />
         </div>
       </div>
