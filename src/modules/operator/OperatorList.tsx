@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Icon, message, Input, Spin } from 'antd';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { OperatorProps } from './OperatorProps';
+import { OperatorProps, OperatorModelProps } from './OperatorProps';
 
 type Props = {
 
@@ -56,7 +56,8 @@ const OperatorList: React.FC<Props> = (props) => {
           setLoading(false);
         }
       }).catch((err) => {
-        message.error('服务器被吃了..');
+        message.error('服务器被吃了..或传的路径出错');
+        (props as any).history.push(`/operator-list`);
       });
   };
 
@@ -64,6 +65,17 @@ const OperatorList: React.FC<Props> = (props) => {
     const pathItems = currentPath.split('/');
     const newPath = `${pathItems.slice(0, navItemIndex + 1).join('/')}`;
     (props as any).history.push(`/operator-list/${encodeURIComponent(newPath)}`);
+  };
+
+  const handleToDetail = (obj: OperatorProps) => {
+    let newPath: string;
+    if (!!obj.model) {
+      sessionStorage.setItem('OperatorListCurrentPath', currentPath);
+      newPath = `/operator-detail/${obj.model.componentID}`;
+    } else {
+      newPath = `/operator-list/${encodeURIComponent(obj.path)}`
+    }
+    (props as any).history.push(newPath);
   };
 
   useEffect(() => {
@@ -103,16 +115,26 @@ const OperatorList: React.FC<Props> = (props) => {
             (
               filter(list).length === 0 ? <NotFound content={`Oops.. 找不到名字包含 “${filterVal}” 的文件`} /> :
                 filter(list).map((item: OperatorProps, index: number) => (
-                  <Link
-                    to={`/operator-list/${item.model ? encodeURIComponent(currentPath) : encodeURIComponent(item.path)}`}
-                    key={index}
-                  >
-                    <Operator
-                      icon={item.icon}
-                      title={item.title}
-                      isDirectory={!!item.model}
-                    />
-                  </Link>
+                  // <Link
+                  //   to={
+                  //     item.model ?
+                  //       `/operator-detail/${item.model.componentID}` :
+                  //       `/operator-list/${item.model ? encodeURIComponent(currentPath) : encodeURIComponent(item.path)}`
+                  //   }
+                  //   key={index}
+                  // >
+                  <div className="operator" onClick={() => handleToDetail(item)}>
+                    <div className="operator-icon">
+                      {
+                        !!item.model ?
+                          <Icon type={item.icon || 'code'} style={{ color: 'rgba(0,0,0,.6)', fontSize: 40 }} /> :
+                          <Icon type="folder" theme="filled" style={{ color: '#00cdea' }} />
+                      }
+                    </div>
+                    <div className="operator-text">
+                      {item.title || 'Unknown'}
+                    </div>
+                  </div>
                 ))
             )
         }
