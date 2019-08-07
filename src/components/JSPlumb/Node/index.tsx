@@ -6,6 +6,9 @@ import React, {
 import { generateNodeId } from '../util';
 import './index.css';
 import { NodeProps, NodeState } from 'jsplumb-react';
+import { Popover, Button, Descriptions, Tag } from 'antd';
+import { OperatorModelProps } from '../../../modules/operator/OperatorProps';
+import { FlowNodeProps } from '../../../modules/workflow/WorkflowProps';
 
 const defaultDragSettings = {
 
@@ -56,9 +59,16 @@ type NodePropsFData = {
   type: 'both' | 'source' | 'target'
   icon: string
   label: string
-}
+};
 
-export default class Node extends PureComponent<NodeProps & NodePropsFData, NodeState> {
+type CustomNodeProps = {
+  model: OperatorModelProps
+  style: CSSProperties
+  onSelect: (selectedNode: FlowNodeProps) => void
+  onDelete: (nodeId: string) => void
+};
+
+export default class Node extends PureComponent<NodeProps & NodePropsFData & CustomNodeProps, NodeState> {
   public static propTypes = {
     allowLoopback: PropTypes.bool,
     children: PropTypes.func,
@@ -69,6 +79,7 @@ export default class Node extends PureComponent<NodeProps & NodePropsFData, Node
     onDrag: PropTypes.func,
     onDrop: PropTypes.func,
     onSelect: PropTypes.func,
+    onDelete: PropTypes.func,
     style: PropTypes.object,
     styleName: PropTypes.string,
     targetSettings: PropTypes.object,
@@ -132,7 +143,7 @@ export default class Node extends PureComponent<NodeProps & NodePropsFData, Node
   }
 
   public render() {
-    const { children, className, diagramId, id, style, styleName, type, label, icon } = this.props;
+    const { children, className, diagramId, id, style, styleName, type, label, icon, model, onDelete } = this.props;
     // const { drag } = this.state;
 
     return (
@@ -150,18 +161,36 @@ export default class Node extends PureComponent<NodeProps & NodePropsFData, Node
           <div>
             {children}
           </div>
-          <div className="right-keyword-wrapper" style={{ display: 'none' }}>
-            <div className="delete-icon">删除</div>
-            <div>不可用</div></div>
           <strong>
             <i className={`iconfont ${icon} node-icon`}></i>
             <span>{label}</span>
           </strong>
-          <span className="node-meta el-tooltip" >
-            ...
-          </span>
         </div>
+        <Popover
+          placement="rightBottom"
+          title="设置"
+          content={
+            <div style={{ maxWidth: 240 }}>
+              <Descriptions title="" column={1} size="small">
+                <Descriptions.Item label="输入">
+                  {model && model.inputs && Object.keys(model.inputs).map((key: string) => <Tag >{key} ({model.inputs[key].type})</Tag>)}
+                </Descriptions.Item>
+                <Descriptions.Item label="输出">
+                  {model && model.outputs && Object.keys(model.outputs).map((key: string) => <Tag >{key} ({model.outputs[key].type})</Tag>)}
+                </Descriptions.Item>
+                <Descriptions.Item label="操作">
+                  <Button type="danger" size="small" onClick={() => onDelete(id)}>删除</Button>
+                </Descriptions.Item>
+              </Descriptions>
+            </div>
+          }
+        >
+          <span className="node-meta el-tooltip">
+            ...
+            </span>
+        </Popover>
       </div>
+
     );
   }
 
@@ -201,7 +230,7 @@ export default class Node extends PureComponent<NodeProps & NodePropsFData, Node
   }
 
   private handleSelect = (multiSelect?: boolean) => {
-    const { jsPlumb, onSelect } = this.props;
+    const { jsPlumb, id, style, type, label, icon, model, onSelect } = this.props;
 
     if (!multiSelect) {
       // @ts-ignore
@@ -219,7 +248,7 @@ export default class Node extends PureComponent<NodeProps & NodePropsFData, Node
           node.params.id
         ));
 
-      onSelect(selections);
+      onSelect({ id, style, type, label, icon, model });
     }
   }
 

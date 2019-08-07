@@ -4,14 +4,14 @@ import { debounce } from 'lodash';
 import { v4 } from 'uuid';
 import { useDrop, DropTargetMonitor } from 'react-dnd'
 import { Graph, Node } from '../../components/JSPlumb';
-import { FlowNodeProps } from './WorkflowProps';
+import { FlowNodeProps, FlowNodesProps } from './WorkflowProps';
 import { XYCoord } from 'dnd-core';
 import { useMappedState } from 'redux-react-hook';
 import { Button, Icon, Tooltip, message } from 'antd';
 
 type Props = {};
 
-const flowNodes: FlowNodeProps = {};
+const flowNodes: FlowNodesProps = {};
 const flowConnections: any = [];
 
 const WorkflowStage: React.FC<Props> = (props) => {
@@ -26,6 +26,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
   const [nodes, setNodes] = useState<any>(flowNodes);
   const [xOffset, setXOffset] = useState<number>(0.0);
   const [yOffset, setYOffset] = useState<number>(0.0);
+  const [selectedNode, setSelectedNode] = useState<FlowNodeProps | null>(null);
   const [connections, setConnections] = useState<any>(flowConnections);
   // const nodes: FlowNodeProps = useMappedState(state => state.workflowReducer)  
 
@@ -74,6 +75,10 @@ const WorkflowStage: React.FC<Props> = (props) => {
     // }
   };
 
+  const handleDeleteNode = (nodeId: string) => {
+    console.log(nodeId);
+  };
+
   const handleSave = () => {
     console.log(`nodes: `, nodes);
     console.log(`connections: `, connections);
@@ -91,8 +96,8 @@ const WorkflowStage: React.FC<Props> = (props) => {
     setHeight(500);
   };
 
-  const handleSelectNode = (selected: string[]) => {
-    console.log(selected);
+  const handleSelectNode = (selectedNode: FlowNodeProps) => {
+    console.log(selectedNode);
   };
 
   // const handleDrop = (id: string, x: number, y: number) => {
@@ -113,14 +118,24 @@ const WorkflowStage: React.FC<Props> = (props) => {
       const relativeXOffset = clientOffset!.x - dropPlaceOffset.left;
       const relativeYOffset = clientOffset!.y - dropPlaceOffset.top;
 
-      console.log(item);
+      console.log(`✨拖动结束！`, item.name);
+
+      let type: 'both' | 'source' | 'target' = 'both';
+      if (item.name.model) {
+        if (!(item.name.model.inputs && Object.keys(item.name.model.inputs).length > 0)) {
+          type = 'source';
+        } else if (!(item.name.model.outputs && Object.keys(item.name.model.outputs).length > 0)) {
+          type = 'target';
+        }
+      }
 
       setNodes({
         ...nodes,
         [v4()]: {
           label: item.name.title,
           icon: 'icon-code1',
-          type: 'both',
+          type,
+          model: item.name.model,
           style: {
             left: relativeXOffset,
             top: relativeYOffset,
@@ -162,7 +177,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
           id={'simpleDiagram'}
           maxScale={MAX_SCALE}
           minScale={MIN_SCALE}
-          onSelect={handleSelectNode}
+          // onSelect={handleSelectNode}
           onAddConnection={handleAddConnection}
           onRemoveConnection={handleRemoveConnection}
           onPanEnd={handlePanEnd}
@@ -178,11 +193,17 @@ const WorkflowStage: React.FC<Props> = (props) => {
                 //@ts-ignore
                 <Node
                   id={id}
-                  key={id}
-                  // onDrop={handleDrop}
-                  style={nodes[id].style}
                   className="node"
-                  {...nodes[id]}
+                  key={id}
+                  type={nodes[id].type}
+                  icon={nodes[id].icon}
+                  label={nodes[id].label}
+                  model={nodes[id].model}
+                  // onDrop={handleDrop}
+                  //@ts-ignore
+                  onSelect={handleSelectNode}
+                  onDelete={handleDeleteNode}
+                  style={nodes[id].style}
                 >
                 </Node>
               );

@@ -1,10 +1,10 @@
 import { v4 } from 'uuid';
-import { FlowNodeProps } from './WorkflowProps';
+import { FlowNodesProps } from './WorkflowProps';
 
 export const ADD_NODE = 'ADD_NODE';
 export const REMOVE_NODE = 'REMOVE_NODE';
 
-const initialState: FlowNodeProps = {
+const initialState: FlowNodesProps = {
   [v4()]: {
     label: '数据',
     icon: 'icon-database',
@@ -25,7 +25,7 @@ const initialState: FlowNodeProps = {
   }
 };
 
-function workflowReducer(state: FlowNodeProps = initialState, action: any) {
+function workflowReducer(state: FlowNodesProps = initialState, action: any) {
   switch (action.type) {
     case ADD_NODE:
       const { label, icon, type, style } = action;

@@ -121,12 +121,12 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
             });
           });
           values.outputs = outputs;
-          Object.keys(values.params).forEach((name: string) => {
+          Object.keys(values.params).forEach((key: string) => {
             params.push({
-              name,
-              title: values.params[name].title,
-              type: values.params[name].type,
-              default: values.params[name].default,
+              key,
+              name: values.params[key].name,
+              type: values.params[key].type,
+              default: values.params[key].default,
             });
           });
           values.params = params;
@@ -166,9 +166,9 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
           note: item.note,
         }
       });
-      formValues.params && formValues.params.forEach((item: { name: string, title: string, type: string, default: string }) => {
-        params[item.name] = {
-          title: item.title,
+      formValues.params && formValues.params.forEach((item: { key: string, name: string, type: string, default: string }) => {
+        params[item.key] = {
+          name: item.name,
           type: item.type,
           default: item.default,
         }
@@ -391,7 +391,7 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
                     handleClick={() => handleRemoveParam(index)}
                   />
                   <Form.Item label="参数名称" required {...formItemLayout}>
-                    {getFieldDecorator(`params[${index}].name`, {
+                    {getFieldDecorator(`params[${index}].key`, {
                       initialValue: paramName,
                       rules: [
                         { required: true, message: '请填写参数名称' },
@@ -401,7 +401,7 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
                     )}
                   </Form.Item>
                   <Form.Item label="参数标题（展示）" required {...formItemLayout}>
-                    {getFieldDecorator(`params[${index}].title`, {
+                    {getFieldDecorator(`params[${index}].name`, {
                       initialValue: '',
                       rules: [
                         { required: true, message: '请填写参数标题（展示）' },

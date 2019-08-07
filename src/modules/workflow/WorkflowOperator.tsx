@@ -107,7 +107,7 @@ const WorkflowOperator: React.FC<Props> = (props) => {
           setNodes(newNodes);
           dataList = [];
           generateList(newNodes);
-          console.log(dataList);
+          // console.log(dataList);
         }
       }).catch((err) => {
         message.error('服务器被吃了..');
