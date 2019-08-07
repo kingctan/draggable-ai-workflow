@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import WorkflowOperator from '../workflow/WorkflowOperator';
@@ -12,6 +12,8 @@ type Props = {
 const ProjectDetail: React.FC<Props> = (props) => {
   const { } = props;
 
+  const [nodeConfig, setConfig] = useState(null);
+
   useEffect(() => {
 
   }, []);
@@ -20,10 +22,10 @@ const ProjectDetail: React.FC<Props> = (props) => {
     <div className="workflow">
       <DndProvider backend={HTML5Backend}>
         <WorkflowOperator />
-        {
-          //@ts-ignore
-          <WorkflowStage />
-        }
+
+        <WorkflowStage
+
+        />
         <WorkflowConf />
       </DndProvider>
 

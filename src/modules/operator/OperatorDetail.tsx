@@ -80,17 +80,16 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
   const handleAddParam = () => setConfParam([...confParam, generateUniqueName('param')]);
 
   const handleRemoveInput = (index: number) => {
-    if (confInput.length <= 1) return message.warning('请保证至少存在一个输入');
+    if (confInput.length + confOutput.length <= 1) return message.warning('请保证至少存在一个输入或输出');
     setConfInput([...confInput.slice(0, index), ...confInput.slice(index + 1)]);
   };
 
   const handleRemoveOutput = (index: number) => {
-    if (confOutput.length <= 1) return message.warning('请保证至少存在一个输出');
+    if (confOutput.length + confInput.length <= 1) return message.warning('请保证至少存在一个输入或输出');
     setConfOutput([...confOutput.slice(0, index), ...confOutput.slice(index + 1)]);
   };
 
   const handleRemoveParam = (index: number) => {
-    if (confParam.length <= 1) return message.warning('请保证至少存在一个可调参数');
     setConfParam([...confParam.slice(0, index), ...confParam.slice(index + 1)]);
   };
 
@@ -99,7 +98,7 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
       .then((res) => {
         if (res.data.code === 200) {
           const values = res.data.data;
-          console.log(values);
+          // console.log(values);
           setConfInput(Object.keys(values.inputs));
           setConfOutput(Object.keys(values.outputs));
           setConfParam(Object.keys(values.params));
@@ -134,6 +133,12 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
           setFieldsValue({
             ...values,
             directory: values.directory ? values.directory.slice(values.directory.lastIndexOf('/') + 1) : '',
+            code: '',
+          });
+          values.code && axios.get(values.code).then((res) => {
+            setFieldsValue({
+              code: res.data,
+            });
           });
         }
       }).catch((err) => {
@@ -148,19 +153,20 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
       const inputs: any = {};
       const outputs: any = {};
       const params: any = {};
-      formValues.inputs.forEach((item: { name: string, type: string, note: string }) => {
+      console.log(formValues);
+      formValues.inputs && formValues.inputs.forEach((item: { name: string, type: string, note: string }) => {
         inputs[item.name] = {
           type: item.type,
           note: item.note,
         }
       });
-      formValues.outputs.forEach((item: { name: string, type: string, note: string }) => {
+      formValues.outputs && formValues.outputs.forEach((item: { name: string, type: string, note: string }) => {
         outputs[item.name] = {
           type: item.type,
           note: item.note,
         }
       });
-      formValues.params.forEach((item: { name: string, title: string, type: string, default: string }) => {
+      formValues.params && formValues.params.forEach((item: { name: string, title: string, type: string, default: string }) => {
         params[item.name] = {
           title: item.title,
           type: item.type,

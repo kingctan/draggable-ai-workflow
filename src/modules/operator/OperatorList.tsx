@@ -54,6 +54,8 @@ const OperatorList: React.FC<Props> = (props) => {
           console.log(res.data.data);
           setList(res.data.data);
           setLoading(false);
+        } else {
+          (props as any).history.push(`/operator-list`);
         }
       }).catch((err) => {
         message.error('服务器被吃了..或传的路径出错');

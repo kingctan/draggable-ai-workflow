@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { AutoSizer } from 'react-virtualized';
-import CSSModules from 'react-css-modules';
 import { debounce } from 'lodash';
 import { v4 } from 'uuid';
 import { useDrop, DropTargetMonitor } from 'react-dnd'
@@ -10,38 +9,10 @@ import { XYCoord } from 'dnd-core';
 import { useMappedState } from 'redux-react-hook';
 import { Button, Icon, Tooltip, message } from 'antd';
 
-type Props = {
+type Props = {};
 
-};
-
-const flowNodes: FlowNodeProps = {
-  // [v4()]: {
-  //   label: '数据',
-  //   icon: 'icon-database',
-  //   type: 'source',
-  //   style: {
-  //     left: 272.5,
-  //     top: 233
-  //   },
-  // },
-  // [v4()]: {
-  //   label: '模型',
-  //   icon: 'icon-ziyuanshezhi',
-  //   type: 'target',
-  //   style: {
-  //     left: 372.5,
-  //     top: 233
-  //   }
-  // }
-};
-
-const flowConnections: any = [
-  // {
-  //   id: 'connection1',
-  //   source: 'node1',
-  //   target: 'node2'
-  // },
-];
+const flowNodes: FlowNodeProps = {};
+const flowConnections: any = [];
 
 const WorkflowStage: React.FC<Props> = (props) => {
   const { } = props;
@@ -53,10 +24,10 @@ const WorkflowStage: React.FC<Props> = (props) => {
   const [width, setWidth] = useState<number>(500);
   const [height, setHeight] = useState<number>(500);
   const [nodes, setNodes] = useState<any>(flowNodes);
-  // const nodes: FlowNodeProps = useMappedState(state => state.workflowReducer)
   const [xOffset, setXOffset] = useState<number>(0.0);
   const [yOffset, setYOffset] = useState<number>(0.0);
   const [connections, setConnections] = useState<any>(flowConnections);
+  // const nodes: FlowNodeProps = useMappedState(state => state.workflowReducer)  
 
   const handleResize = debounce(
     ({ height, width }: { height: number, width: number }) => {
@@ -73,7 +44,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
   };
 
   const handleZoom = (scale?: number | undefined) => {
-    console.log(scale);
+    // console.log(scale);
     setScale(scale!);
   };
 
@@ -104,7 +75,8 @@ const WorkflowStage: React.FC<Props> = (props) => {
   };
 
   const handleSave = () => {
-
+    console.log(`nodes: `, nodes);
+    console.log(`connections: `, connections);
   };
 
   const handlePlay = () => {
@@ -117,6 +89,10 @@ const WorkflowStage: React.FC<Props> = (props) => {
     setYOffset(0.0);
     setWidth(500);
     setHeight(500);
+  };
+
+  const handleSelectNode = (selected: string[]) => {
+    console.log(selected);
   };
 
   // const handleDrop = (id: string, x: number, y: number) => {
@@ -137,15 +113,13 @@ const WorkflowStage: React.FC<Props> = (props) => {
       const relativeXOffset = clientOffset!.x - dropPlaceOffset.left;
       const relativeYOffset = clientOffset!.y - dropPlaceOffset.top;
 
-      // console.log(item);
+      console.log(item);
 
-      // console.log(`横坐标相对便宜：`, relativeXOffset);
-      // console.log(`纵坐标相对便宜：`, relativeYOffset);
       setNodes({
         ...nodes,
         [v4()]: {
           label: item.name.title,
-          icon: 'icon-database',
+          icon: 'icon-code1',
           type: 'both',
           style: {
             left: relativeXOffset,
@@ -153,10 +127,6 @@ const WorkflowStage: React.FC<Props> = (props) => {
           },
         }
       });
-
-      return {
-        name: 'stage',
-      }
     },
     collect: monitor => ({
       isOver: monitor.isOver(),
@@ -178,7 +148,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
             <Tooltip placement="top" title="运行">
               <Button onClick={handlePlay}><Icon type="play-circle" theme="filled" />运行</Button>
             </Tooltip>
-            <Tooltip placement="top" title="画布重置">
+            <Tooltip placement="top" title="缩放重置">
               <Button onClick={handleReset}><Icon type="sync" /></Button>
             </Tooltip>
             <Tooltip placement="top" title="全屏">
@@ -192,6 +162,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
           id={'simpleDiagram'}
           maxScale={MAX_SCALE}
           minScale={MIN_SCALE}
+          onSelect={handleSelectNode}
           onAddConnection={handleAddConnection}
           onRemoveConnection={handleRemoveConnection}
           onPanEnd={handlePanEnd}
@@ -223,4 +194,4 @@ const WorkflowStage: React.FC<Props> = (props) => {
   );
 };
 
-export default CSSModules(WorkflowStage);
+export default WorkflowStage;
