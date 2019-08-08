@@ -6,13 +6,14 @@ import { useDrop, DropTargetMonitor } from 'react-dnd'
 import { Graph, Node } from '../../components/JSPlumb';
 import { FlowNodeProps, FlowNodesProps } from './WorkflowProps';
 import { XYCoord } from 'dnd-core';
-import { useMappedState } from 'redux-react-hook';
+import { useMappedState, useDispatch } from 'redux-react-hook';
 import { Button, Icon, Tooltip, message } from 'antd';
 import { generateNodeId } from '../../components/JSPlumb/util';
+import { ADD_NODE, REMOVE_NODE } from './workflowReducer';
 
 type Props = {
   projectId: number | null
-  changeNodeConfig: (nodeInfo: FlowNodeProps) => void
+  // changeNodeConfig: (nodeInfo: FlowNodeProps) => void
 };
 
 const flowNodes: FlowNodesProps = {};
@@ -21,7 +22,7 @@ const flowConnections: any = [];
 const MY_GRAPH_ID = 'simpleDiagram';
 
 const WorkflowStage: React.FC<Props> = (props) => {
-  const { projectId, changeNodeConfig } = props;
+  const { projectId } = props;
 
   const MAX_SCALE = 2;
   const MIN_SCALE = 0.5;
@@ -29,12 +30,14 @@ const WorkflowStage: React.FC<Props> = (props) => {
   const [scale, setScale] = useState<number>(1);
   const [width, setWidth] = useState<number>(500);
   const [height, setHeight] = useState<number>(500);
-  const [nodes, setNodes] = useState<any>(flowNodes);
+  // const [nodes, setNodes] = useState<any>(flowNodes);
   const [xOffset, setXOffset] = useState<number>(0.0);
   const [yOffset, setYOffset] = useState<number>(0.0);
-  const [selectedNode, setSelectedNode] = useState<FlowNodeProps | null>(null);
+  // const [selectedNode, setSelectedNode] = useState<FlowNodeProps | null>(null);
   const [connections, setConnections] = useState<any>(flowConnections);
-  // const nodes: FlowNodeProps = useMappedState(state => state.workflowReducer)  
+
+  const nodes: FlowNodesProps = useMappedState(state => state.workflowReducer)
+  const dispatch = useDispatch();
 
   const handleResize = debounce(
     ({ height, width }: { height: number, width: number }) => {
@@ -55,15 +58,15 @@ const WorkflowStage: React.FC<Props> = (props) => {
     setScale(scale!);
   };
 
-  const handleClose = (id: string | undefined) => {
-    if (id) {
-      const { [id]: omit, ...remaining } = nodes;
-      setNodes(remaining);
-      setConnections(connections.filter((connection: any) => (
-        connection.source !== id && connection.target !== id
-      )));
-    }
-  };
+  // const handleClose = (id: string | undefined) => {
+  //   if (id) {
+  //     const { [id]: omit, ...remaining } = nodes;
+  //     setNodes(remaining);
+  //     setConnections(connections.filter((connection: any) => (
+  //       connection.source !== id && connection.target !== id
+  //     )));
+  //   }
+  // };
 
   const handleAddConnection = (id: string, sourceId: string, targetId: string) => {
     console.log(id, sourceId, targetId);
@@ -83,9 +86,13 @@ const WorkflowStage: React.FC<Props> = (props) => {
 
   const handleDeleteNode = (nodeId: string) => {
     // console.log(nodeId);
-    const newNodes = { ...nodes };
-    delete newNodes[nodeId];
-    setNodes(newNodes);
+    // const newNodes = { ...nodes };
+    // delete newNodes[nodeId];
+    // setNodes(newNodes);
+    dispatch({
+      type: REMOVE_NODE,
+      nodeId,
+    });
   };
 
   const handleBeforeDrop = (sourceId: string, targetId: string) => {
@@ -129,7 +136,6 @@ const WorkflowStage: React.FC<Props> = (props) => {
   const [selectedNodeId, setSelectedNodeId] = useState<string | undefined | null>(null);
   const handleSelectNode = (selectedNode: FlowNodeProps) => {
     setSelectedNodeId(selectedNode.id);
-    changeNodeConfig(nodes[selectedNode.id]);
   };
 
   // const handleDrop = (id: string, x: number, y: number) => {
@@ -150,7 +156,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
       const relativeXOffset = clientOffset!.x - dropPlaceOffset.left;
       const relativeYOffset = clientOffset!.y - dropPlaceOffset.top;
 
-      console.log(`✨拖动结束！`, item.name);
+      // console.log(`✨拖动结束！`, item.name);
 
       let type: 'both' | 'source' | 'target' = 'both';
       if (item.name.model) {
@@ -161,9 +167,13 @@ const WorkflowStage: React.FC<Props> = (props) => {
         }
       }
 
-      setNodes({
-        ...nodes,
-        [generateNodeId(MY_GRAPH_ID, v4())]: {
+      const nodeId = generateNodeId(MY_GRAPH_ID, v4());
+
+      dispatch({
+        type: ADD_NODE,
+        nodeId,
+        nodeInfo: {
+          id: nodeId,
           label: item.name.title,
           icon: 'icon-code1',
           type,

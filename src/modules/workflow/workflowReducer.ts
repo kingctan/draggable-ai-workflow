@@ -8,23 +8,19 @@ const initialState: FlowNodesProps = {};
 
 function workflowReducer(state: FlowNodesProps = initialState, action: any) {
   switch (action.type) {
-    case ADD_NODE:
-      const { label, icon, type, style } = action;
-      const newNode = {
-        [v4()]: {
-          label,
-          icon,
-          type,
-          style,
-        }
-      };
+    case ADD_NODE: {
+      const { nodeId, nodeInfo } = action;
       return {
         ...state,
-        ...newNode,
+        [nodeId]: nodeInfo
       };
-    case REMOVE_NODE:
-      console.log('remove');
-      return state;
+    }
+    case REMOVE_NODE: {
+      const { nodeId } = action;
+      const newNodes = { ...state };
+      delete newNodes[nodeId];
+      return newNodes;
+    }
     default:
       return state;
   }

@@ -8,10 +8,20 @@ export type FlowNodeProps = {
   icon: string
   style: CSSProperties
   type: 'both' | 'source' | 'target'
-  model?: OperatorModelProps
+  model: OperatorModelProps
 };
 
 
 export type FlowNodesProps = {
-  [key: string]: FlowNodeProps
+  [nodeId: string]: FlowNodeProps
+};
+
+
+export type ParamConfigProps = {
+  [nodeId: string]: {
+    [key: string]: {
+      value: string
+      type: string
+    }
+  }
 };
