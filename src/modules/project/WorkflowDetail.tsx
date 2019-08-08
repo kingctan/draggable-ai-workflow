@@ -25,7 +25,7 @@ const WorkflowDetail: React.FC<Props> = (props) => {
   const handleSelectNode = (nodeId: string) => setSelectedNodeId(nodeId);
 
   const handelChangeParam = (nodeId: string, paramKey: string, paramValue: string) => {
-    console.log(nodeId, paramKey, paramValue);
+    // console.log(nodeId, paramKey, paramValue);
     dispatch({
       type: UPDATE_NODE_PARAM,
       nodeId,

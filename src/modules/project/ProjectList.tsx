@@ -69,9 +69,14 @@ const ProjectList: React.FC<Props> = (props) => {
     align: 'center',
     render: (text: string, row: ProjectProps) => (
       <span style={{ whiteSpace: 'nowrap' }}>
+        <Link to={`/workflow/${row.projectID}`}>
+          <p style={{ display: 'inline-block', margin: 0 }}>
+            工作流
+          </p>
+        </Link>
+        <Divider type="vertical" />
         <Link to={`/project-detail/${row.projectID}`}>
           <p style={{ display: 'inline-block', margin: 0 }}>
-            {/* <Icon type="edit" />  */}
             修改
           </p>
         </Link>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AutoSizer } from 'react-virtualized';
 import { debounce, findIndex } from 'lodash';
 import { v4 } from 'uuid';
+import axios from 'axios';
 import { useDrop, DropTargetMonitor } from 'react-dnd'
 import { Graph, Node } from '../../components/JSPlumb';
 import { FlowNodeProps, FlowNodesProps } from './WorkflowProps';
@@ -9,7 +10,7 @@ import { XYCoord } from 'dnd-core';
 import { useMappedState, useDispatch } from 'redux-react-hook';
 import { Button, Icon, Tooltip, message } from 'antd';
 import { generateNodeId } from '../../components/JSPlumb/util';
-import { ADD_NODE, REMOVE_NODE } from './workflowReducer';
+import { ADD_NODE, REMOVE_NODE, UPDATE_NODE_BY_CONNECTION } from './workflowReducer';
 
 type Props = {
   projectId: number | null
@@ -106,6 +107,11 @@ const WorkflowStage: React.FC<Props> = (props) => {
         if (source.model.outputs[targetInputKey]) canConnect = true;
       });
       if (canConnect) {
+        dispatch({
+          type: UPDATE_NODE_BY_CONNECTION,
+          sourceId,
+          targetId,
+        });
         return true;
       } else {
         message.warning('两个组件的输入输出不匹配，无法建立连接！');
@@ -117,13 +123,64 @@ const WorkflowStage: React.FC<Props> = (props) => {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     console.log(`nodes: `, nodes);
-    console.log(`connections: `, connections);
+    if (Object.keys(nodes).length === 0) return message.warning('未制作工作流..');
+    const graph: any = [];
+    Object.keys(nodes).forEach((nodeId: string) => {
+      const node: FlowNodeProps = nodes[nodeId];
+
+      const params: any = {};
+      Object.keys(nodes[nodeId].model.params).forEach((paramKey: string) => {
+        params[paramKey] = {
+          value: nodes[nodeId].model.params[paramKey].default,
+          type: nodes[nodeId].model.params[paramKey].type,
+        };
+      });
+
+      graph.push({
+        id: node.id,
+        name: node.label,
+        code: node.model.code,
+        container: node.model.container,
+        deps: node.deps || [],
+        fe: node.style,
+        inputs: node.inputRuntime,
+        outputs: node.outputRuntime,
+        params,
+      });
+    });
+    await axios.put(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/project/update`, {
+      projectID: projectId,
+      graph: {
+        version: "v1.0",
+        graph,
+      }
+    })
+      .then((res) => {
+        if (res.data.code === 200) {
+          return message.success('已保存');
+        } else {
+          return message.error('保存失败');
+        }
+      }).catch((err) => {
+        return message.error('服务器被吃了..');
+      });
   };
 
-  const handlePlay = () => {
-
+  const handlePlay = async () => {
+    if (Object.keys(nodes).length === 0) return message.warning('未制作工作流..');
+    await handleSave();
+    axios.post(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/job/create`, {
+      projectID: projectId,
+    })
+      .then((res) => {
+        if (res.data.code === 200) {
+          return message.success('已运行');
+        }
+      }).catch((err) => {
+        return message.error('服务器被吃了..');
+      });
   };
 
   const handleReset = () => {
@@ -185,6 +242,9 @@ const WorkflowStage: React.FC<Props> = (props) => {
           },
         }
       });
+
+      onSelectNode(nodeId);
+
     },
     collect: monitor => ({
       isOver: monitor.isOver(),

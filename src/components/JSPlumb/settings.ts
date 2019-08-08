@@ -69,7 +69,7 @@ export default {
             //@ts-ignore
             const plumb = this._jsPlumb.instance;
             //@ts-ignore
-            plumb.deleteConnection(this.component)
+            plumb.deleteConnection(this.component);
             // console.log(this);
           }
         },

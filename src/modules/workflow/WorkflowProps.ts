@@ -8,12 +8,28 @@ export type FlowNodeProps = {
   icon: string
   style: CSSProperties
   type: 'both' | 'source' | 'target'
+  deps?: string[]
+  inputRuntime?: InputRuntimeProps
+  outputRuntime?: OutputRuntimeProps
   model: OperatorModelProps
 };
 
-
 export type FlowNodesProps = {
   [nodeId: string]: FlowNodeProps
+};
+
+export type InputRuntimeProps = {
+  [key: string]: {
+    id: string
+    type: string
+    name: string
+  }
+};
+
+export type OutputRuntimeProps = {
+  [key: string]: {
+    type: string
+  }
 };
 
 

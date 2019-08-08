@@ -39,6 +39,7 @@ export type OperatorModelProps = {
   },
   createTime: number
   note: string
+  code: string
 };
 
 

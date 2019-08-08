@@ -465,14 +465,14 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
   ) => {
     if (!originalEvent) { return; }
 
-    this.handleRemoveConnection(
-      //@ts-ignore
-      connection.getParameter('id'),
-      //@ts-ignore
-      connection.getParameter('source'),
-      //@ts-ignore
-      connection.getParameter('target')
-    )();
+    // this.handleRemoveConnection(
+    //   //@ts-ignore
+    //   connection.getParameter('id'),
+    //   //@ts-ignore
+    //   connection.getParameter('source'),
+    //   //@ts-ignore
+    //   connection.getParameter('target')
+    // )();
   }
 
   private handleRemoveConnection = (
