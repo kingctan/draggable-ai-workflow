@@ -3,15 +3,41 @@ import { OperatorModelProps } from "../operator/OperatorProps";
 
 
 export type FlowNodeProps = {
-  id?: string
+  id: string
   label: string
   icon: string
   style: CSSProperties
   type: 'both' | 'source' | 'target'
-  model?: OperatorModelProps
+  deps?: string[]
+  inputRuntime?: InputRuntimeProps
+  outputRuntime?: OutputRuntimeProps
+  model: OperatorModelProps
+};
+
+export type FlowNodesProps = {
+  [nodeId: string]: FlowNodeProps
+};
+
+export type InputRuntimeProps = {
+  [key: string]: {
+    id: string
+    type: string
+    name: string
+  }
+};
+
+export type OutputRuntimeProps = {
+  [key: string]: {
+    type: string
+  }
 };
 
 
-export type FlowNodesProps = {
-  [key: string]: FlowNodeProps
+export type ParamConfigProps = {
+  [nodeId: string]: {
+    [key: string]: {
+      value: string
+      type: string
+    }
+  }
 };

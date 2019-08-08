@@ -1,10 +1,10 @@
 import { combineReducers } from 'redux';
 
-// import workflowReducer from '../modules/workflow/workflowReducer';
+import workflowReducer from '../modules/workflow/workflowReducer';
 
 
 const rootReducer = combineReducers({
-  // workflowReducer
+  workflowReducer
 });
 
 export default rootReducer;

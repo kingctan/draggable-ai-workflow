@@ -11,7 +11,12 @@ export type OperatorModelProps = {
   componentName: string
   directory: string
   params: {
-    [k: string]: any
+    [k: string]: {
+      name: string
+      type: string
+      default: string
+      value?: string
+    }
   },
   inputs: {
     [key: string]: {
@@ -34,6 +39,7 @@ export type OperatorModelProps = {
   },
   createTime: number
   note: string
+  code: string
 };
 
 

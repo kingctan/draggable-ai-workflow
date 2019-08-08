@@ -44,7 +44,7 @@ const ProjectList: React.FC<Props> = (props) => {
     key: 'projectName',
     dataIndex: 'projectName',
     render: (text: string, row: ProjectProps) => (
-      <Link to={`/workflow/${row.projectID}`} className="table-column-link">
+      <Link to={`/workflow${(row.graph && row.graph.graph) ? `/${row.projectID}` : ''}`} className="table-column-link">
         {text}
       </Link>
     )
@@ -59,9 +59,9 @@ const ProjectList: React.FC<Props> = (props) => {
     render: (text: { [k: string]: string }) => text.root || '',
   },
   {
-    title: '创建时间',
-    key: 'createTime',
-    dataIndex: 'createTime',
+    title: '更新时间',
+    key: 'updateTime',
+    dataIndex: 'updateTime',
     render: (text: number) => formatDate(new Date(text), 'MM/dd/yyyy, hh:mm:ss')
   }, {
     title: '操作',
@@ -69,9 +69,14 @@ const ProjectList: React.FC<Props> = (props) => {
     align: 'center',
     render: (text: string, row: ProjectProps) => (
       <span style={{ whiteSpace: 'nowrap' }}>
+        <Link to={`/workflow${(row.graph && row.graph.graph) ? `/${row.projectID}` : ''}`}>
+          <p style={{ display: 'inline-block', margin: 0 }}>
+            工作流
+          </p>
+        </Link>
+        <Divider type="vertical" />
         <Link to={`/project-detail/${row.projectID}`}>
           <p style={{ display: 'inline-block', margin: 0 }}>
-            {/* <Icon type="edit" />  */}
             修改
           </p>
         </Link>

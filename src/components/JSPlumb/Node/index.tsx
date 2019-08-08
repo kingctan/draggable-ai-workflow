@@ -62,6 +62,7 @@ type NodePropsFData = {
 };
 
 type CustomNodeProps = {
+  selectedActive: boolean
   model: OperatorModelProps
   style: CSSProperties
   onSelect: (selectedNode: FlowNodeProps) => void
@@ -148,7 +149,7 @@ export default class Node extends PureComponent<NodeProps & NodePropsFData & Cus
 
     return (
       <div
-        className={`${className} ${styleName ? styleName : ''}`}
+        className={`${className} ${styleName ? styleName : ''} ${this.props.selectedActive ? 'node-selected' : ''}`}
         id={generateNodeId(diagramId!, id)}
         onPointerUp={this.handlePrevent}
         onPointerDown={this.handlePointerDown}

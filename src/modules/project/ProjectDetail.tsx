@@ -1,26 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { Button, Icon, Table, Modal, Divider, Input, Form, message, Spin } from 'antd';
+import { Button, Icon, Input, Form, message, Spin } from 'antd';
 
-import { ProjectProps } from './ProjectProps';
 import { FormComponentProps } from 'antd/lib/form';
 import { formItemLayout, tailFormItemLayout } from '../../utils/FormLayout';
 
-type Props = {
+type Props = {};
 
-};
-
-interface ProjectDetailProps extends FormComponentProps {
-
-};
-
-
+interface ProjectDetailProps extends FormComponentProps { };
 
 const ProjectDetail: React.FC<Props & ProjectDetailProps> = (props) => {
   const { } = props;
 
-  const { getFieldDecorator, validateFields, getFieldValue, getFieldsValue, setFieldsValue } = props.form;
+  const { getFieldDecorator, validateFields, getFieldsValue, setFieldsValue } = props.form;
   const { projectId } = (props as any).match.params;
 
   const [loading, setLoading] = useState(false);

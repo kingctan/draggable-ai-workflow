@@ -42,7 +42,7 @@ const MyDivider: React.SFC<{ visible: boolean }> = ({ visible }) => (
     </Form.Item> : null
 );
 
-const COMPONENT_TYPES = ['数据', '数据处理', '算法', '评估', '报表'];
+const COMPONENT_TYPES = ['数据', '数据处理', '算法', '评估', '模型', '报表'];
 const INPUT_OUTPUT_TYPES = ['Dataset', 'RawData', 'Model', 'Log'];
 const PARAM_TYPES = [{
   value: 'boolean',
@@ -133,7 +133,7 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
           setFieldsValue({
             ...values,
             directory: values.directory ? values.directory.slice(values.directory.lastIndexOf('/') + 1) : '',
-            code: '',
+            code: PRESET_CODE,
           });
           values.code && axios.get(values.code).then((res) => {
             setFieldsValue({
@@ -241,9 +241,12 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
         <Button type="primary" onClick={handelSubmit} style={{ marginLeft: 10 }}>
           <Icon type="check" /> 确认保存
         </Button>
-        <Button type="danger" onClick={handleDelete}>
-          <Icon type="delete" /> 删除
-        </Button>
+        {
+          componentId &&
+          <Button type="danger" onClick={handleDelete}>
+            <Icon type="delete" /> 删除
+          </Button>
+        }
         {
           tab === 'input' &&
           <Button onClick={handleAddInput}><Icon type="plus-square" /> 新增输入</Button>
@@ -424,12 +427,9 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
                       </Select>
                     )}
                   </Form.Item>
-                  <Form.Item label="参数默认值" required {...formItemLayout}>
+                  <Form.Item label="参数默认值"  {...formItemLayout}>
                     {getFieldDecorator(`params[${index}].default`, {
                       initialValue: '',
-                      rules: [
-                        { required: true, message: '请选择参数默认值' },
-                      ],
                     })(
                       <Input />
                     )}
@@ -505,7 +505,7 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
           <Tabs.TabPane tab="代码" key="code" style={styles.tabPaneStyle}>
             <Form.Item >
               {getFieldDecorator('code', {
-                initialValue: '',
+                initialValue: PRESET_CODE,
                 rules: [
                   { required: true, message: '请填写代码' },
                 ],
@@ -539,6 +539,22 @@ const styles = {
     marginBottom: 0,
   }
 };
+
+const PRESET_CODE = `
+# -*- coding: utf-8 -*-
+# 规则：
+# runner函数为固定入口，请勿修改
+# kwargs参数会传入组件的Param和Inputs，字典形式存储
+# return返回是组件的Outputs，key值必须和你的Outputs名称一致
+
+import time
+
+def runner(**kwargs):
+    print("Got kwargs: {}".format(kwargs))
+    #  开始书写您的代码
+
+    return {}
+`;
 
 export default Form.create<OperatorDetailProps>({
   name: 'OperatorDetail',
