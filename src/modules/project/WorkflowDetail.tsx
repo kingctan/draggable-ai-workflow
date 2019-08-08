@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { DndProvider } from 'react-dnd';
-import axios from 'axios';
 import HTML5Backend from 'react-dnd-html5-backend';
 import WorkflowOperator from '../workflow/WorkflowOperator';
 import WorkflowStage from '../workflow/WorkflowStage';
 import WorkflowConf from '../workflow/WorkflowConf';
-import { FlowNodeProps, ParamConfigProps } from '../workflow/WorkflowProps';
 import { useDispatch } from 'redux-react-hook';
 import { UPDATE_NODE_PARAM, CLEAR_NODES } from '../workflow/workflowReducer';
 
@@ -33,6 +31,8 @@ const WorkflowDetail: React.FC<Props> = (props) => {
       paramValue,
     });
   };
+
+
 
   useEffect(() => {
     return () => {

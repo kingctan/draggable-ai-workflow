@@ -4,8 +4,7 @@ import { FlowNodesProps } from './WorkflowProps';
 export const ADD_NODE = 'ADD_NODE';
 export const UPDATE_NODE_PARAM = 'UPDATE_NODE_PARAM';
 export const UPDATE_NODE_BY_CONNECTION = 'UPDATE_NODE_BY_CONNECTION';
-export const UPDATE_NODE_INPUTS_RUNTIME = 'UPDATE_NODE_INPUTS_RUNTIME';
-export const UPDATE_NODE_OUTPUTS_RUNTIME = 'UPDATE_NODE_OUTPUTS_RUNTIME';
+export const UPDATE_NODE_STYLE = 'UPDATE_NODE_STYLE';
 export const REMOVE_NODE = 'REMOVE_NODE';
 export const CLEAR_NODES = 'CLEAR_NODES';
 
@@ -65,6 +64,16 @@ function workflowReducer(state: FlowNodesProps = initialState, action: any) {
 
       return willUpdateNodes;
     }
+
+    case UPDATE_NODE_STYLE: {
+      const { nodeId, left, top } = action;
+      const willUpdateNode = { ...state };
+
+      willUpdateNode[nodeId].style = { left, top }
+
+      return willUpdateNode;
+    }
+
     case REMOVE_NODE: {
       const { nodeId } = action;
       const willUpdateNodes = { ...state };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AutoSizer } from 'react-virtualized';
 import { debounce, findIndex } from 'lodash';
 import { v4 } from 'uuid';
@@ -10,7 +10,7 @@ import { XYCoord } from 'dnd-core';
 import { useMappedState, useDispatch } from 'redux-react-hook';
 import { Button, Icon, Tooltip, message } from 'antd';
 import { generateNodeId } from '../../components/JSPlumb/util';
-import { ADD_NODE, REMOVE_NODE, UPDATE_NODE_BY_CONNECTION } from './workflowReducer';
+import { ADD_NODE, REMOVE_NODE, UPDATE_NODE_BY_CONNECTION, UPDATE_NODE_STYLE } from './workflowReducer';
 
 type Props = {
   projectId: number | null
@@ -21,13 +21,15 @@ type Props = {
 const flowNodes: FlowNodesProps = {};
 const flowConnections: any = [];
 
+const MAX_SCALE = 2;
+const MIN_SCALE = 0.5;
 const MY_GRAPH_ID = 'simpleDiagram';
 
 const WorkflowStage: React.FC<Props> = (props) => {
   const { projectId, selectedNodeId, onSelectNode } = props;
 
-  const MAX_SCALE = 2;
-  const MIN_SCALE = 0.5;
+  const [loadingForSave, setLoadingForSave] = useState(false);
+  const [loadingForRun, setLoadingForRun] = useState(false);
 
   const [scale, setScale] = useState<number>(1);
   const [width, setWidth] = useState<number>(500);
@@ -125,8 +127,12 @@ const WorkflowStage: React.FC<Props> = (props) => {
 
   const handleSave = async () => {
     console.log(`nodes: `, nodes);
+
     if (Object.keys(nodes).length === 0) return message.warning('未制作工作流..');
+
     const graph: any = [];
+    setLoadingForSave(true);
+
     Object.keys(nodes).forEach((nodeId: string) => {
       const node: FlowNodeProps = nodes[nodeId];
 
@@ -145,6 +151,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
         container: node.model.container,
         deps: node.deps || [],
         fe: node.style,
+        model: node.model,
         inputs: node.inputRuntime,
         outputs: node.outputRuntime,
         params,
@@ -158,27 +165,36 @@ const WorkflowStage: React.FC<Props> = (props) => {
       }
     })
       .then((res) => {
+        setLoadingForSave(false);
         if (res.data.code === 200) {
           return message.success('已保存');
         } else {
           return message.error('保存失败');
         }
       }).catch((err) => {
+        setLoadingForSave(false);
         return message.error('服务器被吃了..');
       });
   };
 
   const handlePlay = async () => {
     if (Object.keys(nodes).length === 0) return message.warning('未制作工作流..');
+
+    setLoadingForRun(true);
     await handleSave();
+
     axios.post(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/job/create`, {
       projectID: projectId,
     })
       .then((res) => {
         if (res.data.code === 200) {
-          return message.success('已运行');
+          setLoadingForRun(false);
+          return message.success('已运行，可前往实例列表查看任务');
+        } else {
+          return message.error('运行失败');
         }
       }).catch((err) => {
+        setLoadingForRun(false);
         return message.error('服务器被吃了..');
       });
   };
@@ -191,17 +207,35 @@ const WorkflowStage: React.FC<Props> = (props) => {
     setHeight(500);
   };
 
-
   const handleSelectNode = (selectedNode: FlowNodeProps) => {
     onSelectNode(selectedNode.id);
   };
 
-  // const handleDrop = (id: string, x: number, y: number) => {
-  //   setNodes({
-  //     ...nodes,
-  //     [id]: { ...nodes[id], x, y }
-  //   });
-  // };
+  const handleDrop = (id: string, x: number, y: number) => {
+    // setNodes({
+    //   ...nodes,
+    //   [id]: { ...nodes[id], x, y }
+    // });
+    dispatch({
+      type: UPDATE_NODE_STYLE,
+      nodeId: id,
+      left: x,
+      top: y
+    });
+    console.log(id, x, y);
+  };
+
+  const generateNodeType = (node: FlowNodeProps) => {
+    let type: 'both' | 'source' | 'target' = 'both';
+    if (node.model) {
+      if (!(node.model.inputs && Object.keys(node.model.inputs).length > 0)) {
+        type = 'source';
+      } else if (!(node.model.outputs && Object.keys(node.model.outputs).length > 0)) {
+        type = 'target';
+      }
+    }
+    return type;
+  };
 
   const [{ canDrop, isOver }, drop] = useDrop({
     accept: 'box',
@@ -215,16 +249,6 @@ const WorkflowStage: React.FC<Props> = (props) => {
       const relativeYOffset = clientOffset!.y - dropPlaceOffset.top;
 
       // console.log(`✨拖动结束！`, item.name);
-
-      let type: 'both' | 'source' | 'target' = 'both';
-      if (item.name.model) {
-        if (!(item.name.model.inputs && Object.keys(item.name.model.inputs).length > 0)) {
-          type = 'source';
-        } else if (!(item.name.model.outputs && Object.keys(item.name.model.outputs).length > 0)) {
-          type = 'target';
-        }
-      }
-
       const nodeId = generateNodeId(MY_GRAPH_ID, v4());
 
       dispatch({
@@ -234,7 +258,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
           id: nodeId,
           label: item.name.title,
           icon: 'icon-code1',
-          type,
+          type: generateNodeType(item.name),
           model: item.name.model,
           style: {
             left: relativeXOffset,
@@ -252,6 +276,40 @@ const WorkflowStage: React.FC<Props> = (props) => {
     }),
   });
 
+  const getWorkflowInfo = () => {
+    axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/project/get?projectID=${projectId}`)
+      .then((res) => {
+        if (res.data.code === 200) {
+          const graph = res.data.data.graph.graph;
+          graph.forEach((item: any) => {
+            dispatch({
+              type: ADD_NODE,
+              nodeId: item.id,
+              nodeInfo: {
+                id: item.id,
+                label: item.name,
+                icon: 'icon-code1',
+                type: generateNodeType(item),
+                model: item.model,
+                style: {
+                  left: item.fe.left || 0,
+                  top: item.fe.top || 0,
+                },
+              }
+            });
+          });
+        }
+      }).catch((err) => {
+        message.error('服务器被吃了..');
+      });
+  };
+
+  useEffect(() => {
+    if (projectId) {
+      getWorkflowInfo();
+    }
+  }, []);
+
   return (
     <div className="workflow-stage">
       <AutoSizer onResize={handleResize}>
@@ -261,10 +319,14 @@ const WorkflowStage: React.FC<Props> = (props) => {
         <div className="stage-toolbar">
           <Button.Group>
             <Tooltip placement="top" title="保存">
-              <Button onClick={handleSave}><Icon type="save" theme="filled" />保存</Button>
+              <Button onClick={handleSave}>
+                {loadingForSave ? <Icon type="loading" /> : <Icon type="save" theme="filled" />} 保存
+              </Button>
             </Tooltip>
             <Tooltip placement="top" title="运行">
-              <Button onClick={handlePlay}><Icon type="play-circle" theme="filled" />运行</Button>
+              <Button onClick={handlePlay} >
+                {loadingForRun ? <Icon type="loading" /> : <Icon type="play-circle" theme="filled" />} 运行
+              </Button>
             </Tooltip>
             <Tooltip placement="top" title="缩放重置">
               <Button onClick={handleReset}><Icon type="sync" /></Button>
@@ -305,7 +367,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
                   icon={nodes[id].icon}
                   label={nodes[id].label}
                   model={nodes[id].model}
-                  // onDrop={handleDrop}
+                  onDrop={handleDrop}
                   //@ts-ignore
                   onSelect={handleSelectNode}
                   onDelete={handleDeleteNode}
