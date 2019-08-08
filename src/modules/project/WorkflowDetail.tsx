@@ -5,6 +5,7 @@ import HTML5Backend from 'react-dnd-html5-backend';
 import WorkflowOperator from '../workflow/WorkflowOperator';
 import WorkflowStage from '../workflow/WorkflowStage';
 import WorkflowConf from '../workflow/WorkflowConf';
+import { FlowNodeProps } from '../workflow/WorkflowProps';
 
 type Props = {
 
@@ -15,7 +16,9 @@ const WorkflowDetail: React.FC<Props> = (props) => {
 
   const { projectId } = (props as any).match.params;
 
-  const [nodeConfig, setConfig] = useState(null);
+  const [selectedNodeInfo, setSelectedNodeInfo] = useState<FlowNodeProps | undefined>(undefined);
+
+  const changeNodeConfig = (nodeInfo: FlowNodeProps) => setSelectedNodeInfo(nodeInfo);
 
   useEffect(() => {
   }, []);
@@ -24,9 +27,17 @@ const WorkflowDetail: React.FC<Props> = (props) => {
     <div className="workflow">
       <DndProvider backend={HTML5Backend}>
         <WorkflowOperator />
+        <WorkflowStage
+          changeNodeConfig={changeNodeConfig}
+          projectId={projectId ? Number(projectId) : null}
+        />
+        {
+          //@ts-ignore
+          <WorkflowConf
+            nodeInfo={selectedNodeInfo}
+          />
+        }
 
-        <WorkflowStage projectId={projectId ? Number(projectId) : null} />
-        <WorkflowConf />
       </DndProvider>
 
     </div>

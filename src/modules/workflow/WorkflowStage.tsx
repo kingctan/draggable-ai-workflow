@@ -10,7 +10,10 @@ import { useMappedState } from 'redux-react-hook';
 import { Button, Icon, Tooltip, message } from 'antd';
 import { generateNodeId } from '../../components/JSPlumb/util';
 
-type Props = { projectId: number | null };
+type Props = {
+  projectId: number | null
+  changeNodeConfig: (nodeInfo: FlowNodeProps) => void
+};
 
 const flowNodes: FlowNodesProps = {};
 const flowConnections: any = [];
@@ -18,7 +21,7 @@ const flowConnections: any = [];
 const MY_GRAPH_ID = 'simpleDiagram';
 
 const WorkflowStage: React.FC<Props> = (props) => {
-  const { projectId } = props;
+  const { projectId, changeNodeConfig } = props;
 
   const MAX_SCALE = 2;
   const MIN_SCALE = 0.5;
@@ -126,6 +129,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
   const [selectedNodeId, setSelectedNodeId] = useState<string | undefined | null>(null);
   const handleSelectNode = (selectedNode: FlowNodeProps) => {
     setSelectedNodeId(selectedNode.id);
+    changeNodeConfig(nodes[selectedNode.id]);
   };
 
   // const handleDrop = (id: string, x: number, y: number) => {

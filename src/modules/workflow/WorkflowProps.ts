@@ -3,7 +3,7 @@ import { OperatorModelProps } from "../operator/OperatorProps";
 
 
 export type FlowNodeProps = {
-  id?: string
+  id: string
   label: string
   icon: string
   style: CSSProperties
