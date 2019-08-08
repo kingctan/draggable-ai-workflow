@@ -133,7 +133,7 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
           setFieldsValue({
             ...values,
             directory: values.directory ? values.directory.slice(values.directory.lastIndexOf('/') + 1) : '',
-            code: '',
+            code: PRESET_CODE,
           });
           values.code && axios.get(values.code).then((res) => {
             setFieldsValue({
@@ -505,7 +505,7 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
           <Tabs.TabPane tab="代码" key="code" style={styles.tabPaneStyle}>
             <Form.Item >
               {getFieldDecorator('code', {
-                initialValue: '',
+                initialValue: PRESET_CODE,
                 rules: [
                   { required: true, message: '请填写代码' },
                 ],
@@ -539,6 +539,22 @@ const styles = {
     marginBottom: 0,
   }
 };
+
+const PRESET_CODE = `
+# -*- coding: utf-8 -*-
+# 规则：
+# runner函数为固定入口，请勿修改
+# kwargs参数会传入组件的Param和Inputs，字典形式存储
+# return返回是组件的Outputs，key值必须和你的Outputs名称一致
+
+import time
+
+def runner(**kwargs):
+    print("Got kwargs: {}".format(kwargs))
+    #  开始书写您的代码
+
+    return {}
+`;
 
 export default Form.create<OperatorDetailProps>({
   name: 'OperatorDetail',

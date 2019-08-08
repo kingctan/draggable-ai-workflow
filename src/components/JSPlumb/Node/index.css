@@ -90,7 +90,7 @@
   z-index: 21;
 }
 
-.node.jtk-drag-selected {
+.node-selected {
   z-index: 3;
   border: solid 1px #5C87FF;
   color: #5C87FF;
@@ -100,12 +100,12 @@
   z-index: 4;
 }
 
-.node.jtk-drag-selected .dot-rect-top,
-.node.jtk-drag-selected .dot-rect-bottom {
+.node-selected .dot-rect-top,
+.node-selected .dot-rect-bottom {
   border-color: #5C87FF;
 }
 
-.node.jtk-drag-selected .node-meta {
+.node-selected .node-meta {
   background: #5C87FF;
 }
 

@@ -11,7 +11,11 @@ export type OperatorModelProps = {
   componentName: string
   directory: string
   params: {
-    [k: string]: any
+    [k: string]: {
+      name: string
+      type: string
+      default: string
+    }
   },
   inputs: {
     [key: string]: {

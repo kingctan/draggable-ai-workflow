@@ -89,13 +89,19 @@ const WorkflowStage: React.FC<Props> = (props) => {
     const source = nodes[sourceId];
     const target = nodes[targetId];
     let canConnect = false;
-    Object.keys(target.model.inputs).forEach((targetInputKey: string) => {
-      if (source.model.outputs[targetInputKey]) canConnect = true;
-    });
-    if (canConnect) {
-      return true;
+    if (target.model && source.model) {
+      Object.keys(target.model.inputs).forEach((targetInputKey: string) => {
+        console.log(source.model.outputs[targetInputKey]);
+        if (source.model.outputs[targetInputKey]) canConnect = true;
+      });
+      if (canConnect) {
+        return true;
+      } else {
+        message.warning('两个组件的输入输出不匹配，无法建立连接！');
+        return false;
+      }
     } else {
-      message.warning('两个组件的输入输出不匹配，无法建立连接');
+      message.warning('无法建议连接：请使用自定义组件并配置至少一个输入或输出，其它组件暂时只做展示！', 6);
       return false;
     }
   };
@@ -117,8 +123,9 @@ const WorkflowStage: React.FC<Props> = (props) => {
     setHeight(500);
   };
 
+  const [selectedNodeId, setSelectedNodeId] = useState<string | undefined | null>(null);
   const handleSelectNode = (selectedNode: FlowNodeProps) => {
-    console.log(selectedNode);
+    setSelectedNodeId(selectedNode.id);
   };
 
   // const handleDrop = (id: string, x: number, y: number) => {
@@ -217,6 +224,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
                 <Node
                   id={id}
                   className="node"
+                  selectedActive={id === selectedNodeId}
                   key={id}
                   type={nodes[id].type}
                   icon={nodes[id].icon}

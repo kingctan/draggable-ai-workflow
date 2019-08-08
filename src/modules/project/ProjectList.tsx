@@ -59,9 +59,9 @@ const ProjectList: React.FC<Props> = (props) => {
     render: (text: { [k: string]: string }) => text.root || '',
   },
   {
-    title: '创建时间',
-    key: 'createTime',
-    dataIndex: 'createTime',
+    title: '更新时间',
+    key: 'updateTime',
+    dataIndex: 'updateTime',
     render: (text: number) => formatDate(new Date(text), 'MM/dd/yyyy, hh:mm:ss')
   }, {
     title: '操作',
