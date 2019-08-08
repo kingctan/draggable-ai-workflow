@@ -168,7 +168,7 @@ export default class Node extends PureComponent<NodeProps & NodePropsFData & Cus
         </div>
         <Popover
           placement="rightBottom"
-          title="设置"
+          title={label}
           content={
             <div style={{ maxWidth: 240 }}>
               <Descriptions title="" column={1} size="small">
@@ -187,7 +187,7 @@ export default class Node extends PureComponent<NodeProps & NodePropsFData & Cus
         >
           <span className="node-meta el-tooltip">
             ...
-            </span>
+          </span>
         </Popover>
       </div>
 

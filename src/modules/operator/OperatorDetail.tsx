@@ -7,7 +7,7 @@ import AceEditor from 'react-ace';
 import 'brace/mode/python';
 import 'brace/theme/tomorrow';
 import 'brace/ext/language_tools';
-import 'brace/snippets/python';
+// import 'brace/snippets/python';
 import { formItemLayout, tailFormItemLayout } from '../../utils/FormLayout';
 import { Link } from 'react-router-dom';
 import { OperatorConfigParam } from './OperatorProps';
@@ -517,8 +517,8 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
                   name="UNIQUE_ID_OF_ACE_EDITOR"
                   style={{ height: 600, lineHeight: 1.4 }}
                   editorProps={{ $blockScrolling: true }}
-                  enableBasicAutocompletion={true}
-                  enableLiveAutocompletion={true}
+                // enableBasicAutocompletion={true}
+                // enableLiveAutocompletion={true}
                 />
               )}
             </Form.Item>

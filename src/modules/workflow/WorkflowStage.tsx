@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AutoSizer } from 'react-virtualized';
-import { debounce } from 'lodash';
+import { debounce, findIndex } from 'lodash';
 import { v4 } from 'uuid';
 import { useDrop, DropTargetMonitor } from 'react-dnd'
 import { Graph, Node } from '../../components/JSPlumb';
@@ -8,14 +8,17 @@ import { FlowNodeProps, FlowNodesProps } from './WorkflowProps';
 import { XYCoord } from 'dnd-core';
 import { useMappedState } from 'redux-react-hook';
 import { Button, Icon, Tooltip, message } from 'antd';
+import { generateNodeId } from '../../components/JSPlumb/util';
 
-type Props = {};
+type Props = { projectId: number | null };
 
 const flowNodes: FlowNodesProps = {};
 const flowConnections: any = [];
 
+const MY_GRAPH_ID = 'simpleDiagram';
+
 const WorkflowStage: React.FC<Props> = (props) => {
-  const { } = props;
+  const { projectId } = props;
 
   const MAX_SCALE = 2;
   const MIN_SCALE = 0.5;
@@ -59,12 +62,12 @@ const WorkflowStage: React.FC<Props> = (props) => {
     }
   };
 
-  const handleAddConnection = (id: string, source: string, target: string) => {
-    console.log({ id, source, target })
-    setConnections([
-      ...connections,
-      { id, source, target }
-    ]);
+  const handleAddConnection = (id: string, sourceId: string, targetId: string) => {
+    console.log(id, sourceId, targetId);
+    // setConnections([
+    //   ...connections,
+    //   { id, source, target }
+    // ]);
   };
 
   const handleRemoveConnection = (connectionId?: string, sourceId?: string) => {
@@ -76,7 +79,25 @@ const WorkflowStage: React.FC<Props> = (props) => {
   };
 
   const handleDeleteNode = (nodeId: string) => {
-    console.log(nodeId);
+    // console.log(nodeId);
+    const newNodes = { ...nodes };
+    delete newNodes[nodeId];
+    setNodes(newNodes);
+  };
+
+  const handleBeforeDrop = (sourceId: string, targetId: string) => {
+    const source = nodes[sourceId];
+    const target = nodes[targetId];
+    let canConnect = false;
+    Object.keys(target.model.inputs).forEach((targetInputKey: string) => {
+      if (source.model.outputs[targetInputKey]) canConnect = true;
+    });
+    if (canConnect) {
+      return true;
+    } else {
+      message.warning('两个组件的输入输出不匹配，无法建立连接');
+      return false;
+    }
   };
 
   const handleSave = () => {
@@ -131,7 +152,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
 
       setNodes({
         ...nodes,
-        [v4()]: {
+        [generateNodeId(MY_GRAPH_ID, v4())]: {
           label: item.name.title,
           icon: 'icon-code1',
           type,
@@ -174,10 +195,12 @@ const WorkflowStage: React.FC<Props> = (props) => {
         <Graph
           connections={connections}
           height={height}
-          id={'simpleDiagram'}
+          id={MY_GRAPH_ID}
           maxScale={MAX_SCALE}
           minScale={MIN_SCALE}
           // onSelect={handleSelectNode}
+          // do something when connect two endpoints
+          onBeforeDrop={handleBeforeDrop}
           onAddConnection={handleAddConnection}
           onRemoveConnection={handleRemoveConnection}
           onPanEnd={handlePanEnd}

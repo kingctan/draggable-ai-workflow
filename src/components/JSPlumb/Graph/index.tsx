@@ -12,7 +12,12 @@ import Close from '../Close';
 import Portals from '../Portals';
 
 const PanAndZoom = panAndZoomHoc('div');
-export default class Graph extends PureComponent<GraphProps, GraphState> {
+
+type customProps = {
+  onBeforeDrop: (sourceId: string, targetId: string) => void
+};
+
+export default class Graph extends PureComponent<GraphProps & customProps, GraphState> {
   public static propTypes = {
     bridge: PropTypes.oneOfType([
       PropTypes.func,
@@ -32,6 +37,7 @@ export default class Graph extends PureComponent<GraphProps, GraphState> {
     maxScale: PropTypes.number,
     minScale: PropTypes.number,
     onAddConnection: PropTypes.func,
+    onBeforeDrop: PropTypes.func,
     onPanAndZoom: PropTypes.func,
     onPanEnd: PropTypes.func,
     onPanMove: PropTypes.func,
@@ -91,7 +97,7 @@ export default class Graph extends PureComponent<GraphProps, GraphState> {
   //@ts-ignore
   private timeout: NodeJS.Timer;
 
-  public constructor(props: GraphProps) {
+  public constructor(props: GraphProps & customProps) {
     super(props);
 
     this.jsPlumb = jsPlumb.getInstance({
@@ -106,14 +112,15 @@ export default class Graph extends PureComponent<GraphProps, GraphState> {
     this.jsPlumb.ready(() => {
       // @ts-ignore
       this.jsPlumb.endpointAnchorClass = 'rja_';
-      // this.jsPlumb.bind('connection', this.handleNewConnection);
+      this.jsPlumb.bind('connection', this.handleNewConnection);
+      this.jsPlumb.bind('beforeDrop', (info) => this.props.onBeforeDrop(info.sourceId, info.targetId));
       // @ts-ignore
       // this.jsPlumb.bind('connectionDetached', this.handleDetachedConnection);
 
       this.jsPlumb.bind('connectionDragStop', (connection: any) => {
         connection.getOverlay("label-connector").show();
-        connection.bind("click", function (conn: any) {
-        });
+        // connection.bind("click", function (conn: any) {
+        // });
         connection.bind("mouseover", function (conn: any) {
           connection.getOverlay("delete-connector").show();
         });
@@ -413,18 +420,29 @@ export default class Graph extends PureComponent<GraphProps, GraphState> {
     { connection }: ConnectionMadeEventInfo,
     originalEvent: any
   ) => {
+    //@ts-ignore
+
     if (!originalEvent) { return; }
+
+    //@ts-ignore
+    this.props.onAddConnection(
+      connection.id,
+      //@ts-ignore
+      connection.sourceId,
+      //@ts-ignore
+      connection.targetId,
+    );
 
     // console.log(connection.source);
 
-    this.handleAddConnection(
-      //@ts-ignore
-      connection.getParameter('id'),
-      //@ts-ignore
-      connection.getParameter('source'),
-      //@ts-ignore
-      connection.getParameter('target')
-    )();
+    // this.handleAddConnection(
+    //   //@ts-ignore
+    //   connection.getParameter('id'),
+    //   //@ts-ignore
+    //   connection.getParameter('source'),
+    //   //@ts-ignore
+    //   connection.getParameter('target')
+    // )();
   }
 
   private handleAddConnection = (
