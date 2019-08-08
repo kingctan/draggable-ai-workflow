@@ -13,7 +13,8 @@ import { ADD_NODE, REMOVE_NODE } from './workflowReducer';
 
 type Props = {
   projectId: number | null
-  // changeNodeConfig: (nodeInfo: FlowNodeProps) => void
+  selectedNodeId: string
+  onSelectNode: (nodeId: string) => void
 };
 
 const flowNodes: FlowNodesProps = {};
@@ -22,7 +23,7 @@ const flowConnections: any = [];
 const MY_GRAPH_ID = 'simpleDiagram';
 
 const WorkflowStage: React.FC<Props> = (props) => {
-  const { projectId } = props;
+  const { projectId, selectedNodeId, onSelectNode } = props;
 
   const MAX_SCALE = 2;
   const MIN_SCALE = 0.5;
@@ -36,7 +37,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
   // const [selectedNode, setSelectedNode] = useState<FlowNodeProps | null>(null);
   const [connections, setConnections] = useState<any>(flowConnections);
 
-  const nodes: FlowNodesProps = useMappedState(state => state.workflowReducer)
+  const nodes: FlowNodesProps = useMappedState(state => state.workflowReducer);
   const dispatch = useDispatch();
 
   const handleResize = debounce(
@@ -133,9 +134,9 @@ const WorkflowStage: React.FC<Props> = (props) => {
     setHeight(500);
   };
 
-  const [selectedNodeId, setSelectedNodeId] = useState<string | undefined | null>(null);
+
   const handleSelectNode = (selectedNode: FlowNodeProps) => {
-    setSelectedNodeId(selectedNode.id);
+    onSelectNode(selectedNode.id);
   };
 
   // const handleDrop = (id: string, x: number, y: number) => {

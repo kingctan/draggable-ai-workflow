@@ -15,6 +15,7 @@ export type OperatorModelProps = {
       name: string
       type: string
       default: string
+      value?: string
     }
   },
   inputs: {
