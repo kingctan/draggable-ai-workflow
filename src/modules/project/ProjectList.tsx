@@ -43,8 +43,8 @@ const ProjectList: React.FC<Props> = (props) => {
     title: '名称',
     key: 'projectName',
     dataIndex: 'projectName',
-    render: (text: string) => (
-      <Link to={`/project-list`} className="table-column-link">
+    render: (text: string, row: ProjectProps) => (
+      <Link to={`/workflow/${row.projectID}`} className="table-column-link">
         {text}
       </Link>
     )
@@ -69,6 +69,13 @@ const ProjectList: React.FC<Props> = (props) => {
     align: 'center',
     render: (text: string, row: ProjectProps) => (
       <span style={{ whiteSpace: 'nowrap' }}>
+        <Link to={`/project-detail/${row.projectID}`}>
+          <p style={{ display: 'inline-block', margin: 0 }}>
+            {/* <Icon type="edit" />  */}
+            修改
+          </p>
+        </Link>
+        <Divider type="vertical" />
         <a
           href="javascript:;"
           onClick={() => {

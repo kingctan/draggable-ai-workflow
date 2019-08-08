@@ -7,6 +7,7 @@ import InstanceList from '../modules/instance/InstanceList';
 import InstanceDetail from '../modules/instance/InstanceDetail';
 import OperatorList from '../modules/operator/OperatorList';
 import OperatorDetail from '../modules/operator/OperatorDetail';
+import WorkflowDetail from '../modules/project/WorkflowDetail';
 
 const isAuthenticated = () => {
   return true;
@@ -51,6 +52,9 @@ export const Routes = () =>
       <LayoutRoute path="/" exact navmark="project" component={ProjectList} />
       <LayoutRoute path="/project-list" exact navmark="project" component={ProjectList} />
       <LayoutRoute path="/project-detail" exact navmark="project" component={ProjectDetail} />
+      <LayoutRoute path="/project-detail/:projectId" exact navmark="project" component={ProjectDetail} />
+      <LayoutRoute path="/workflow" exact navmark="project" component={WorkflowDetail} />
+      <LayoutRoute path="/workflow/:projectId" exact navmark="project" component={WorkflowDetail} />
       <LayoutRoute path="/instance-list" exact navmark="instance" component={InstanceList} />
       <LayoutRoute path="/instance-detail" exact navmark="instance" component={InstanceDetail} />
       <LayoutRoute path="/operator-list" exact navmark="operator" component={OperatorList} />
