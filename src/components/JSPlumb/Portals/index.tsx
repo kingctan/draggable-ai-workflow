@@ -23,8 +23,7 @@ export default class Portals extends PureComponent<PortalsProps> {
     //@ts-ignore
     children: undefined,
     connections: [],
-    //@ts-ignore
-    id: undefined,
+    id: '',
     //@ts-ignore
     onRemoveConnection: undefined
   };
@@ -33,7 +32,6 @@ export default class Portals extends PureComponent<PortalsProps> {
     //@ts-ignore
     return this.props.connections.map(({ id: connId, source, target }) => {
       const htmlId = generateConnectionId(this.props.id, connId);
-      console.log(htmlId);
 
       return (
         <Bridge

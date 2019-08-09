@@ -72,12 +72,12 @@ const WorkflowStage: React.FC<Props> = (props) => {
   //   }
   // };
 
-  const handleAddConnection = (id: string, sourceId: string, targetId: string) => {
-    console.log(id, sourceId, targetId);
-    // setConnections([
-    //   ...connections,
-    //   { id, source, target }
-    // ]);
+  const handleAddConnection = (id: string, source: string, target: string) => {
+    console.log(id, source, target);
+    setConnections([
+      ...connections,
+      { id, source, target }
+    ]);
   };
 
   const handleRemoveConnection = (connectionId?: string, sourceId?: string) => {
@@ -222,7 +222,6 @@ const WorkflowStage: React.FC<Props> = (props) => {
       left: x,
       top: y
     });
-    console.log(id, x, y);
   };
 
   const generateNodeType = (node: FlowNodeProps) => {
@@ -300,7 +299,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
           });
         }
       }).catch((err) => {
-        message.error('服务器被吃了..');
+        // message.error('服务器被吃了..');
       });
   };
 

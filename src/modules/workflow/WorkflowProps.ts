@@ -18,6 +18,12 @@ export type FlowNodesProps = {
   [nodeId: string]: FlowNodeProps
 };
 
+export type FlowConnectionProps = {
+  id: string
+  source: string
+  target: string
+};
+
 export type InputRuntimeProps = {
   [key: string]: {
     id: string
