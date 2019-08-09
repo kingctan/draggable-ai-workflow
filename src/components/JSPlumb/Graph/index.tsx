@@ -115,7 +115,7 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
       this.jsPlumb.bind('connection', this.handleNewConnection);
       this.jsPlumb.bind('beforeDrop', (info) => this.props.onBeforeDrop(info.sourceId, info.targetId));
       // @ts-ignore
-      // this.jsPlumb.bind('connectionDetached', this.handleDetachedConnection);
+      this.jsPlumb.bind('connectionDetached', this.handleDetachedConnection);
 
       this.jsPlumb.bind('connectionDragStop', (connection: any) => {
         connection.getOverlay("label-connector").show();
@@ -293,7 +293,7 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
             </Nodes>
           </div>
         </PanAndZoom>
-        {() => portals}
+        {/* {portals} */}
       </>
     );
   }
@@ -424,25 +424,14 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
 
     if (!originalEvent) { return; }
 
-    //@ts-ignore
-    this.props.onAddConnection(
+    this.handleAddConnection(
+      //@ts-ignore
       connection.id,
       //@ts-ignore
       connection.sourceId,
       //@ts-ignore
-      connection.targetId,
-    );
-
-    // console.log(connection.source);
-
-    // this.handleAddConnection(
-    //   //@ts-ignore
-    //   connection.getParameter('id'),
-    //   //@ts-ignore
-    //   connection.getParameter('source'),
-    //   //@ts-ignore
-    //   connection.getParameter('target')
-    // )();
+      connection.targetId
+    )();
   }
 
   private handleAddConnection = (
@@ -454,7 +443,7 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
       this.props.onAddConnection(
         connectionId,
         source,
-        target
+        target,
       );
     }
   }
@@ -465,14 +454,14 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
   ) => {
     if (!originalEvent) { return; }
 
-    // this.handleRemoveConnection(
-    //   //@ts-ignore
-    //   connection.getParameter('id'),
-    //   //@ts-ignore
-    //   connection.getParameter('source'),
-    //   //@ts-ignore
-    //   connection.getParameter('target')
-    // )();
+    this.handleRemoveConnection(
+      //@ts-ignore
+      connection.getParameter('id'),
+      //@ts-ignore
+      connection.getParameter('source'),
+      //@ts-ignore
+      connection.getParameter('target')
+    )();
   }
 
   private handleRemoveConnection = (

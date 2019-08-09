@@ -1,5 +1,5 @@
-import React, { useState, SyntheticEvent, useEffect } from 'react';
-import { Form, Radio, Input, Select, Tabs, Icon, Button, Divider, message, InputNumber, Modal } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Form, Input, Select, Tabs, Icon, Button, Divider, message, InputNumber, Modal } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
 import { v4 } from 'uuid';
 import axios from 'axios';
@@ -10,17 +10,11 @@ import 'brace/ext/language_tools';
 // import 'brace/snippets/python';
 import { formItemLayout, tailFormItemLayout } from '../../utils/FormLayout';
 import { Link } from 'react-router-dom';
-import { OperatorConfigParam } from './OperatorProps';
 import './operator.styl';
 
-type Props = {
+type Props = {};
 
-};
-
-
-interface OperatorDetailProps extends FormComponentProps {
-
-};
+interface OperatorDetailProps extends FormComponentProps {};
 
 const MyFormItemTitle: React.SFC<{ name: string, handleClick: () => void }> = ({ name, handleClick }) => (
   <Form.Item {...tailFormItemLayout}>

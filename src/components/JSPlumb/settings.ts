@@ -3,6 +3,19 @@ import { generateConnectionId } from './util';
 
 const COLOR_ENDPOINT = '#5C87FF';
 
+const ConnectorStyle = {
+  strokeWidth: 2,
+  stroke: "#c4c4c4",
+  joinstyle: "round",
+  outlineStroke: "transparent",
+  outlineWidth: 4
+};
+
+const ConnectorHoverStyle = {
+  strokeWidth: 3,
+  stroke: "#216477",
+};
+
 const EndpointStyleSource = {
   radius: 7,
   strokeWidth: 5,
@@ -40,7 +53,10 @@ const renderOverlay = (component: any) => {
 
 export default {
   Anchor: ['Continuous', {}],
-  Anchors: [['Continuous', {}], ['Continuous', {}]],
+  Anchors: [['BottomCenter'], ['TopCenter']],
+  ConnectionsDetachable: false,
+  Connector: ["Bezier", { curviness: 50 }],
+  MaxConnections: -1,
   ConnectionOverlays: [
     ["Arrow", {
       location: 1,
@@ -79,7 +95,6 @@ export default {
   EndpointHoverStyle: EndpointHoverStyleSource,
   EndpointHoverStyles: [EndpointHoverStyleSource, EndpointHoverStyleTarget],
   EndpointStyle: EndpointStyleSource,
-  EndpointStyles: [EndpointStyleSource, EndpointStyleTarget],
-  // HoverPaintStyle,
-  // PaintStyle
+  HoverPaintStyle: ConnectorHoverStyle,
+  PaintStyle: ConnectorStyle,
 };

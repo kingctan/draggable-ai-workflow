@@ -25,7 +25,7 @@ const WorkflowConf: React.FC<Props & WorkflowConfProps> = (props) => {
 
   const [loading, setLoading] = useState(true);
   const [nodeInfo, setNodeInfo] = useState<FlowNodeProps | null>(null);
-  const [paramConfigs, setParamConfigs] = useState<NodeParamConfigProps>({});
+  const [paramConfigs, setParamConfigs] = useState<NodeParamConfigProps | null>(null);
 
   const nodes: FlowNodesProps = useMappedState(state => state.workflowReducer);
 
@@ -37,8 +37,8 @@ const WorkflowConf: React.FC<Props & WorkflowConfProps> = (props) => {
     setNodeInfo(nodeInfo);
     if (nodeInfo && nodeInfo.model && nodeInfo.model.params) {
       setParamConfigs(nodeInfo.model.params);
-      setLoading(false);
     }
+    setLoading(false);
   }, [selectedNodeId]);
 
 
@@ -50,13 +50,15 @@ const WorkflowConf: React.FC<Props & WorkflowConfProps> = (props) => {
           <Form.Item>
             <h3>{nodeInfo && nodeInfo.label || ''}</h3>
           </Form.Item>
-          {/* {!paramConfigs && <div>当前未选择节点</div>}
-        {
-          (paramConfigs && Object.keys(paramConfigs).length === 0) &&
-          <div>当前节点没有可调参数</div>
-        } */}
           {
-            Object.keys(paramConfigs).map((key: string) => (
+            !paramConfigs && <div>选择节点可配置参数</div>
+          }
+          {
+            (paramConfigs && Object.keys(paramConfigs).length === 0) &&
+            <div>该节点无可调参数</div>
+          }
+          {
+            paramConfigs && Object.keys(paramConfigs).map((key: string) => (
               <Form.Item label={paramConfigs[key].name}>
                 {getFieldDecorator(`${key}`, {
                   initialValue: paramConfigs[key].default,

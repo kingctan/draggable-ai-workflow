@@ -1,4 +1,3 @@
-import { v4 } from 'uuid';
 import { FlowNodesProps } from './WorkflowProps';
 
 export const ADD_NODE = 'ADD_NODE';
@@ -14,6 +13,11 @@ function workflowReducer(state: FlowNodesProps = initialState, action: any) {
   switch (action.type) {
     case ADD_NODE: {
       const { nodeId, nodeInfo } = action;
+      console.log('x✨');
+      console.log({
+        ...state,
+        [nodeId]: nodeInfo
+      });
       return {
         ...state,
         [nodeId]: nodeInfo
