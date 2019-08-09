@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { Button, Icon, Table, Modal, Divider, Input } from 'antd';
+import { Button, Icon, Table, Modal, Divider, Input, message } from 'antd';
 
 import { ProjectProps } from './ProjectProps';
 import { formatDate } from '../../utils/formatHelper';
@@ -34,6 +34,19 @@ const ProjectList: React.FC<Props> = (props) => {
   const filter = (list: ProjectProps[]) => list.filter((item: ProjectProps) => item.projectName.includes(filterVal));
 
   const handleRefresh = () => getList();
+
+  const handleDelete = (projectId: string) => {
+    axios.delete(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/project/delete?projectID=${projectId}`, {
+      withCredentials: true
+    }).then((res) => {
+      if (res.data.code === 200) {
+        message.success('删除成功');
+        getList();
+      }
+    }).catch((err) => {
+      console.error(err);
+    });
+  };
 
   useEffect(() => {
     getList();
@@ -88,6 +101,7 @@ const ProjectList: React.FC<Props> = (props) => {
               title: "删除项目",
               content: <span>确定删除项目：<b>{row.projectName}</b> ？</span>,
               onOk() {
+                handleDelete(row.projectID.toString());
               },
             });
           }}

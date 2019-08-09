@@ -14,7 +14,7 @@ import './operator.styl';
 
 type Props = {};
 
-interface OperatorDetailProps extends FormComponentProps {};
+interface OperatorDetailProps extends FormComponentProps { };
 
 const MyFormItemTitle: React.SFC<{ name: string, handleClick: () => void }> = ({ name, handleClick }) => (
   <Form.Item {...tailFormItemLayout}>
