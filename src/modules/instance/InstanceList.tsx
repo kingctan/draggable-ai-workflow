@@ -49,20 +49,28 @@ const InstanceList: React.FC<Props> = (props) => {
     title: '实例名',
     key: 'jobName',
     dataIndex: 'jobName',
-    render: (text: string) => (
+    render: (text: string, row: InstanceProps) => (
       <span className="table-column-link">
-        {text}
+        <a
+          target="_blank"
+          href={`http://39.108.232.245:31441/workflows/default/${row.jobName}`}
+          style={{ whiteSpace: 'nowrap' }}
+        >
+          {text}
+        </a>
       </span>
     )
   }, {
     title: '描述',
     key: 'note',
     dataIndex: 'note',
-  }, {
-    title: '所属项目',
-    key: 'projectName',
-    dataIndex: 'projectName',
-  }, {
+  },
+  //  {
+  //   title: '所属项目',
+  //   key: 'projectName',
+  //   dataIndex: 'projectName',
+  // },
+  {
     title: '创建时间',
     key: 'createTime',
     dataIndex: 'createTime',
@@ -74,6 +82,21 @@ const InstanceList: React.FC<Props> = (props) => {
     render: (text: string) => (
       <Badge color={statusColorMap[text]} text={text} />
     )
+  }, {
+    title: '操作',
+    key: 'operate',
+    align: 'center',
+    render: (text: string, row: InstanceProps) => (
+      <a
+        target="_blank"
+        href={`http://39.108.232.245:31441/workflows/default/${row.jobName}`}
+        style={{ whiteSpace: 'nowrap' }}
+      >
+        <p style={{ display: 'inline-block', margin: 0 }}>
+          日志
+          </p>
+      </a>
+    ),
   }];
 
   return (

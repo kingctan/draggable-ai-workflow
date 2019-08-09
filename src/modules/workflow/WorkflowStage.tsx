@@ -74,10 +74,10 @@ const WorkflowStage: React.FC<Props> = (props) => {
 
   const handleAddConnection = (id: string, source: string, target: string) => {
     console.log(id, source, target);
-    setConnections([
-      ...connections,
-      { id, source, target }
-    ]);
+    // setConnections([
+    //   ...connections,
+    //   { id, source, target }
+    // ]);
   };
 
   const handleRemoveConnection = (connectionId?: string, sourceId?: string) => {
