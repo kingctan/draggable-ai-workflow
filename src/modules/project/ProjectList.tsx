@@ -6,12 +6,10 @@ import { Button, Icon, Table, Modal, Divider, Input, message } from 'antd';
 import { ProjectProps } from './ProjectProps';
 import { formatDate } from '../../utils/formatHelper';
 
-type Props = {
-
-};
+type Props = {};
 
 const ProjectList: React.FC<Props> = (props) => {
-  const { } = props;
+  // const { } = props;
 
   const [list, setList] = useState<ProjectProps[]>([]);
   const [filterVal, setFilterVal] = useState(''); // 搜索框值

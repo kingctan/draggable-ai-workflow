@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AutoSizer } from 'react-virtualized';
-import { debounce, findIndex } from 'lodash';
+import { debounce } from 'lodash';
 import { v4 } from 'uuid';
 import axios from 'axios';
 import { useDrop, DropTargetMonitor } from 'react-dnd'
@@ -18,7 +18,7 @@ type Props = {
   onSelectNode: (nodeId: string) => void
 };
 
-const flowNodes: FlowNodesProps = {};
+// const flowNodes: FlowNodesProps = {};
 const flowConnections: any = [];
 
 const MAX_SCALE = 2;
@@ -97,6 +97,11 @@ const WorkflowStage: React.FC<Props> = (props) => {
       type: REMOVE_NODE,
       nodeId,
     });
+
+    if (nodeId === selectedNodeId) {
+      onSelectNode('');
+    }
+
   };
 
   const handleBeforeDrop = (sourceId: string, targetId: string) => {
@@ -236,7 +241,10 @@ const WorkflowStage: React.FC<Props> = (props) => {
     return type;
   };
 
-  const [{ canDrop, isOver }, drop] = useDrop({
+  const [{
+    // canDrop,
+    // isOver
+  }, drop] = useDrop({
     accept: 'box',
     drop: (item: any, monitor: DropTargetMonitor) => {
       const clientOffset: XYCoord | null = monitor.getSourceClientOffset();

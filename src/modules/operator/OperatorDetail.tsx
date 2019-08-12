@@ -56,7 +56,7 @@ const generateUniqueName = (name: string) => `${name}-${v4().slice(-4)}`;
 
 
 const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
-  const { } = props;
+  // const { } = props;
   const { getFieldDecorator, validateFields, getFieldValue, getFieldsValue, setFieldsValue } = props.form;
   const { componentId } = (props as any).match.params;
 
@@ -135,7 +135,7 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
             });
           });
         }
-      }).catch((err) => {
+      }).catch(() => {
         message.error('服务器被吃了..');
       });
   };
@@ -184,7 +184,7 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
               message.success('已更新');
               (props as any).history.push(`/operator-list/${encodeURIComponent(`自定义/${formValues.directory}`)}`);
             }
-          }).catch((err) => {
+          }).catch(() => {
             message.error('服务器被吃了..');
           });
       } else { // 新增算子
@@ -194,7 +194,7 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
               message.success('新增成功');
               (props as any).history.push(`/operator-list/${encodeURIComponent(`自定义/${formValues.directory}`)}`);
             }
-          }).catch((err) => {
+          }).catch(() => {
             message.error('服务器被吃了..');
           });
       }

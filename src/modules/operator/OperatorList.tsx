@@ -2,28 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Button, Icon, message, Input, Spin } from 'antd';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { OperatorProps, OperatorModelProps } from './OperatorProps';
+import { OperatorProps } from './OperatorProps';
 
-type Props = {
-
-};
-
-const Operator: React.FC<{ title: string, icon?: string, isDirectory: boolean }> = ({ title, icon = '', isDirectory }) => {
-  return (
-    <div className="operator">
-      <div className="operator-icon">
-        {
-          isDirectory ?
-            <Icon type={icon || 'code'} style={{ color: 'rgba(0,0,0,.6)', fontSize: 40 }} /> :
-            <Icon type="folder" theme="filled" style={{ color: '#00cdea' }} />
-        }
-      </div>
-      <div className="operator-text">
-        {title || 'Unknown'}
-      </div>
-    </div>
-  )
-};
+type Props = {};
 
 const NotFound: React.FC<{ content: string }> = ({ content }) => {
   return (
@@ -34,7 +15,7 @@ const NotFound: React.FC<{ content: string }> = ({ content }) => {
 };
 
 const OperatorList: React.FC<Props> = (props) => {
-  const { } = props;
+  // const { } = props;
 
   const currentPath = (props as any).match.params.currentPath ? decodeURIComponent((props as any).match.params.currentPath) : '';
 

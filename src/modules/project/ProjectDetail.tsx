@@ -11,7 +11,7 @@ type Props = {};
 interface ProjectDetailProps extends FormComponentProps { };
 
 const ProjectDetail: React.FC<Props & ProjectDetailProps> = (props) => {
-  const { } = props;
+  // const { } = props;
 
   const { getFieldDecorator, validateFields, getFieldsValue, setFieldsValue } = props.form;
   const { projectId } = (props as any).match.params;

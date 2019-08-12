@@ -4,9 +4,7 @@ import axios from 'axios';
 import { nodeData, NodeData } from './gData';
 import { useDrag, DragSourceMonitor } from 'react-dnd';
 
-type Props = {
-
-};
+type Props = {};
 
 const formatData = (nodeData: NodeData[], prevKey?: string) => {
   for (let i = 0; i < nodeData.length; i += 1) {
@@ -52,7 +50,12 @@ generateList(gData);
 const DraggableItem: React.SFC<any> = (props) => {
   const { data, title } = props;
   const name = data;
-  const [{ isDragging }, drag, preview] = useDrag({
+  const [{
+    // isDragging
+  },
+    drag,
+    // preview
+  ] = useDrag({
     item: { name, type: 'box' },
     end: (dropResult?: { name: string, monitor: DragSourceMonitor }) => {
       if (dropResult) {

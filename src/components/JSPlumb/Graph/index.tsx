@@ -9,7 +9,7 @@ import './index.css';
 import Nodes from '../Nodes';
 import { GraphProps, GraphState } from 'jsplumb-react';
 import Close from '../Close';
-import Portals from '../Portals';
+// import Portals from '../Portals';
 
 const PanAndZoom = panAndZoomHoc('div');
 
@@ -248,16 +248,16 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
       ...style
     };
 
-    const portals = this.props.bridge ? (
-      <Portals
-        connections={this.props.connections}
-        id={id}
-        onRemoveConnection={this.props.onRemoveConnection}
-      >
-        {this.props.bridge}
-      </Portals>
-    ) :
-      null;
+    // const portals = this.props.bridge ? (
+    //   <Portals
+    //     connections={this.props.connections}
+    //     id={id}
+    //     onRemoveConnection={this.props.onRemoveConnection}
+    //   >
+    //     {this.props.bridge}
+    //   </Portals>
+    // ) :
+    //   null;
 
     return (
       <>

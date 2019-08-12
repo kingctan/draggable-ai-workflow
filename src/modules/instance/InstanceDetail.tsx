@@ -1,11 +1,9 @@
 import React from 'react';
 
-type Props = {
-
-};
+type Props = {};
 
 const InstanceDetail: React.FC<Props> = (props) => {
-  const { } = props;
+  // const { } = props;
   return (
     <div>
       666

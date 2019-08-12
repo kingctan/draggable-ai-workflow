@@ -243,11 +243,11 @@ export default class Node extends PureComponent<NodeProps & NodePropsFData & Cus
 
     if (onSelect) {
       // @ts-ignore
-      const selections = jsPlumb._katavorio_main
-        .getSelection()
-        .map((node: any) => (
-          node.params.id
-        ));
+      // const selections = jsPlumb._katavorio_main
+      //   .getSelection()
+      //   .map((node: any) => (
+      //     node.params.id
+      //   ));
 
       onSelect({ id, style, type, label, icon, model });
     }
