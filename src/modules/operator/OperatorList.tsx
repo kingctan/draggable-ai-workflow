@@ -33,7 +33,7 @@ const OperatorList: React.FC<Props> = (props) => {
       .then((res) => {
         if (res.data.code === 200) {
           console.log(res.data.data);
-          setList(res.data.data);
+          setList(res.data.data || []);
           setLoading(false);
         } else {
           (props as any).history.push(`/operator-list`);

@@ -102,31 +102,6 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
 
     this.jsPlumb = jsPlumb.getInstance({
       ...settings,
-      // ConnectionOverlays: [
-      //   ...settings.ConnectionOverlays,
-      //   [
-      //     "Label", {
-      //       location: 0.6,
-      //       label: '<span class="delete-icon-connect iconfont icon-delete"></span>',
-      //       id: "delete-connector",
-      //       cssClass: "workflow-node-delete",
-      //       visible: false,
-      //       events: {
-      //         // tap: function (e: any) {
-      //         //   //@ts-ignore
-      //         //   const plumb = this._jsPlumb.instance;
-      //         //   //@ts-ignore
-      //         //   props.onRemoveConnection(this.component.sourceId, this.component.targetId)
-      //         //   //@ts-ignore
-      //         //   plumb.deleteConnection(this.component);
-      //         //   //@ts-ignore
-      //         //   plumb.detach(this.component);
-
-      //         //   console.log(plumb.detach);
-      //         // }
-      //       },
-      //     }]
-      // ],
       ...props.settings,
       // @ts-ignore
       container: generateGraphId(props.id)
@@ -134,15 +109,11 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
   }
 
   public componentDidMount() {
-    const { onRemoveConnection } = this.props;
     this.jsPlumb.ready(() => {
       // @ts-ignore
       // this.jsPlumb.endpointAnchorClass = 'rja_';
       this.jsPlumb.bind('connection', (info: ConnectionMadeEventInfo, e: Event) => {
         const { connection }: any = info;
-        setTimeout(() => {
-          connection.getOverlay("label-connector").show();
-        }, 0);
         //@ts-ignore
         const JSplumb = this.jsPlumb;
         connection.addOverlay([
@@ -159,6 +130,9 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
               }
             },
           }]);
+        setTimeout(() => {
+          connection.getOverlay("label-connector").show();
+        }, 0);
         connection.bind("mouseover", function (conn: any) {
           connection.getOverlay("delete-connector").show();
         });
@@ -509,7 +483,6 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
   ) => {
 
     // if (!originalEvent) { return; }
-    // console.log('😪')
 
     this.handleRemoveConnection(
       //@ts-ignore

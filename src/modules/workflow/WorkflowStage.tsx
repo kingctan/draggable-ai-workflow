@@ -5,12 +5,12 @@ import { v4 } from 'uuid';
 import axios from 'axios';
 import { useDrop, DropTargetMonitor } from 'react-dnd'
 import { Graph, Node } from '../../components/JSPlumb';
-import { FlowNodeProps, FlowNodesProps, FlowConnectionProps } from './WorkflowProps';
+import { FlowNodeProps, FlowNodesProps, FlowConnectionProps, OutputRuntimeProps } from './WorkflowProps';
 import { XYCoord } from 'dnd-core';
 import { useMappedState, useDispatch } from 'redux-react-hook';
 import { Button, Icon, Tooltip, message } from 'antd';
 import { generateNodeId, generateConnectionId } from '../../components/JSPlumb/util';
-import { ADD_NODE, REMOVE_NODE, UPDATE_NODE_DEPS, UPDATE_NODE_STYLE } from './workflowReducer';
+import { ADD_NODE, REMOVE_NODE, NEW_CONNECTION, UPDATE_NODE_STYLE, REMOVE_CONNECTION } from './workflowReducer';
 
 type Props = {
   projectId: number | null
@@ -85,6 +85,11 @@ const WorkflowStage: React.FC<Props> = (props) => {
     setConnections(connections.filter((connection: any) => (
       connection.id !== connectionId
     )));
+    dispatch({
+      type: REMOVE_CONNECTION,
+      sourceId,
+      targetId,
+    });
   };
 
   const handleDeleteNode = (nodeId: string) => {
@@ -104,17 +109,27 @@ const WorkflowStage: React.FC<Props> = (props) => {
   };
 
   const handleBeforeDrop = (sourceId: string, targetId: string) => {
-    const source = nodes[sourceId];
-    const target = nodes[targetId];
-    let canConnect = false;
+    const source: FlowNodeProps = nodes[sourceId];
+    const target: FlowNodeProps = nodes[targetId];
+    let checkType = false; // 判断连线两端算子输入输出类型是否匹配
     if (target.model && source.model) {
-      Object.keys(target.model.inputs).forEach((targetInputKey: string) => {
-        console.log(source.model.outputs[targetInputKey]);
-        if (source.model.outputs[targetInputKey]) canConnect = true;
+
+      const outputTypes: string[] = []; // 存所有输入、所有输出的type
+      Object.keys(source.model.outputs).forEach((outputKey: string) => {
+        outputTypes.push(source.model.outputs[outputKey].type);
       });
-      if (canConnect) {
+      Object.keys(target.model.inputs).forEach((inputKey: string) => {
+        if (outputTypes.includes(target.model.inputs[inputKey].type)) checkType = true;
+      });
+
+      if (target.inputRuntime && Object.keys(target.inputRuntime).length === Object.keys(target.model.inputs).length) {
+        message.warning(<span><b>{target.label}</b> 无法接受更多的输入！</span>);
+        return false;
+      }
+
+      if (checkType) {
         dispatch({
-          type: UPDATE_NODE_DEPS,
+          type: NEW_CONNECTION,
           sourceId,
           targetId,
         });
@@ -123,6 +138,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
         message.warning('两个组件的输入输出不匹配，无法建立连接！');
         return false;
       }
+
     } else {
       message.warning('无法建议连接：请使用自定义组件并配置至少一个输入或输出，其它组件暂时只做展示！', 6);
       return false;
@@ -261,21 +277,32 @@ const WorkflowStage: React.FC<Props> = (props) => {
       const relativeYOffset = clientOffset!.y - dropPlaceOffset.top;
 
       // console.log(`✨拖动结束！`, item.name);
+      const payload = item.name;
       const nodeId = generateNodeId(MY_GRAPH_ID, v4());
+
+      const outputRuntime: OutputRuntimeProps = {};
+
+      // 最后提交时不用关心输出的依赖，只需要把输出原来就有的所有key都带上就行
+      Object.keys(payload.model.outputs).forEach((outputKey: string) => {
+        outputRuntime[outputKey] = {
+          type: payload.model.outputs[outputKey].type,
+        }
+      });
 
       dispatch({
         type: ADD_NODE,
         nodeId,
         nodeInfo: {
           id: nodeId,
-          label: item.name.title,
+          label: payload.title,
           icon: 'icon-code1',
-          type: generateNodeType(item.name),
-          model: item.name.model,
+          type: generateNodeType(payload),
+          model: payload.model,
           style: {
             left: relativeXOffset,
             top: relativeYOffset,
           },
+          outputRuntime,
         }
       });
 
@@ -318,6 +345,8 @@ const WorkflowStage: React.FC<Props> = (props) => {
                   left: item.fe.left || 0,
                   top: item.fe.top || 0,
                 },
+                outputRuntime: item.outputs,
+                inputRuntime: item.inputs,
               }
             });
           });
