@@ -2,7 +2,7 @@ import { FlowNodesProps } from './WorkflowProps';
 
 export const ADD_NODE = 'ADD_NODE';
 export const UPDATE_NODE_PARAM = 'UPDATE_NODE_PARAM';
-export const UPDATE_NODE_BY_CONNECTION = 'UPDATE_NODE_BY_CONNECTION';
+export const UPDATE_NODE_DEPS = 'UPDATE_NODE_DEPS';
 export const UPDATE_NODE_STYLE = 'UPDATE_NODE_STYLE';
 export const REMOVE_NODE = 'REMOVE_NODE';
 export const CLEAR_NODES = 'CLEAR_NODES';
@@ -13,16 +13,12 @@ function workflowReducer(state: FlowNodesProps = initialState, action: any) {
   switch (action.type) {
     case ADD_NODE: {
       const { nodeId, nodeInfo } = action;
-      console.log('x✨');
-      console.log({
-        ...state,
-        [nodeId]: nodeInfo
-      });
       return {
         ...state,
         [nodeId]: nodeInfo
       };
     }
+
     case UPDATE_NODE_PARAM: {
       const { nodeId, paramKey, paramValue } = action;
       const willUpdateNode = { ...state };
@@ -31,7 +27,8 @@ function workflowReducer(state: FlowNodesProps = initialState, action: any) {
 
       return willUpdateNode;
     }
-    case UPDATE_NODE_BY_CONNECTION: {
+
+    case UPDATE_NODE_DEPS: {
       const { sourceId, targetId } = action;
       const willUpdateNodes = { ...state };
 
@@ -93,9 +90,11 @@ function workflowReducer(state: FlowNodesProps = initialState, action: any) {
 
       return willUpdateNodes;
     }
+
     case CLEAR_NODES: {
       return {};
     }
+
     default:
       return state;
   }

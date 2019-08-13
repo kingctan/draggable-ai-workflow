@@ -38,7 +38,6 @@ export type OutputRuntimeProps = {
   }
 };
 
-
 export type ParamConfigProps = {
   [nodeId: string]: {
     [key: string]: {

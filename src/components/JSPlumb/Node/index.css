@@ -74,7 +74,7 @@
   height: 4px;
   left: 50%;
   margin-left: -6px;
-  z-index: 10;
+  z-index: 20;
 }
 
 .node .dot-rect-top {
@@ -90,8 +90,25 @@
   z-index: 21;
 }
 
+.node .source-point {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  margin-left: -10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  z-index: 22;
+  background: #5C87FF;
+  opacity: 0;
+}
+
+.node .source-point:hover {
+  opacity: 0.3;
+}
+
 .node-selected {
-  z-index: 3;
+  /* z-index: 3; */
   border: solid 1px #5C87FF;
   color: #5C87FF;
 }

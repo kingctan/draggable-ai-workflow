@@ -5,12 +5,12 @@ import { v4 } from 'uuid';
 import axios from 'axios';
 import { useDrop, DropTargetMonitor } from 'react-dnd'
 import { Graph, Node } from '../../components/JSPlumb';
-import { FlowNodeProps, FlowNodesProps } from './WorkflowProps';
+import { FlowNodeProps, FlowNodesProps, FlowConnectionProps } from './WorkflowProps';
 import { XYCoord } from 'dnd-core';
 import { useMappedState, useDispatch } from 'redux-react-hook';
 import { Button, Icon, Tooltip, message } from 'antd';
-import { generateNodeId } from '../../components/JSPlumb/util';
-import { ADD_NODE, REMOVE_NODE, UPDATE_NODE_BY_CONNECTION, UPDATE_NODE_STYLE } from './workflowReducer';
+import { generateNodeId, generateConnectionId } from '../../components/JSPlumb/util';
+import { ADD_NODE, REMOVE_NODE, UPDATE_NODE_DEPS, UPDATE_NODE_STYLE } from './workflowReducer';
 
 type Props = {
   projectId: number | null
@@ -19,7 +19,7 @@ type Props = {
 };
 
 // const flowNodes: FlowNodesProps = {};
-const flowConnections: any = [];
+// const flowConnections: any = [];
 
 const MAX_SCALE = 2;
 const MIN_SCALE = 0.5;
@@ -38,7 +38,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
   const [xOffset, setXOffset] = useState<number>(0.0);
   const [yOffset, setYOffset] = useState<number>(0.0);
   // const [selectedNode, setSelectedNode] = useState<FlowNodeProps | null>(null);
-  const [connections, setConnections] = useState<any>(flowConnections);
+  const [connections, setConnections] = useState<FlowConnectionProps[]>([]);
 
   const nodes: FlowNodesProps = useMappedState(state => state.workflowReducer);
   const dispatch = useDispatch();
@@ -74,18 +74,17 @@ const WorkflowStage: React.FC<Props> = (props) => {
 
   const handleAddConnection = (id: string, source: string, target: string) => {
     console.log(id, source, target);
+
     // setConnections([
     //   ...connections,
     //   { id, source, target }
     // ]);
   };
 
-  const handleRemoveConnection = (connectionId?: string, sourceId?: string) => {
-    // if (confirm('Remove connection \'' + connectionId + '\'?')) {
+  const handleRemoveConnection = (connectionId?: string, sourceId?: string, targetId?: string) => {
     setConnections(connections.filter((connection: any) => (
       connection.id !== connectionId
     )));
-    // }
   };
 
   const handleDeleteNode = (nodeId: string) => {
@@ -115,7 +114,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
       });
       if (canConnect) {
         dispatch({
-          type: UPDATE_NODE_BY_CONNECTION,
+          type: UPDATE_NODE_DEPS,
           sourceId,
           targetId,
         });
@@ -212,6 +211,12 @@ const WorkflowStage: React.FC<Props> = (props) => {
     setHeight(500);
   };
 
+  const handleScreen = () => {
+    console.log('🌺', nodes);
+    console.log('🖼', connections);
+    message.warn('开发中 😁');
+  };
+
   const handleSelectNode = (selectedNode: FlowNodeProps) => {
     onSelectNode(selectedNode.id);
   };
@@ -288,7 +293,17 @@ const WorkflowStage: React.FC<Props> = (props) => {
       .then((res) => {
         if (res.data.code === 200) {
           const graph = res.data.data.graph.graph;
+          const tmpConnections: FlowConnectionProps[] = [];
           graph.forEach((item: any) => {
+            if (item.deps) {
+              item.deps.forEach((depNodeId: string) => {
+                tmpConnections.push({
+                  id: generateConnectionId(MY_GRAPH_ID, v4()),
+                  source: depNodeId,
+                  target: item.id,
+                });
+              });
+            }
             dispatch({
               type: ADD_NODE,
               nodeId: item.id,
@@ -298,6 +313,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
                 icon: 'icon-code1',
                 type: generateNodeType(item),
                 model: item.model,
+                deps: item.deps,
                 style: {
                   left: item.fe.left || 0,
                   top: item.fe.top || 0,
@@ -305,6 +321,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
               }
             });
           });
+          setConnections(tmpConnections);
         }
       }).catch((err) => {
         // message.error('服务器被吃了..');
@@ -339,7 +356,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
               <Button onClick={handleReset}><Icon type="sync" /></Button>
             </Tooltip>
             <Tooltip placement="top" title="全屏">
-              <Button onClick={() => message.warn('开发中 😁')}><Icon type="fullscreen" /></Button>
+              <Button onClick={handleScreen}><Icon type="fullscreen" /></Button>
             </Tooltip>
           </Button.Group>
         </div>
