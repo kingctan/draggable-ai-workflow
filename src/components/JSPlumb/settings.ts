@@ -73,23 +73,23 @@ export default {
         cssClass: "workflow-node-label",
         visible: false,
       }],
-    [
-      "Label", {
-        location: 0.6,
-        label: '<span class="delete-icon-connect iconfont icon-delete"></span>',
-        id: "delete-connector",
-        cssClass: "workflow-node-delete",
-        visible: false,
-        events: {
-          tap: function (e: any) {
-            //@ts-ignore
-            const plumb = this._jsPlumb.instance;
-            //@ts-ignore
-            plumb.deleteConnection(this.component);
-            // console.log(this);
-          }
-        },
-      }]
+    // [
+    //   "Label", {
+    //     location: 0.6,
+    //     label: '<span class="delete-icon-connect iconfont icon-delete"></span>',
+    //     id: "delete-connector",
+    //     cssClass: "workflow-node-delete",
+    //     visible: false,
+    //     events: {
+    //       tap: function (e: any) {
+    //         //@ts-ignore
+    //         const plumb = this._jsPlumb.instance;
+    //         //@ts-ignore
+    //         plumb.deleteConnection(this.component);
+    //         // console.log(this);
+    //       }
+    //     },
+    //   }]
   ],
   Endpoint: ['Dot', { radius: 5 }],
   EndpointHoverStyle: EndpointHoverStyleSource,

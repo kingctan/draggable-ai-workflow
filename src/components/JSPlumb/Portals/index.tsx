@@ -29,6 +29,7 @@ export default class Portals extends PureComponent<PortalsProps> {
   };
 
   public render() {
+
     //@ts-ignore
     return this.props.connections.map(({ id: connId, source, target }) => {
       const htmlId = generateConnectionId(this.props.id, connId);

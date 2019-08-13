@@ -12,7 +12,7 @@ type Props = {
 };
 
 const WorkflowDetail: React.FC<Props> = (props) => {
-  const { } = props;
+  // const { } = props;
 
   const { projectId } = (props as any).match.params;
 

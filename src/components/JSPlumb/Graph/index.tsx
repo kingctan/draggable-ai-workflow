@@ -9,7 +9,7 @@ import './index.css';
 import Nodes from '../Nodes';
 import { GraphProps, GraphState } from 'jsplumb-react';
 import Close from '../Close';
-import Portals from '../Portals';
+// import Portals from '../Portals';
 
 const PanAndZoom = panAndZoomHoc('div');
 
@@ -61,14 +61,14 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
   };
 
   public static defaultProps: GraphProps = {
-    bridge: (connId, source, target, onRemoveConnection) => (
-      <Close
-        id={connId}
-        onClose={onRemoveConnection}
-        source={source}
-        target={target}
-      />
-    ),
+    // bridge: (connId, source, target, onRemoveConnection) => (
+    //   <Close
+    //     id={connId}
+    //     onClose={onRemoveConnection}
+    //     source={source}
+    //     target={target}
+    //   />
+    // ),
     className: '',
     connections: [],
     height: 500,
@@ -102,6 +102,31 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
 
     this.jsPlumb = jsPlumb.getInstance({
       ...settings,
+      // ConnectionOverlays: [
+      //   ...settings.ConnectionOverlays,
+      //   [
+      //     "Label", {
+      //       location: 0.6,
+      //       label: '<span class="delete-icon-connect iconfont icon-delete"></span>',
+      //       id: "delete-connector",
+      //       cssClass: "workflow-node-delete",
+      //       visible: false,
+      //       events: {
+      //         // tap: function (e: any) {
+      //         //   //@ts-ignore
+      //         //   const plumb = this._jsPlumb.instance;
+      //         //   //@ts-ignore
+      //         //   props.onRemoveConnection(this.component.sourceId, this.component.targetId)
+      //         //   //@ts-ignore
+      //         //   plumb.deleteConnection(this.component);
+      //         //   //@ts-ignore
+      //         //   plumb.detach(this.component);
+
+      //         //   console.log(plumb.detach);
+      //         // }
+      //       },
+      //     }]
+      // ],
       ...props.settings,
       // @ts-ignore
       container: generateGraphId(props.id)
@@ -109,25 +134,55 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
   }
 
   public componentDidMount() {
+    const { onRemoveConnection } = this.props;
     this.jsPlumb.ready(() => {
       // @ts-ignore
-      this.jsPlumb.endpointAnchorClass = 'rja_';
-      this.jsPlumb.bind('connection', this.handleNewConnection);
-      this.jsPlumb.bind('beforeDrop', (info) => this.props.onBeforeDrop(info.sourceId, info.targetId));
-      // @ts-ignore
-      this.jsPlumb.bind('connectionDetached', this.handleDetachedConnection);
-
-      this.jsPlumb.bind('connectionDragStop', (connection: any) => {
-        connection.getOverlay("label-connector").show();
-        // connection.bind("click", function (conn: any) {
-        // });
+      // this.jsPlumb.endpointAnchorClass = 'rja_';
+      this.jsPlumb.bind('connection', (info: ConnectionMadeEventInfo, e: Event) => {
+        const { connection }: any = info;
+        setTimeout(() => {
+          connection.getOverlay("label-connector").show();
+        }, 0);
+        //@ts-ignore
+        const JSplumb = this.jsPlumb;
+        connection.addOverlay([
+          "Label", {
+            location: 0.6,
+            label: '<span class="delete-icon-connect iconfont icon-delete"></span>',
+            id: "delete-connector",
+            cssClass: "workflow-node-delete",
+            visible: false,
+            events: {
+              tap: function (e: any) {
+                //@ts-ignore
+                JSplumb.deleteConnection(this.component);
+              }
+            },
+          }]);
         connection.bind("mouseover", function (conn: any) {
           connection.getOverlay("delete-connector").show();
         });
         connection.bind("mouseout", function (conn: any) {
           connection.getOverlay("delete-connector").hide();
         });
+        this.handleNewConnection(info, e);
       });
+
+      this.jsPlumb.bind('beforeDrop', (info) => this.props.onBeforeDrop(info.sourceId, info.targetId));
+      // @ts-ignore
+      this.jsPlumb.bind('connectionDetached', this.handleDetachedConnection);
+
+      // this.jsPlumb.bind('connectionDragStop', (connection: any) => {
+      //   connection.getOverlay("label-connector").show();
+      //   // connection.bind("click", function (conn: any) {
+      //   // });
+      //   connection.bind("mouseover", function (conn: any) {
+      //     connection.getOverlay("delete-connector").show();
+      //   });
+      //   connection.bind("mouseout", function (conn: any) {
+      //     connection.getOverlay("delete-connector").hide();
+      //   });
+      // });
 
       this.jsPlumb.setSuspendDrawing(true);
 
@@ -147,74 +202,73 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
     connections: prevConnections,
     scale: prevScale
   }: GraphProps) {
-    if (prevScale !== this.props.scale) {
-      //@ts-ignore
-      this.jsPlumb.setZoom(this.props.scale);
-    }
+    // if (prevScale !== this.props.scale) {
+    //   //@ts-ignore
+    //   this.jsPlumb.setZoom(this.props.scale);
+    // }
 
-    const {
-      connections,
-      id
-    } = this.props;
-    //@ts-ignore
-    if (connections.length < prevConnections.length) {
-      //@ts-ignore
-      const currentConnections = new Set(connections.map(connection => connection.id));
-      //@ts-ignore
-      const removedConnections = prevConnections.filter(connection => (
-        !currentConnections.has(connection.id)
-      ));
+    // const {
+    //   connections,
+    //   id: diagramId,
+    // } = this.props;
+    // //@ts-ignore
+    // if (connections.length < prevConnections.length) {
+    //   //@ts-ignore
+    //   const currentConnections = new Set(connections.map(connection => connection.id));
+    //   //@ts-ignore
+    //   const removedConnections = prevConnections.filter(connection => (
+    //     !currentConnections.has(connection.id)
+    //   ));
+    //   removedConnections.forEach(({ source, target }) => {
+    //     const removedConnectionSet = new Set(removedConnections.map(connection => connection.id));
+    //     // @ts-ignore
+    //     const remainingConnection = this.jsPlumb.getConnections({
+    //       source: generateNodeId(diagramId, source),
+    //       target: generateNodeId(diagramId, target)
+    //     }).find((connection: Connection) => (
+    //       //@ts-ignore
+    //       removedConnectionSet.has(connection.getParameter('id'))
+    //     ));
 
-      removedConnections.forEach(({ source, target }) => {
-        const removedConnectionSet = new Set(removedConnections.map(connection => connection.id));
-        // @ts-ignore
-        const remainingConnection = this.jsPlumb.getConnections({
-          source: generateNodeId(id, source),
-          target: generateNodeId(id, target)
-        }).find((connection: Connection) => (
-          //@ts-ignore
-          removedConnectionSet.has(connection.getParameter('id'))
-        ));
+    //     if (remainingConnection) {
+    //       this.jsPlumb.unbind('connectionDetached', this.handleDetachedConnection);
+    //       this.jsPlumb.deleteConnection(remainingConnection);
+    //       // @ts-ignore
+    //       this.jsPlumb.bind('connectionDetached', this.handleDetachedConnection);
+    //     }
+    //   });
+    // } else if (
+    //   //@ts-ignore
+    //   connections.length >
+    //   //@ts-ignore
+    //   prevConnections.length
+    // ) {
+    //   //@ts-ignore
+    //   const previousConnections = new Set(prevConnections.map(connection => connection.id));
+    //   //@ts-ignore
+    //   const newConnections = connections.filter(connection => (
+    //     !previousConnections.has(connection.id)
+    //   ));
 
-        if (remainingConnection) {
-          this.jsPlumb.unbind('connectionDetached', this.handleDetachedConnection);
-          this.jsPlumb.deleteConnection(remainingConnection);
-          // @ts-ignore
-          this.jsPlumb.bind('connectionDetached', this.handleDetachedConnection);
-        }
-      });
-    } else if (
-      //@ts-ignore
-      connections.length >
-      //@ts-ignore
-      prevConnections.length
-    ) {
-      //@ts-ignore
-      const previousConnections = new Set(prevConnections.map(connection => connection.id));
-      //@ts-ignore
-      const newConnections = connections.filter(connection => (
-        !previousConnections.has(connection.id)
-      ));
+    //   newConnections.forEach(({ id: newId, source, target }) => {
+    //     const newConnectionsSet = new Set(newConnections.map(connection => connection.id));
+    //     // @ts-ignore
+    //     const connectionExists = this.jsPlumb.getConnections({
+    //       source: generateNodeId(diagramId, source),
+    //       target: generateNodeId(diagramId, target)
+    //     }).some((connection: Connection) => (
+    //       //@ts-ignore
+    //       newConnectionsSet.has(connection.getParameter('id'))
+    //     ));
 
-      newConnections.forEach(({ id: newId, source, target }) => {
-        const newConnectionsSet = new Set(newConnections.map(connection => connection.id));
-        // @ts-ignore
-        const connectionExists = this.jsPlumb.getConnections({
-          source: generateNodeId(id, source),
-          target: generateNodeId(id, target)
-        }).some((connection: Connection) => (
-          //@ts-ignore
-          newConnectionsSet.has(connection.getParameter('id'))
-        ));
-
-        if (!connectionExists) {
-          this.jsPlumb.unbind('connection', this.handleNewConnection);
-          this.renderConnection(newId, source, target);
-          this.jsPlumb.bind('connection', this.handleNewConnection);
-        }
-      });
-    }
-    this.jsPlumb.repaintEverything();
+    //     if (!connectionExists) {
+    //       this.jsPlumb.unbind('connection', this.handleNewConnection);
+    //       this.renderConnection(newId, source, target);
+    //       this.jsPlumb.bind('connection', this.handleNewConnection);
+    //     }
+    //   });
+    // }
+    // this.jsPlumb.repaintEverything();
   }
 
   public componentWillUnmount() {
@@ -248,16 +302,16 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
       ...style
     };
 
-    const portals = this.props.bridge ? (
-      <Portals
-        connections={this.props.connections}
-        id={id}
-        onRemoveConnection={this.props.onRemoveConnection}
-      >
-        {this.props.bridge}
-      </Portals>
-    ) :
-      null;
+    // const portals = this.props.bridge ? (
+    //   <Portals
+    //     connections={this.props.connections}
+    //     id={id}
+    //     onRemoveConnection={this.props.onRemoveConnection}
+    //   >
+    //     {this.props.bridge}
+    //   </Portals>
+    // ) :
+    //   null;
 
     return (
       <>
@@ -406,11 +460,10 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
       parameters: {
         id: connectionId.toString(),
         source: sourceId,
-        target: targetId
+        target: targetId,
       },
       source: sourceHtmlId,
       target: targetHtmlId,
-      detachable: false,
     } as any;
 
     this.jsPlumb.connect(state);
@@ -424,14 +477,16 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
 
     if (!originalEvent) { return; }
 
-    this.handleAddConnection(
-      //@ts-ignore
-      connection.id,
-      //@ts-ignore
-      connection.sourceId,
-      //@ts-ignore
-      connection.targetId
-    )();
+    // connection.getOverlay('label-connector').setLabel()
+
+    // this.handleAddConnection(
+    //   //@ts-ignore
+    //   connection.id,
+    //   //@ts-ignore
+    //   connection.sourceId,
+    //   //@ts-ignore
+    //   connection.targetId
+    // )();
   }
 
   private handleAddConnection = (
@@ -452,7 +507,9 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
     { connection }: ConnectionMadeEventInfo,
     originalEvent: any
   ) => {
-    if (!originalEvent) { return; }
+
+    // if (!originalEvent) { return; }
+    // console.log('😪')
 
     this.handleRemoveConnection(
       //@ts-ignore

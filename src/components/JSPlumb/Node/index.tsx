@@ -115,7 +115,7 @@ export default class Node extends PureComponent<NodeProps & NodePropsFData & Cus
     drag: true
   };
 
-  private connectionFilter = ':not(.jsplumb-react-node)';
+  private connectionFilter = '.source-point';
   private dragFilter = ':not(.jsplumb-react-node)';
   //@ts-ignore
   private timeout: NodeJS.Timer;
@@ -167,6 +167,7 @@ export default class Node extends PureComponent<NodeProps & NodePropsFData & Cus
             <span>{label}</span>
           </strong>
         </div>
+        <div className="source-point"></div>
         <Popover
           placement="rightBottom"
           title={label}
@@ -243,11 +244,11 @@ export default class Node extends PureComponent<NodeProps & NodePropsFData & Cus
 
     if (onSelect) {
       // @ts-ignore
-      const selections = jsPlumb._katavorio_main
-        .getSelection()
-        .map((node: any) => (
-          node.params.id
-        ));
+      // const selections = jsPlumb._katavorio_main
+      //   .getSelection()
+      //   .map((node: any) => (
+      //     node.params.id
+      //   ));
 
       onSelect({ id, style, type, label, icon, model });
     }
@@ -277,19 +278,18 @@ export default class Node extends PureComponent<NodeProps & NodePropsFData & Cus
   private addSourceEndPoints = () => {
     const { sourceSettings, id, diagramId, jsPlumb } = this.props;
 
-    // jsPlumb!.makeSource(this.node, {
-    //   filter: this.connectionFilter,
-    //   ...sourceSettings,
-    //   parameters: {
-    //     ...sourceSettings!.parameters,
-    //     source: id
-    //   }
-    // });
-
-    jsPlumb!.addEndpoint(
-      generateNodeId(diagramId!, id),
-      sourceSettings as any,
-    )
+    jsPlumb!.makeSource(this.node, {
+      filter: this.connectionFilter,
+      ...sourceSettings,
+      parameters: {
+        ...sourceSettings!.parameters,
+        source: id
+      }
+    });
+    // jsPlumb!.addEndpoint(
+    //   generateNodeId(diagramId!, id),
+    //   sourceSettings as any,
+    // )
   }
 
   private addTargetEndPoints = () => {

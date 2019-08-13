@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Input, InputNumber, Button, Icon } from 'antd';
+import { Form, Input, InputNumber } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
-import { formItemLayout, formItemLayoutForWorkFlowConfig, tailFormItemLayoutForWorkFlowConfig } from '../../utils/FormLayout';
-import { FlowNodeProps, ParamConfigProps, FlowNodesProps } from './WorkflowProps';
-import { useDispatch, useMappedState } from 'redux-react-hook';
+import { FlowNodeProps, FlowNodesProps } from './WorkflowProps';
+import { useMappedState } from 'redux-react-hook';
 
 type Props = {
   selectedNodeId: string
@@ -29,12 +28,15 @@ const WorkflowConf: React.FC<Props & WorkflowConfProps> = (props) => {
 
   const nodes: FlowNodesProps = useMappedState(state => state.workflowReducer);
 
-  const { getFieldDecorator, validateFields, getFieldsValue, setFieldsValue } = props.form;
+  const { getFieldDecorator } = props.form;
 
   useEffect(() => {
     setLoading(true);
     const nodeInfo = nodes[selectedNodeId];
     setNodeInfo(nodeInfo);
+    if (!selectedNodeId) {
+      setParamConfigs(null);
+    }
     if (nodeInfo && nodeInfo.model && nodeInfo.model.params) {
       setParamConfigs(nodeInfo.model.params);
     }

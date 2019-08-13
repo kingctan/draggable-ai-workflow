@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { Button, Icon, Table, Modal, Divider, Input, Badge } from 'antd';
+import { Button, Icon, Table, Input, Badge } from 'antd';
 
 import { InstanceProps } from './InstanceProps';
 import { formatDate } from '../../utils/formatHelper';
 
-type Props = {
-
-};
+type Props = {};
 
 const statusColorMap: any = {
   Succeeded: 'green',
@@ -17,7 +14,7 @@ const statusColorMap: any = {
 }
 
 const InstanceList: React.FC<Props> = (props) => {
-  const { } = props;
+  // const { } = props;
 
   const [list, setList] = useState<InstanceProps[]>([]);
   const [filterVal, setFilterVal] = useState(''); // 搜索框值
