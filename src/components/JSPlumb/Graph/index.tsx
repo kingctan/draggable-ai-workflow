@@ -15,6 +15,7 @@ const PanAndZoom = panAndZoomHoc('div');
 
 type customProps = {
   onBeforeDrop: (sourceId: string, targetId: string) => void
+  onClickLabel: (sourceId: string, targetId: string) => void
 };
 
 export default class Graph extends PureComponent<GraphProps & customProps, GraphState> {
@@ -37,6 +38,7 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
     maxScale: PropTypes.number,
     minScale: PropTypes.number,
     onAddConnection: PropTypes.func,
+    onClickLabel: PropTypes.func,
     onBeforeDrop: PropTypes.func,
     onPanAndZoom: PropTypes.func,
     onPanEnd: PropTypes.func,
@@ -109,6 +111,7 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
   }
 
   public componentDidMount() {
+    const { onClickLabel } = this.props;
     this.jsPlumb.ready(() => {
       // @ts-ignore
       // this.jsPlumb.endpointAnchorClass = 'rja_';
@@ -116,6 +119,19 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
         const { connection }: any = info;
         //@ts-ignore
         const JSplumb = this.jsPlumb;
+        connection.addOverlay([
+          "Label", {
+            location: 0.5,
+            id: "label-connector",
+            label: '<span class="error-icon-connect green-icon">i</span>',
+            cssClass: "workflow-node-label",
+            visible: false,
+            events: {
+              tap: function (e: any) {
+                onClickLabel('xx', 'rr');
+              }
+            },
+          }]);
         connection.addOverlay([
           "Label", {
             location: 0.6,

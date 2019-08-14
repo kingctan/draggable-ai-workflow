@@ -34,11 +34,12 @@
   "scripts": {
     "start": "react-app-rewired start",
     "start:prod": "env-cmd -f .env.production react-app-rewired start",
-    "build": "react-app-rewired build",
+    "build": "react-app-rewired build && npm run zip",
     "build:dev": "env-cmd -f .env.development react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject",
-    "cz": "git-cz"
+    "cz": "git-cz",
+    "zip": "cd build && zip -q -r Archive.zip * && cd .."
   },
   "eslintConfig": {
     "extends": "react-app"

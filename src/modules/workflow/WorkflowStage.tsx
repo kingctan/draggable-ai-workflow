@@ -11,15 +11,13 @@ import { useMappedState, useDispatch } from 'redux-react-hook';
 import { Button, Icon, Tooltip, message } from 'antd';
 import { generateNodeId, generateConnectionId } from '../../components/JSPlumb/util';
 import { ADD_NODE, REMOVE_NODE, NEW_CONNECTION, UPDATE_NODE_STYLE, REMOVE_CONNECTION } from './workflowReducer';
+import ModalConnections from '../../components/ModalConnections';
 
 type Props = {
   projectId: number | null
   selectedNodeId: string
   onSelectNode: (nodeId: string) => void
 };
-
-// const flowNodes: FlowNodesProps = {};
-// const flowConnections: any = [];
 
 const MAX_SCALE = 2;
 const MIN_SCALE = 0.5;
@@ -31,13 +29,13 @@ const WorkflowStage: React.FC<Props> = (props) => {
   const [loadingForSave, setLoadingForSave] = useState(false);
   const [loadingForRun, setLoadingForRun] = useState(false);
 
+  const [visibilityOfModal, setVisibilityOfModal] = useState(false);
+
   const [scale, setScale] = useState<number>(1);
   const [width, setWidth] = useState<number>(500);
   const [height, setHeight] = useState<number>(500);
-  // const [nodes, setNodes] = useState<any>(flowNodes);
   const [xOffset, setXOffset] = useState<number>(0.0);
   const [yOffset, setYOffset] = useState<number>(0.0);
-  // const [selectedNode, setSelectedNode] = useState<FlowNodeProps | null>(null);
   const [connections, setConnections] = useState<FlowConnectionProps[]>([]);
 
   const nodes: FlowNodesProps = useMappedState(state => state.workflowReducer);
@@ -58,19 +56,8 @@ const WorkflowStage: React.FC<Props> = (props) => {
   };
 
   const handleZoom = (scale?: number | undefined) => {
-    // console.log(scale);
     setScale(scale!);
   };
-
-  // const handleClose = (id: string | undefined) => {
-  //   if (id) {
-  //     const { [id]: omit, ...remaining } = nodes;
-  //     setNodes(remaining);
-  //     setConnections(connections.filter((connection: any) => (
-  //       connection.source !== id && connection.target !== id
-  //     )));
-  //   }
-  // };
 
   const handleAddConnection = (id: string, source: string, target: string) => {
     console.log(id, source, target);
@@ -93,10 +80,6 @@ const WorkflowStage: React.FC<Props> = (props) => {
   };
 
   const handleDeleteNode = (nodeId: string) => {
-    // console.log(nodeId);
-    // const newNodes = { ...nodes };
-    // delete newNodes[nodeId];
-    // setNodes(newNodes);
     dispatch({
       type: REMOVE_NODE,
       nodeId,
@@ -105,7 +88,10 @@ const WorkflowStage: React.FC<Props> = (props) => {
     if (nodeId === selectedNodeId) {
       onSelectNode('');
     }
+  };
 
+  const handleClickLabel = (sourceId: string, targetId: string) => {
+    // setVisibilityOfModal(true);
   };
 
   const handleBeforeDrop = (sourceId: string, targetId: string) => {
@@ -228,9 +214,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
   };
 
   const handleScreen = () => {
-    console.log('🌺', nodes);
-    console.log('🖼', connections);
-    message.warn('开发中 😁');
+    message.warn('开发中');
   };
 
   const handleSelectNode = (selectedNode: FlowNodeProps) => {
@@ -283,11 +267,13 @@ const WorkflowStage: React.FC<Props> = (props) => {
       const outputRuntime: OutputRuntimeProps = {};
 
       // 最后提交时不用关心输出的依赖，只需要把输出原来就有的所有key都带上就行
-      Object.keys(payload.model.outputs).forEach((outputKey: string) => {
-        outputRuntime[outputKey] = {
-          type: payload.model.outputs[outputKey].type,
-        }
-      });
+      if (payload.model && payload.model.outputs) {
+        Object.keys(payload.model.outputs).forEach((outputKey: string) => {
+          outputRuntime[outputKey] = {
+            type: payload.model.outputs[outputKey].type,
+          }
+        });
+      }
 
       dispatch({
         type: ADD_NODE,
@@ -376,7 +362,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
                 {loadingForSave ? <Icon type="loading" /> : <Icon type="save" theme="filled" />} 保存
               </Button>
             </Tooltip>
-            <Tooltip placement="top" title="运行">
+            <Tooltip placement="top" title="保存并运行">
               <Button onClick={handlePlay} >
                 {loadingForRun ? <Icon type="loading" /> : <Icon type="play-circle" theme="filled" />} 运行
               </Button>
@@ -397,6 +383,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
           minScale={MIN_SCALE}
           // onSelect={handleSelectNode}
           // do something when connect two endpoints
+          onClickLabel={handleClickLabel}
           onBeforeDrop={handleBeforeDrop}
           onAddConnection={handleAddConnection}
           onRemoveConnection={handleRemoveConnection}
@@ -432,6 +419,19 @@ const WorkflowStage: React.FC<Props> = (props) => {
           }
         </Graph>
       </div>
+      {
+        //@ts-ignore
+        <ModalConnections
+          visible={visibilityOfModal}
+          loading={false}
+          sourceId={'222'}
+          targetId={'333'}
+          nodes={nodes}
+          connections={connections}
+          handleOk={() => { }}
+          handleCancel={() => { }}
+        />
+      }
     </div>
   );
 };

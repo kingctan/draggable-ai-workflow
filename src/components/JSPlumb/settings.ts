@@ -55,7 +55,7 @@ export default {
   Anchor: ['Continuous', {}],
   Anchors: [['BottomCenter'], ['TopCenter']],
   ConnectionsDetachable: false,
-  Connector: ["Bezier", { curviness: 50 }],
+  Connector: ["Bezier", { curviness: 45 }],
   MaxConnections: -1,
   ConnectionOverlays: [
     ["Arrow", {
@@ -65,14 +65,14 @@ export default {
       length: 11,
       id: "ARROW",
     }],
-    [
-      "Label", {
-        location: 0.5,
-        id: "label-connector",
-        label: '<span class="error-icon-connect green-icon">i</span>',
-        cssClass: "workflow-node-label",
-        visible: false,
-      }],
+    // [
+    //   "Label", {
+    //     location: 0.5,
+    //     id: "label-connector",
+    //     label: '<span class="error-icon-connect green-icon">i</span>',
+    //     cssClass: "workflow-node-label",
+    //     visible: false,
+    //   }],
     // [
     //   "Label", {
     //     location: 0.6,

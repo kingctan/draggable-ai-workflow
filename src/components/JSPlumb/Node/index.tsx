@@ -15,7 +15,7 @@ const defaultDragSettings = {
 };
 const defaultSourceSettings = {
   anchor: 'BottomCenter',
-  connector: ["Bezier", { curviness: 50 }],
+  connector: ["Bezier", { curviness: 45 }],
   isSource: true,
   endpoint: "Dot",
   connectorStyle: {
