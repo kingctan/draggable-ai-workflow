@@ -10,7 +10,7 @@ type Props = {
   collapsed: boolean
 };
 
-const LayoutSidebar: SFC<Props | any> = (props) => {
+const LayoutSidebar: SFC<Props> = (props) => {
   const { navmark, collapsed } = props;
 
   return (

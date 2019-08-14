@@ -46,3 +46,8 @@ export type ParamConfigProps = {
     }
   }
 };
+
+export type ConnectionConfigProps = {
+  sourceId: string
+  targetId: string
+};

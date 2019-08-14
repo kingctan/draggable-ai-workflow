@@ -2,7 +2,8 @@ import { FlowNodesProps } from './WorkflowProps';
 
 export const ADD_NODE = 'ADD_NODE';
 export const UPDATE_NODE_PARAM = 'UPDATE_NODE_PARAM';
-export const UPDATE_NODE_DEPS = 'UPDATE_NODE_DEPS';
+export const NEW_CONNECTION = 'NEW_CONNECTION';
+export const REMOVE_CONNECTION = 'REMOVE_CONNECTION';
 export const UPDATE_NODE_STYLE = 'UPDATE_NODE_STYLE';
 export const REMOVE_NODE = 'REMOVE_NODE';
 export const CLEAR_NODES = 'CLEAR_NODES';
@@ -13,6 +14,7 @@ function workflowReducer(state: FlowNodesProps = initialState, action: any) {
   switch (action.type) {
     case ADD_NODE: {
       const { nodeId, nodeInfo } = action;
+
       return {
         ...state,
         [nodeId]: nodeInfo
@@ -21,19 +23,18 @@ function workflowReducer(state: FlowNodesProps = initialState, action: any) {
 
     case UPDATE_NODE_PARAM: {
       const { nodeId, paramKey, paramValue } = action;
-      const willUpdateNode = { ...state };
+      const newNodes = { ...state };
 
-      willUpdateNode[nodeId].model.params[paramKey].default = paramValue;
+      newNodes[nodeId].model.params[paramKey].default = paramValue;
 
-      return willUpdateNode;
+      return newNodes;
     }
 
-    case UPDATE_NODE_DEPS: {
-      const { sourceId, targetId } = action;
-      const willUpdateNodes = { ...state };
+    case NEW_CONNECTION: {
+      const { sourceId, targetId, sourceOutput, targetInput } = action;
+      const newNodes = { ...state };
 
-      const sourceNode = willUpdateNodes[sourceId];
-      const targetNode = willUpdateNodes[targetId];
+      const targetNode = newNodes[targetId];
 
       if (!targetNode.deps) {
         targetNode.deps = [sourceId];
@@ -43,52 +44,66 @@ function workflowReducer(state: FlowNodesProps = initialState, action: any) {
         }
       }
 
-      const outputRuntimeKey = Object.keys(sourceNode.model.outputs)[0];
-      if (outputRuntimeKey) {
-        sourceNode.outputRuntime = {
-          [outputRuntimeKey]: {
-            type: sourceNode.model.outputs[outputRuntimeKey].type
-          }
+      targetNode.inputRuntime = {
+        [targetInput]: {
+          id: sourceId,
+          type: targetNode.model.inputs[targetInput].type,
+          name: sourceOutput,
         }
       }
 
-      const inputRuntimeKey = Object.keys(targetNode.model.inputs)[0];
-      if (inputRuntimeKey) {
-        targetNode.inputRuntime = {
-          [inputRuntimeKey]: {
-            id: sourceId,
-            type: targetNode.model.inputs[inputRuntimeKey].type,
-            name: outputRuntimeKey,
+      return newNodes;
+    }
+
+    case REMOVE_CONNECTION: {
+      const { sourceId, targetId } = action;
+      const newNodes = { ...state };
+
+      if (newNodes[targetId].inputRuntime) {
+        Object.keys(newNodes[targetId].inputRuntime!).forEach((inputKey: string) => {
+          if (newNodes[targetId].inputRuntime![inputKey].id === sourceId) {
+            delete newNodes[targetId].inputRuntime![inputKey];
           }
-        }
+        });
       }
 
-      return willUpdateNodes;
+      newNodes[targetId].deps = newNodes[targetId].deps!.filter((dep: string) => dep !== sourceId);
+
+      return newNodes;
     }
 
     case UPDATE_NODE_STYLE: {
       const { nodeId, left, top } = action;
-      const willUpdateNode = { ...state };
+      const newNodes = { ...state };
 
-      willUpdateNode[nodeId].style = { left, top }
+      newNodes[nodeId].style = { left, top }
 
-      return willUpdateNode;
+      return newNodes;
     }
 
     case REMOVE_NODE: {
       const { nodeId } = action;
-      const willUpdateNodes = { ...state };
+      const newNodes = { ...state };
 
-      Object.keys(willUpdateNodes).forEach((key: string) => {
-        const node = willUpdateNodes[key];
+      Object.keys(newNodes).forEach((key: string) => {
+        const node = newNodes[key];
+
         if (node.deps && node.deps!.includes(nodeId)) {
           node.deps = node.deps!.filter((dep: string) => dep !== nodeId);
         }
+
+        if (node.inputRuntime) {
+          Object.keys(node.inputRuntime).forEach((inputKey: string) => {
+            if (node.inputRuntime![inputKey].id === nodeId) {
+              delete node.inputRuntime![inputKey];
+            }
+          });
+        }
       });
 
-      delete willUpdateNodes[nodeId];
+      delete newNodes[nodeId];
 
-      return willUpdateNodes;
+      return newNodes;
     }
 
     case CLEAR_NODES: {

@@ -22,7 +22,6 @@ interface WorkflowConfProps extends FormComponentProps { }
 const WorkflowConf: React.FC<Props & WorkflowConfProps> = (props) => {
   const { selectedNodeId } = props;
 
-  const [loading, setLoading] = useState(true);
   const [nodeInfo, setNodeInfo] = useState<FlowNodeProps | null>(null);
   const [paramConfigs, setParamConfigs] = useState<NodeParamConfigProps | null>(null);
 
@@ -31,23 +30,26 @@ const WorkflowConf: React.FC<Props & WorkflowConfProps> = (props) => {
   const { getFieldDecorator } = props.form;
 
   useEffect(() => {
-    setLoading(true);
-    const nodeInfo = nodes[selectedNodeId];
-    setNodeInfo(nodeInfo);
-    if (!selectedNodeId) {
-      setParamConfigs(null);
-    }
-    if (nodeInfo && nodeInfo.model && nodeInfo.model.params) {
-      setParamConfigs(nodeInfo.model.params);
-    }
-    setLoading(false);
+    setParamConfigs(null);
+    setTimeout(() => {
+      const nodeInfo = nodes[selectedNodeId];
+
+      setNodeInfo(nodeInfo);
+      if (!selectedNodeId) {
+        setParamConfigs(null);
+      }
+      if (nodeInfo && nodeInfo.model && nodeInfo.model.params) {
+        setParamConfigs(nodeInfo.model.params);
+      }
+    }, 0);
+
   }, [selectedNodeId]);
 
 
   return (
     <div className="workflow-conf">
       {
-        !loading &&
+        paramConfigs &&
         <Form onSubmit={() => { }}>
           <Form.Item>
             <h3>{nodeInfo && nodeInfo.label || ''}</h3>

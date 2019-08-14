@@ -5,21 +5,19 @@ import { v4 } from 'uuid';
 import axios from 'axios';
 import { useDrop, DropTargetMonitor } from 'react-dnd'
 import { Graph, Node } from '../../components/JSPlumb';
-import { FlowNodeProps, FlowNodesProps, FlowConnectionProps } from './WorkflowProps';
+import { FlowNodeProps, FlowNodesProps, FlowConnectionProps, OutputRuntimeProps, ConnectionConfigProps } from './WorkflowProps';
 import { XYCoord } from 'dnd-core';
 import { useMappedState, useDispatch } from 'redux-react-hook';
 import { Button, Icon, Tooltip, message } from 'antd';
 import { generateNodeId, generateConnectionId } from '../../components/JSPlumb/util';
-import { ADD_NODE, REMOVE_NODE, UPDATE_NODE_DEPS, UPDATE_NODE_STYLE } from './workflowReducer';
+import { ADD_NODE, REMOVE_NODE, NEW_CONNECTION, UPDATE_NODE_STYLE, REMOVE_CONNECTION } from './workflowReducer';
+import ModalConnections from '../../components/ModalConnections';
 
 type Props = {
   projectId: number | null
   selectedNodeId: string
   onSelectNode: (nodeId: string) => void
 };
-
-// const flowNodes: FlowNodesProps = {};
-// const flowConnections: any = [];
 
 const MAX_SCALE = 2;
 const MIN_SCALE = 0.5;
@@ -31,13 +29,14 @@ const WorkflowStage: React.FC<Props> = (props) => {
   const [loadingForSave, setLoadingForSave] = useState(false);
   const [loadingForRun, setLoadingForRun] = useState(false);
 
+  const [visibilityOfModal, setVisibilityOfModal] = useState(false);
+  const [connectionConfig, setConnectionConfig] = useState<ConnectionConfigProps | null>(null);
+
   const [scale, setScale] = useState<number>(1);
   const [width, setWidth] = useState<number>(500);
   const [height, setHeight] = useState<number>(500);
-  // const [nodes, setNodes] = useState<any>(flowNodes);
   const [xOffset, setXOffset] = useState<number>(0.0);
   const [yOffset, setYOffset] = useState<number>(0.0);
-  // const [selectedNode, setSelectedNode] = useState<FlowNodeProps | null>(null);
   const [connections, setConnections] = useState<FlowConnectionProps[]>([]);
 
   const nodes: FlowNodesProps = useMappedState(state => state.workflowReducer);
@@ -58,19 +57,8 @@ const WorkflowStage: React.FC<Props> = (props) => {
   };
 
   const handleZoom = (scale?: number | undefined) => {
-    // console.log(scale);
     setScale(scale!);
   };
-
-  // const handleClose = (id: string | undefined) => {
-  //   if (id) {
-  //     const { [id]: omit, ...remaining } = nodes;
-  //     setNodes(remaining);
-  //     setConnections(connections.filter((connection: any) => (
-  //       connection.source !== id && connection.target !== id
-  //     )));
-  //   }
-  // };
 
   const handleAddConnection = (id: string, source: string, target: string) => {
     console.log(id, source, target);
@@ -85,13 +73,14 @@ const WorkflowStage: React.FC<Props> = (props) => {
     setConnections(connections.filter((connection: any) => (
       connection.id !== connectionId
     )));
+    dispatch({
+      type: REMOVE_CONNECTION,
+      sourceId,
+      targetId,
+    });
   };
 
   const handleDeleteNode = (nodeId: string) => {
-    // console.log(nodeId);
-    // const newNodes = { ...nodes };
-    // delete newNodes[nodeId];
-    // setNodes(newNodes);
     dispatch({
       type: REMOVE_NODE,
       nodeId,
@@ -100,33 +89,68 @@ const WorkflowStage: React.FC<Props> = (props) => {
     if (nodeId === selectedNodeId) {
       onSelectNode('');
     }
-
   };
 
+  const handleClickLabel = (sourceId: string, targetId: string) => {
+    if (sourceId && targetId) {
+      setConnectionConfig({ sourceId, targetId });
+      setVisibilityOfModal(true);
+    }
+  };
+
+  const getKeyCount = (obj: Object) => Object.keys(obj).length;
+
   const handleBeforeDrop = (sourceId: string, targetId: string) => {
-    const source = nodes[sourceId];
-    const target = nodes[targetId];
-    let canConnect = false;
-    if (target.model && source.model) {
-      Object.keys(target.model.inputs).forEach((targetInputKey: string) => {
-        console.log(source.model.outputs[targetInputKey]);
-        if (source.model.outputs[targetInputKey]) canConnect = true;
-      });
-      if (canConnect) {
-        dispatch({
-          type: UPDATE_NODE_DEPS,
-          sourceId,
-          targetId,
-        });
-        return true;
-      } else {
-        message.warning('两个组件的输入输出不匹配，无法建立连接！');
-        return false;
-      }
-    } else {
-      message.warning('无法建议连接：请使用自定义组件并配置至少一个输入或输出，其它组件暂时只做展示！', 6);
+    const source: FlowNodeProps = nodes[sourceId];
+    const target: FlowNodeProps = nodes[targetId];
+
+    // 两个组件不能重复连接
+    if (connections.some((connection: FlowConnectionProps) => connection.target === targetId && connection.source === sourceId)) {
+      message.warning('不能重复连接');
       return false;
     }
+
+    // 两个组件类型要匹配
+    let checkType = false; // 判断连线两端算子输入输出类型是否匹配
+    const outputTypes: string[] = []; // 存所有输入、所有输出的type
+    Object.keys(source.model.outputs).forEach((outputKey: string) => {
+      outputTypes.push(source.model.outputs[outputKey].type);
+    });
+    Object.keys(target.model.inputs).forEach((inputKey: string) => {
+      if (outputTypes.includes(target.model.inputs[inputKey].type)) checkType = true;
+    });
+    if (!checkType) {
+      message.warning('两个组件的输入输出不匹配，无法建立连接！');
+      return false;
+    }
+
+    if (target.inputRuntime && getKeyCount(target.inputRuntime) === getKeyCount(target.model.inputs)) {
+      message.warning(<span><b>{target.label}</b> 无法接受更多的输入！</span>);
+      return false;
+    }
+
+    // 如果target只有一个输入，source也只有一个输出
+    if (getKeyCount(target.model.inputs) === 1 && getKeyCount(source.model.outputs) === 1) {
+
+      const sourceOutput = Object.keys(source.model.outputs)[0];
+      const targetInput = Object.keys(target.model.inputs)[0];
+
+      dispatch({
+        type: NEW_CONNECTION,
+        sourceId,
+        targetId,
+        sourceOutput,
+        targetInput
+      });
+
+      return true;
+
+    } else {
+      setConnectionConfig({ sourceId, targetId });
+      setVisibilityOfModal(true);
+      return false;
+    }
+
   };
 
   const handleSave = async () => {
@@ -212,9 +236,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
   };
 
   const handleScreen = () => {
-    console.log('🌺', nodes);
-    console.log('🖼', connections);
-    message.warn('开发中 😁');
+    message.warn('开发中');
   };
 
   const handleSelectNode = (selectedNode: FlowNodeProps) => {
@@ -222,10 +244,6 @@ const WorkflowStage: React.FC<Props> = (props) => {
   };
 
   const handleDrop = (id: string, x: number, y: number) => {
-    // setNodes({
-    //   ...nodes,
-    //   [id]: { ...nodes[id], x, y }
-    // });
     dispatch({
       type: UPDATE_NODE_STYLE,
       nodeId: id,
@@ -252,41 +270,67 @@ const WorkflowStage: React.FC<Props> = (props) => {
   }, drop] = useDrop({
     accept: 'box',
     drop: (item: any, monitor: DropTargetMonitor) => {
-      const clientOffset: XYCoord | null = monitor.getSourceClientOffset();
+      const payload = item.name;
+      if (!payload.model) {
+        message.warning('请使用自定义组件，其它组件暂只作展示。', 6);
+      } else {
 
-      const ndDropPlace = document.getElementById('drop-stage');
-      const dropPlaceOffset: { left: number, top: number } = ndDropPlace!.getBoundingClientRect();
+        const clientOffset: XYCoord | null = monitor.getSourceClientOffset();
 
-      const relativeXOffset = clientOffset!.x - dropPlaceOffset.left;
-      const relativeYOffset = clientOffset!.y - dropPlaceOffset.top;
+        const ndDropPlace = document.getElementById('drop-stage');
+        const dropPlaceOffset: { left: number, top: number } = ndDropPlace!.getBoundingClientRect();
 
-      // console.log(`✨拖动结束！`, item.name);
-      const nodeId = generateNodeId(MY_GRAPH_ID, v4());
+        const relativeXOffset = clientOffset!.x - dropPlaceOffset.left;
+        const relativeYOffset = clientOffset!.y - dropPlaceOffset.top;
 
-      dispatch({
-        type: ADD_NODE,
-        nodeId,
-        nodeInfo: {
-          id: nodeId,
-          label: item.name.title,
-          icon: 'icon-code1',
-          type: generateNodeType(item.name),
-          model: item.name.model,
-          style: {
-            left: relativeXOffset,
-            top: relativeYOffset,
-          },
+        const nodeId = generateNodeId(MY_GRAPH_ID, v4());
+
+        const outputRuntime: OutputRuntimeProps = {};
+
+        // 最后提交时不用关心输出的依赖，只需要把输出原来就有的所有key都带上就行
+        if (payload.model && payload.model.outputs) {
+          Object.keys(payload.model.outputs).forEach((outputKey: string) => {
+            outputRuntime[outputKey] = {
+              type: payload.model.outputs[outputKey].type,
+            }
+          });
         }
-      });
 
-      onSelectNode(nodeId);
+        dispatch({
+          type: ADD_NODE,
+          nodeId,
+          nodeInfo: {
+            id: nodeId,
+            label: payload.title,
+            icon: 'icon-code1',
+            type: generateNodeType(payload),
+            model: payload.model,
+            style: {
+              left: relativeXOffset,
+              top: relativeYOffset,
+            },
+            outputRuntime,
+          }
+        });
 
+        onSelectNode(nodeId);
+      }
     },
     collect: monitor => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
     }),
   });
+
+  const handleMakeConnection = (sourceId: string, targetId: string) => {
+    setConnections(
+      [...connections, {
+        id: generateConnectionId(MY_GRAPH_ID, v4()),
+        source: sourceId,
+        target: targetId,
+      }]
+    )
+  };
 
   const getWorkflowInfo = () => {
     axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/project/get?projectID=${projectId}`)
@@ -318,6 +362,8 @@ const WorkflowStage: React.FC<Props> = (props) => {
                   left: item.fe.left || 0,
                   top: item.fe.top || 0,
                 },
+                outputRuntime: item.outputs,
+                inputRuntime: item.inputs,
               }
             });
           });
@@ -347,7 +393,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
                 {loadingForSave ? <Icon type="loading" /> : <Icon type="save" theme="filled" />} 保存
               </Button>
             </Tooltip>
-            <Tooltip placement="top" title="运行">
+            <Tooltip placement="top" title="保存并运行">
               <Button onClick={handlePlay} >
                 {loadingForRun ? <Icon type="loading" /> : <Icon type="play-circle" theme="filled" />} 运行
               </Button>
@@ -368,6 +414,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
           minScale={MIN_SCALE}
           // onSelect={handleSelectNode}
           // do something when connect two endpoints
+          onClickLabel={handleClickLabel}
           onBeforeDrop={handleBeforeDrop}
           onAddConnection={handleAddConnection}
           onRemoveConnection={handleRemoveConnection}
@@ -403,6 +450,16 @@ const WorkflowStage: React.FC<Props> = (props) => {
           }
         </Graph>
       </div>
+      {
+        visibilityOfModal &&
+        //@ts-ignore
+        <ModalConnections
+          visible={visibilityOfModal}
+          config={connectionConfig}
+          handleOK={handleMakeConnection}
+          handleCancel={() => setVisibilityOfModal(false)}
+        />
+      }
     </div>
   );
 };

@@ -500,9 +500,6 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
             <Form.Item >
               {getFieldDecorator('code', {
                 initialValue: PRESET_CODE,
-                rules: [
-                  { required: true, message: '请填写代码' },
-                ],
               })(
                 <AceEditor
                   mode="python"
