@@ -29,7 +29,7 @@ const ProjectDetail: React.FC<Props & ProjectDetailProps> = (props) => {
         },
       };
 
-      if (projectId) { // 更新项目
+      if (projectId) { // 更新模板
         finalObj.projectId = Number(projectId);
         axios.put(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/project/update`, finalObj)
           .then((res) => {
@@ -40,7 +40,7 @@ const ProjectDetail: React.FC<Props & ProjectDetailProps> = (props) => {
           }).catch((err) => {
             message.error('服务器被吃了..');
           });
-      } else { // 新增项目
+      } else { // 新增模板
         axios.post(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/project/create`, finalObj)
           .then((res) => {
             if (res.data.code === 200) {
@@ -79,17 +79,17 @@ const ProjectDetail: React.FC<Props & ProjectDetailProps> = (props) => {
         loading ? <Spin tip="加载中..." className="spin" style={{ color: '#fff' }} /> :
           <Form onSubmit={() => { }}>
             <Form.Item {...tailFormItemLayout} className="form-title">
-              {projectId ? "编辑项目" : "创建项目"}
+              {projectId ? "编辑模板" : "创建模板"}
             </Form.Item>
-            <Form.Item label="项目名称" required {...formItemLayout}>
+            <Form.Item label="模板名称" required {...formItemLayout}>
               {getFieldDecorator('projectName', {
                 rules: [{
                   required: true,
-                  message: '请填写项目名称',
+                  message: '请填写模板名称',
                 }],
               })(<Input />)}
             </Form.Item>
-            <Form.Item label="项目描述" {...formItemLayout}>
+            <Form.Item label="模板描述" {...formItemLayout}>
               {getFieldDecorator('note', {
               })(
                 <Input.TextArea autosize={{ minRows: 3, maxRows: 8 }} />

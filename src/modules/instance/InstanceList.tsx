@@ -50,7 +50,7 @@ const InstanceList: React.FC<Props> = (props) => {
       <span className="table-column-link">
         <a
           target="_blank"
-          href={`http://39.108.232.245:31441/workflows/default/${row.jobName}`}
+          href={`http://39.108.232.245:8081/workflows/default/${row.jobName}`}
           style={{ whiteSpace: 'nowrap' }}
         >
           {text}

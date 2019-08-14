@@ -1,4 +1,4 @@
-import React, { SFC, useEffect } from 'react';
+import React, { SFC, useEffect, CSSProperties } from 'react';
 import { Modal, Button, Form, Icon, Tag, Table, Input, Row, Col, Select, message } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
 import { FlowNodesProps, ConnectionConfigProps } from '../modules/workflow/WorkflowProps';
@@ -37,9 +37,11 @@ const ModalConnections: SFC<Props & ConnectionConfigFormProps> = (props) => {
       return message.warning(<span>请保证当前组件 <b>{nodes[sourceId].label}</b> 至少有一个输出</span>);
     }
 
+
+
     for (let i = 0; i < values.output.length; i += 1) {
       const sourceOutput = values.output[i];
-
+      console.log('🌺', values);
       if (sourceOutput && sourceOutput !== '*') {
         isModify = true;
 
@@ -53,7 +55,6 @@ const ModalConnections: SFC<Props & ConnectionConfigFormProps> = (props) => {
 
         handleOK(sourceId, targetId);
         handleCancel();
-        break;
       }
     }
 
@@ -67,69 +68,75 @@ const ModalConnections: SFC<Props & ConnectionConfigFormProps> = (props) => {
   const columns = [
     {
       title: '输出',
-      dataIndex: 'output',
       key: 'output',
       width: '50%',
       render: (text: string, record: string, index: number) => {
         let disabled = false;
         let initialValue = '*';
+        let nodeId = config!.sourceId;
         const targetInputRuntime = nodes[config!.targetId].inputRuntime;
         if (targetInputRuntime && targetInputRuntime[record]) {
           disabled = true;
           initialValue = targetInputRuntime[record].name;
+          nodeId = targetInputRuntime[record].id;
         }
-
         return (
-          <Form.Item className="table-small-form-item">
-            {getFieldDecorator(disabled ? `output-disabled-[${index}]` : `output[${index}]`, {
-              initialValue: initialValue,
-            })(
-              <Select style={{ width: '100%' }} disabled={modalContentDisabled || disabled}>
-                {Object.keys(nodes[config!.sourceId].model.outputs).map((outputKey: string) => (
-                  <Select.Option
-                    value={outputKey}
-                    key={outputKey}
-                    disabled={nodes[config!.sourceId].model.outputs[outputKey].type !== nodes[config!.targetId].model.inputs[record].type}
-                  >
-                    {outputKey}
-                    {` `}
-                    ({nodes[config!.sourceId].model.outputs[outputKey].type})
+          <div style={{ position: 'relative' }}>
+            <p style={styles.P}>{nodeId}</p>
+            <Form.Item className="table-small-form-item">
+
+              {getFieldDecorator(disabled ? `output-disabled-[${index}]` : `output[${index}]`, {
+                initialValue: initialValue,
+              })(
+                <Select style={{ width: '100%' }} disabled={modalContentDisabled || disabled}>
+                  {Object.keys(nodes[config!.sourceId].model.outputs).map((outputKey: string) => (
+                    <Select.Option
+                      value={outputKey}
+                      key={outputKey}
+                      disabled={nodes[config!.sourceId].model.outputs[outputKey].type !== nodes[config!.targetId].model.inputs[record].type}
+                    >
+                      {outputKey}
+                      {` `}
+                      ({nodes[config!.sourceId].model.outputs[outputKey].type})
                   </Select.Option>
-                ))}
-                <Select.Option value="*" key="*">
-                  (无)
+                  ))}
+                  <Select.Option value="*" key="*">
+                    (无)
               </Select.Option>
-              </Select>
-            )}
-          </Form.Item>
+                </Select>
+              )}
+            </Form.Item>
+          </div>
         )
       },
     },
     {
       title: '输入',
-      dataIndex: 'input',
       key: 'input',
       width: '50%',
       render: (text: string, record: string, index: number) => (
-        <Form.Item className="table-small-form-item">
-          {getFieldDecorator(`input[${index}]`, {
-            initialValue: record
-          })(
-            <Select style={{ width: '100%' }} disabled>
-              {Object.keys(nodes[config!.targetId].model.inputs).map((inputKey: string) => (
-                <Select.Option value={inputKey} key={inputKey}>
-                  {inputKey} ({nodes[config!.targetId].model.inputs[inputKey].type})
+        <div style={{ position: 'relative' }}>
+          <Form.Item className="table-small-form-item">
+            {getFieldDecorator(`input[${index}]`, {
+              initialValue: record
+            })(
+              <Select style={{ width: '100%' }} disabled>
+                {Object.keys(nodes[config!.targetId].model.inputs).map((inputKey: string) => (
+                  <Select.Option value={inputKey} key={inputKey}>
+                    {inputKey} ({nodes[config!.targetId].model.inputs[inputKey].type})
                 </Select.Option>
-              ))}
-            </Select>
-          )}
-        </Form.Item>
+                ))}
+              </Select>
+            )}
+          </Form.Item>
+        </div>
       ),
     },
   ];
 
   return (
     <Modal
+      width={680}
       visible={visible}
       title="输入输出配置"
       onCancel={handleCancel}
@@ -164,6 +171,19 @@ const ModalConnections: SFC<Props & ConnectionConfigFormProps> = (props) => {
     </Modal>
   )
 };
+
+const styles: {
+  [field: string]: CSSProperties
+} = {
+  P: {
+    position: 'absolute',
+    top: -13,
+    margin: '0 0 2px 0',
+    fontSize: 12,
+    height: 12,
+    color: '#1890ff'
+  }
+}
 
 export default Form.create<ConnectionConfigFormProps>({
   name: 'ModalConnections',
