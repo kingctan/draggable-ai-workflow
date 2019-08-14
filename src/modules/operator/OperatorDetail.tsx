@@ -446,7 +446,7 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
             </Form.Item>
             <Form.Item label="CPU数" required {...formItemLayout}>
               {getFieldDecorator(`container.cpuNumber`, {
-                initialValue: 1,
+                initialValue: 4,
                 rules: [
                   { required: true, message: '请填写CPU数' },
                 ],
@@ -466,12 +466,12 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
             </Form.Item>
             <Form.Item label="内存(MB)" required {...formItemLayout}>
               {getFieldDecorator(`container.memoryMB`, {
-                initialValue: 8192,
+                initialValue: 4056,
                 rules: [
                   { required: true, message: '请填写内存' },
                 ],
               })(
-                <InputNumber min={8192} style={{ width: '100%' }} />
+                <InputNumber min={1024} style={{ width: '100%' }} />
               )}
             </Form.Item>
 

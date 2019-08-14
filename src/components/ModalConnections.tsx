@@ -9,6 +9,7 @@ import { NEW_CONNECTION } from '../modules/workflow/workflowReducer';
 type Props = {
   visible: boolean
   config: ConnectionConfigProps | null
+  modalContentDisabled: boolean
   handleOK: (sourceId: string, targetId: string) => void
   handleCancel: () => void
 };
@@ -16,7 +17,7 @@ type Props = {
 interface ConnectionConfigFormProps extends FormComponentProps { };
 
 const ModalConnections: SFC<Props & ConnectionConfigFormProps> = (props) => {
-  const { visible, config, handleOK, handleCancel } = props;
+  const { visible, config, modalContentDisabled, handleOK, handleCancel } = props;
 
   const { getFieldDecorator, validateFields, getFieldsValue, setFieldsValue } = props.form;
 
@@ -29,9 +30,17 @@ const ModalConnections: SFC<Props & ConnectionConfigFormProps> = (props) => {
     const targetId = config!.targetId;
 
     let isModify = false; // 不能全部填写“无”
+    values.output.forEach((sourceOutput: string) => {
+      if (sourceOutput && sourceOutput !== '*') isModify = true;
+    });
+    if (!isModify) {
+      return message.warning(<span>请保证当前组件 <b>{nodes[sourceId].label}</b> 至少有一个输出</span>);
+    }
+
     for (let i = 0; i < values.output.length; i += 1) {
       const sourceOutput = values.output[i];
-      if (sourceOutput !== '*') {
+
+      if (sourceOutput && sourceOutput !== '*') {
         isModify = true;
 
         dispatch({
@@ -48,9 +57,7 @@ const ModalConnections: SFC<Props & ConnectionConfigFormProps> = (props) => {
       }
     }
 
-    if (!isModify) {
-      return message.warning(<span>请保证 <b>{nodes[sourceId].label}</b> 至少有一个输出</span>);
-    }
+
   };
 
   useEffect(() => {
@@ -63,24 +70,40 @@ const ModalConnections: SFC<Props & ConnectionConfigFormProps> = (props) => {
       dataIndex: 'output',
       key: 'output',
       width: '50%',
-      render: (text: string, record: string, index: number) => (
-        <Form.Item className="table-small-form-item">
-          {getFieldDecorator(`output[${index}]`, {
-            initialValue: '*'
-          })(
-            <Select style={{ width: '100%' }}>
-              {Object.keys(nodes[config!.sourceId].model.outputs).map((outputKey: string) => (
-                <Select.Option value={outputKey} key={outputKey}>
-                  {outputKey} ({nodes[config!.sourceId].model.outputs[outputKey].type})
-                </Select.Option>
-              ))}
-              <Select.Option value="*" key="*">
-                (无)
+      render: (text: string, record: string, index: number) => {
+        let disabled = false;
+        let initialValue = '*';
+        const targetInputRuntime = nodes[config!.targetId].inputRuntime;
+        if (targetInputRuntime && targetInputRuntime[record]) {
+          disabled = true;
+          initialValue = targetInputRuntime[record].name;
+        }
+
+        return (
+          <Form.Item className="table-small-form-item">
+            {getFieldDecorator(disabled ? `output-disabled-[${index}]` : `output[${index}]`, {
+              initialValue: initialValue,
+            })(
+              <Select style={{ width: '100%' }} disabled={modalContentDisabled || disabled}>
+                {Object.keys(nodes[config!.sourceId].model.outputs).map((outputKey: string) => (
+                  <Select.Option
+                    value={outputKey}
+                    key={outputKey}
+                    disabled={nodes[config!.sourceId].model.outputs[outputKey].type !== nodes[config!.targetId].model.inputs[record].type}
+                  >
+                    {outputKey}
+                    {` `}
+                    ({nodes[config!.sourceId].model.outputs[outputKey].type})
+                  </Select.Option>
+                ))}
+                <Select.Option value="*" key="*">
+                  (无)
               </Select.Option>
-            </Select>
-          )}
-        </Form.Item>
-      ),
+              </Select>
+            )}
+          </Form.Item>
+        )
+      },
     },
     {
       title: '输入',
@@ -110,7 +133,7 @@ const ModalConnections: SFC<Props & ConnectionConfigFormProps> = (props) => {
       visible={visible}
       title="输入输出配置"
       onCancel={handleCancel}
-      footer={[
+      footer={modalContentDisabled ? null : [
         <Button key="back" onClick={handleCancel}>
           取消
         </Button>,

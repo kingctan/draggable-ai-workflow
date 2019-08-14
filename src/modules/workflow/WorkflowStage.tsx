@@ -30,6 +30,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
   const [loadingForRun, setLoadingForRun] = useState(false);
 
   const [visibilityOfModal, setVisibilityOfModal] = useState(false);
+  const [modalContentDisabled, setModelContentDisabled] = useState(false);
   const [connectionConfig, setConnectionConfig] = useState<ConnectionConfigProps | null>(null);
 
   const [scale, setScale] = useState<number>(1);
@@ -94,6 +95,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
   const handleClickLabel = (sourceId: string, targetId: string) => {
     if (sourceId && targetId) {
       setConnectionConfig({ sourceId, targetId });
+      setModelContentDisabled(true);
       setVisibilityOfModal(true);
     }
   };
@@ -146,6 +148,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
       return true;
 
     } else {
+      setModelContentDisabled(false);
       setConnectionConfig({ sourceId, targetId });
       setVisibilityOfModal(true);
       return false;
@@ -455,6 +458,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
         //@ts-ignore
         <ModalConnections
           visible={visibilityOfModal}
+          modalContentDisabled={modalContentDisabled}
           config={connectionConfig}
           handleOK={handleMakeConnection}
           handleCancel={() => setVisibilityOfModal(false)}
