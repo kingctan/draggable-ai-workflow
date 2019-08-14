@@ -128,7 +128,11 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
             visible: false,
             events: {
               tap: function (e: any) {
-                onClickLabel('xx', 'rr');
+                //@ts-ignore
+                const { sourceId, targetId } = this.component;
+                if (sourceId && targetId) {
+                  onClickLabel(sourceId, targetId);
+                }
               }
             },
           }]);
@@ -162,18 +166,6 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
       // @ts-ignore
       this.jsPlumb.bind('connectionDetached', this.handleDetachedConnection);
 
-      // this.jsPlumb.bind('connectionDragStop', (connection: any) => {
-      //   connection.getOverlay("label-connector").show();
-      //   // connection.bind("click", function (conn: any) {
-      //   // });
-      //   connection.bind("mouseover", function (conn: any) {
-      //     connection.getOverlay("delete-connector").show();
-      //   });
-      //   connection.bind("mouseout", function (conn: any) {
-      //     connection.getOverlay("delete-connector").hide();
-      //   });
-      // });
-
       this.jsPlumb.setSuspendDrawing(true);
 
       // Try and make first paint less spastic
@@ -192,73 +184,73 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
     connections: prevConnections,
     scale: prevScale
   }: GraphProps) {
-    // if (prevScale !== this.props.scale) {
-    //   //@ts-ignore
-    //   this.jsPlumb.setZoom(this.props.scale);
-    // }
+    if (prevScale !== this.props.scale) {
+      //@ts-ignore
+      this.jsPlumb.setZoom(this.props.scale);
+    }
 
-    // const {
-    //   connections,
-    //   id: diagramId,
-    // } = this.props;
-    // //@ts-ignore
-    // if (connections.length < prevConnections.length) {
-    //   //@ts-ignore
-    //   const currentConnections = new Set(connections.map(connection => connection.id));
-    //   //@ts-ignore
-    //   const removedConnections = prevConnections.filter(connection => (
-    //     !currentConnections.has(connection.id)
-    //   ));
-    //   removedConnections.forEach(({ source, target }) => {
-    //     const removedConnectionSet = new Set(removedConnections.map(connection => connection.id));
-    //     // @ts-ignore
-    //     const remainingConnection = this.jsPlumb.getConnections({
-    //       source: generateNodeId(diagramId, source),
-    //       target: generateNodeId(diagramId, target)
-    //     }).find((connection: Connection) => (
-    //       //@ts-ignore
-    //       removedConnectionSet.has(connection.getParameter('id'))
-    //     ));
+    const {
+      connections,
+      id: diagramId,
+    } = this.props;
+    //@ts-ignore
+    if (connections.length < prevConnections.length) {
+      //@ts-ignore
+      const currentConnections = new Set(connections.map(connection => connection.id));
+      //@ts-ignore
+      const removedConnections = prevConnections.filter(connection => (
+        !currentConnections.has(connection.id)
+      ));
+      removedConnections.forEach(({ source, target }) => {
+        const removedConnectionSet = new Set(removedConnections.map(connection => connection.id));
+        // @ts-ignore
+        const remainingConnection = this.jsPlumb.getConnections({
+          source: generateNodeId(diagramId, source),
+          target: generateNodeId(diagramId, target)
+        }).find((connection: Connection) => (
+          //@ts-ignore
+          removedConnectionSet.has(connection.getParameter('id'))
+        ));
 
-    //     if (remainingConnection) {
-    //       this.jsPlumb.unbind('connectionDetached', this.handleDetachedConnection);
-    //       this.jsPlumb.deleteConnection(remainingConnection);
-    //       // @ts-ignore
-    //       this.jsPlumb.bind('connectionDetached', this.handleDetachedConnection);
-    //     }
-    //   });
-    // } else if (
-    //   //@ts-ignore
-    //   connections.length >
-    //   //@ts-ignore
-    //   prevConnections.length
-    // ) {
-    //   //@ts-ignore
-    //   const previousConnections = new Set(prevConnections.map(connection => connection.id));
-    //   //@ts-ignore
-    //   const newConnections = connections.filter(connection => (
-    //     !previousConnections.has(connection.id)
-    //   ));
+        if (remainingConnection) {
+          this.jsPlumb.unbind('connectionDetached', this.handleDetachedConnection);
+          this.jsPlumb.deleteConnection(remainingConnection);
+          // @ts-ignore
+          this.jsPlumb.bind('connectionDetached', this.handleDetachedConnection);
+        }
+      });
+    } else if (
+      //@ts-ignore
+      connections.length >
+      //@ts-ignore
+      prevConnections.length
+    ) {
+      //@ts-ignore
+      const previousConnections = new Set(prevConnections.map(connection => connection.id));
+      //@ts-ignore
+      const newConnections = connections.filter(connection => (
+        !previousConnections.has(connection.id)
+      ));
 
-    //   newConnections.forEach(({ id: newId, source, target }) => {
-    //     const newConnectionsSet = new Set(newConnections.map(connection => connection.id));
-    //     // @ts-ignore
-    //     const connectionExists = this.jsPlumb.getConnections({
-    //       source: generateNodeId(diagramId, source),
-    //       target: generateNodeId(diagramId, target)
-    //     }).some((connection: Connection) => (
-    //       //@ts-ignore
-    //       newConnectionsSet.has(connection.getParameter('id'))
-    //     ));
+      newConnections.forEach(({ id: newId, source, target }) => {
+        const newConnectionsSet = new Set(newConnections.map(connection => connection.id));
+        // @ts-ignore
+        const connectionExists = this.jsPlumb.getConnections({
+          source: generateNodeId(diagramId, source),
+          target: generateNodeId(diagramId, target)
+        }).some((connection: Connection) => (
+          //@ts-ignore
+          newConnectionsSet.has(connection.getParameter('id'))
+        ));
 
-    //     if (!connectionExists) {
-    //       this.jsPlumb.unbind('connection', this.handleNewConnection);
-    //       this.renderConnection(newId, source, target);
-    //       this.jsPlumb.bind('connection', this.handleNewConnection);
-    //     }
-    //   });
-    // }
-    // this.jsPlumb.repaintEverything();
+        if (!connectionExists) {
+          this.jsPlumb.unbind('connection', this.handleNewConnection);
+          this.renderConnection(newId, source, target);
+          this.jsPlumb.bind('connection', this.handleNewConnection);
+        }
+      });
+    }
+    this.jsPlumb.repaintEverything();
   }
 
   public componentWillUnmount() {

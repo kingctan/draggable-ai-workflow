@@ -31,10 +31,9 @@ function workflowReducer(state: FlowNodesProps = initialState, action: any) {
     }
 
     case NEW_CONNECTION: {
-      const { sourceId, targetId } = action;
+      const { sourceId, targetId, sourceOutput, targetInput } = action;
       const newNodes = { ...state };
 
-      const sourceNode = newNodes[sourceId];
       const targetNode = newNodes[targetId];
 
       if (!targetNode.deps) {
@@ -45,16 +44,11 @@ function workflowReducer(state: FlowNodesProps = initialState, action: any) {
         }
       }
 
-      const outputRuntimeKey = Object.keys(sourceNode.model.outputs)[0];
-      const inputRuntimeKey = Object.keys(targetNode.model.inputs)[0];
-
-      if (inputRuntimeKey) {
-        targetNode.inputRuntime = {
-          [inputRuntimeKey]: {
-            id: sourceId,
-            type: targetNode.model.inputs[inputRuntimeKey].type,
-            name: outputRuntimeKey,
-          }
+      targetNode.inputRuntime = {
+        [targetInput]: {
+          id: sourceId,
+          type: targetNode.model.inputs[targetInput].type,
+          name: sourceOutput,
         }
       }
 

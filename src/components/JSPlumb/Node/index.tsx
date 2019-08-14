@@ -15,7 +15,7 @@ const defaultDragSettings = {
 };
 const defaultSourceSettings = {
   anchor: 'BottomCenter',
-  connector: ["Bezier", { curviness: 45 }],
+  connector: ["Bezier", { curviness: 50 }],
   isSource: true,
   endpoint: "Dot",
   connectorStyle: {
@@ -167,7 +167,7 @@ export default class Node extends PureComponent<NodeProps & NodePropsFData & Cus
             <span>{label}</span>
           </strong>
         </div>
-        <div className="source-point"></div>
+        {(type === 'source' || type === 'both') && <div className="source-point"></div>}
         <Popover
           placement="rightBottom"
           title={label}

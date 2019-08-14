@@ -5,7 +5,7 @@ import { v4 } from 'uuid';
 import axios from 'axios';
 import { useDrop, DropTargetMonitor } from 'react-dnd'
 import { Graph, Node } from '../../components/JSPlumb';
-import { FlowNodeProps, FlowNodesProps, FlowConnectionProps, OutputRuntimeProps } from './WorkflowProps';
+import { FlowNodeProps, FlowNodesProps, FlowConnectionProps, OutputRuntimeProps, ConnectionConfigProps } from './WorkflowProps';
 import { XYCoord } from 'dnd-core';
 import { useMappedState, useDispatch } from 'redux-react-hook';
 import { Button, Icon, Tooltip, message } from 'antd';
@@ -30,6 +30,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
   const [loadingForRun, setLoadingForRun] = useState(false);
 
   const [visibilityOfModal, setVisibilityOfModal] = useState(false);
+  const [connectionConfig, setConnectionConfig] = useState<ConnectionConfigProps | null>(null);
 
   const [scale, setScale] = useState<number>(1);
   const [width, setWidth] = useState<number>(500);
@@ -91,44 +92,65 @@ const WorkflowStage: React.FC<Props> = (props) => {
   };
 
   const handleClickLabel = (sourceId: string, targetId: string) => {
-    // setVisibilityOfModal(true);
+    if (sourceId && targetId) {
+      setConnectionConfig({ sourceId, targetId });
+      setVisibilityOfModal(true);
+    }
   };
+
+  const getKeyCount = (obj: Object) => Object.keys(obj).length;
 
   const handleBeforeDrop = (sourceId: string, targetId: string) => {
     const source: FlowNodeProps = nodes[sourceId];
     const target: FlowNodeProps = nodes[targetId];
-    let checkType = false; // 判断连线两端算子输入输出类型是否匹配
-    if (target.model && source.model) {
 
-      const outputTypes: string[] = []; // 存所有输入、所有输出的type
-      Object.keys(source.model.outputs).forEach((outputKey: string) => {
-        outputTypes.push(source.model.outputs[outputKey].type);
-      });
-      Object.keys(target.model.inputs).forEach((inputKey: string) => {
-        if (outputTypes.includes(target.model.inputs[inputKey].type)) checkType = true;
-      });
-
-      if (target.inputRuntime && Object.keys(target.inputRuntime).length === Object.keys(target.model.inputs).length) {
-        message.warning(<span><b>{target.label}</b> 无法接受更多的输入！</span>);
-        return false;
-      }
-
-      if (checkType) {
-        dispatch({
-          type: NEW_CONNECTION,
-          sourceId,
-          targetId,
-        });
-        return true;
-      } else {
-        message.warning('两个组件的输入输出不匹配，无法建立连接！');
-        return false;
-      }
-
-    } else {
-      message.warning('无法建议连接：请使用自定义组件并配置至少一个输入或输出，其它组件暂时只做展示！', 6);
+    // 两个组件不能重复连接
+    if (connections.some((connection: FlowConnectionProps) => connection.target === targetId && connection.source === sourceId)) {
+      message.warning('不能重复连接');
       return false;
     }
+
+    // 两个组件类型要匹配
+    let checkType = false; // 判断连线两端算子输入输出类型是否匹配
+    const outputTypes: string[] = []; // 存所有输入、所有输出的type
+    Object.keys(source.model.outputs).forEach((outputKey: string) => {
+      outputTypes.push(source.model.outputs[outputKey].type);
+    });
+    Object.keys(target.model.inputs).forEach((inputKey: string) => {
+      if (outputTypes.includes(target.model.inputs[inputKey].type)) checkType = true;
+    });
+    if (!checkType) {
+      message.warning('两个组件的输入输出不匹配，无法建立连接！');
+      return false;
+    }
+
+    if (target.inputRuntime && getKeyCount(target.inputRuntime) === getKeyCount(target.model.inputs)) {
+      message.warning(<span><b>{target.label}</b> 无法接受更多的输入！</span>);
+      return false;
+    }
+
+    // 如果target只有一个输入，source也只有一个输出
+    if (getKeyCount(target.model.inputs) === 1 && getKeyCount(source.model.outputs) === 1) {
+
+      const sourceOutput = Object.keys(source.model.outputs)[0];
+      const targetInput = Object.keys(target.model.inputs)[0];
+
+      dispatch({
+        type: NEW_CONNECTION,
+        sourceId,
+        targetId,
+        sourceOutput,
+        targetInput
+      });
+
+      return true;
+
+    } else {
+      setConnectionConfig({ sourceId, targetId });
+      setVisibilityOfModal(true);
+      return false;
+    }
+
   };
 
   const handleSave = async () => {
@@ -222,10 +244,6 @@ const WorkflowStage: React.FC<Props> = (props) => {
   };
 
   const handleDrop = (id: string, x: number, y: number) => {
-    // setNodes({
-    //   ...nodes,
-    //   [id]: { ...nodes[id], x, y }
-    // });
     dispatch({
       type: UPDATE_NODE_STYLE,
       nodeId: id,
@@ -252,54 +270,67 @@ const WorkflowStage: React.FC<Props> = (props) => {
   }, drop] = useDrop({
     accept: 'box',
     drop: (item: any, monitor: DropTargetMonitor) => {
-      const clientOffset: XYCoord | null = monitor.getSourceClientOffset();
-
-      const ndDropPlace = document.getElementById('drop-stage');
-      const dropPlaceOffset: { left: number, top: number } = ndDropPlace!.getBoundingClientRect();
-
-      const relativeXOffset = clientOffset!.x - dropPlaceOffset.left;
-      const relativeYOffset = clientOffset!.y - dropPlaceOffset.top;
-
-      // console.log(`✨拖动结束！`, item.name);
       const payload = item.name;
-      const nodeId = generateNodeId(MY_GRAPH_ID, v4());
+      if (!payload.model) {
+        message.warning('请使用自定义组件，其它组件暂只作展示。', 6);
+      } else {
 
-      const outputRuntime: OutputRuntimeProps = {};
+        const clientOffset: XYCoord | null = monitor.getSourceClientOffset();
 
-      // 最后提交时不用关心输出的依赖，只需要把输出原来就有的所有key都带上就行
-      if (payload.model && payload.model.outputs) {
-        Object.keys(payload.model.outputs).forEach((outputKey: string) => {
-          outputRuntime[outputKey] = {
-            type: payload.model.outputs[outputKey].type,
+        const ndDropPlace = document.getElementById('drop-stage');
+        const dropPlaceOffset: { left: number, top: number } = ndDropPlace!.getBoundingClientRect();
+
+        const relativeXOffset = clientOffset!.x - dropPlaceOffset.left;
+        const relativeYOffset = clientOffset!.y - dropPlaceOffset.top;
+
+        const nodeId = generateNodeId(MY_GRAPH_ID, v4());
+
+        const outputRuntime: OutputRuntimeProps = {};
+
+        // 最后提交时不用关心输出的依赖，只需要把输出原来就有的所有key都带上就行
+        if (payload.model && payload.model.outputs) {
+          Object.keys(payload.model.outputs).forEach((outputKey: string) => {
+            outputRuntime[outputKey] = {
+              type: payload.model.outputs[outputKey].type,
+            }
+          });
+        }
+
+        dispatch({
+          type: ADD_NODE,
+          nodeId,
+          nodeInfo: {
+            id: nodeId,
+            label: payload.title,
+            icon: 'icon-code1',
+            type: generateNodeType(payload),
+            model: payload.model,
+            style: {
+              left: relativeXOffset,
+              top: relativeYOffset,
+            },
+            outputRuntime,
           }
         });
+
+        onSelectNode(nodeId);
       }
-
-      dispatch({
-        type: ADD_NODE,
-        nodeId,
-        nodeInfo: {
-          id: nodeId,
-          label: payload.title,
-          icon: 'icon-code1',
-          type: generateNodeType(payload),
-          model: payload.model,
-          style: {
-            left: relativeXOffset,
-            top: relativeYOffset,
-          },
-          outputRuntime,
-        }
-      });
-
-      onSelectNode(nodeId);
-
     },
     collect: monitor => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
     }),
   });
+
+  const handleMakeConnection = (sourceId: string, targetId: string) => {
+    setConnections(
+      [...connections, {
+        id: generateConnectionId(MY_GRAPH_ID, v4()),
+        source: sourceId,
+        target: targetId,
+      }]
+    )
+  };
 
   const getWorkflowInfo = () => {
     axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/project/get?projectID=${projectId}`)
@@ -420,16 +451,13 @@ const WorkflowStage: React.FC<Props> = (props) => {
         </Graph>
       </div>
       {
+        visibilityOfModal &&
         //@ts-ignore
         <ModalConnections
           visible={visibilityOfModal}
-          loading={false}
-          sourceId={'222'}
-          targetId={'333'}
-          nodes={nodes}
-          connections={connections}
-          handleOk={() => { }}
-          handleCancel={() => { }}
+          config={connectionConfig}
+          handleOK={handleMakeConnection}
+          handleCancel={() => setVisibilityOfModal(false)}
         />
       }
     </div>
