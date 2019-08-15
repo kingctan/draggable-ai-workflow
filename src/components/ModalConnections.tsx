@@ -136,7 +136,7 @@ const ModalConnections: SFC<Props & ConnectionConfigFormProps> = (props) => {
 
   return (
     <Modal
-      width={680}
+      width={600}
       visible={visible}
       title="输入输出配置"
       onCancel={handleCancel}
