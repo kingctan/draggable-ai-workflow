@@ -2,8 +2,8 @@
 AI platform workflow with draggable components.
 
 ## Features
-![](https://zjr-github.oss-cn-shenzhen.aliyuncs.com/ai-workflow/%E5%B7%A5%E4%BD%9C%E6%B5%811.png)
-![](https://zjr-github.oss-cn-shenzhen.aliyuncs.com/ai-workflow/%E5%B7%A5%E4%BD%9C%E6%B5%812.png)
+![](https://res.cloudinary.com/dpgih25fj/image/upload/v1565840136/%E5%B7%A5%E4%BD%9C%E6%B5%811.png)
+![](https://res.cloudinary.com/dpgih25fj/image/upload/v1565840135/%E5%B7%A5%E4%BD%9C%E6%B5%812.png)
 
 ## Quick Start
 ### Front end
