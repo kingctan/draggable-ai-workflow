@@ -31,7 +31,7 @@ const LayoutSidebar: SFC<Props> = (props) => {
           <Menu.Item key="project">
             <Link to={sessionStorage.getItem("page-history") || '/project-list'}>
               <Icon type="appstore" theme="filled" />
-              <span>项目管理</span>
+              <span>模板管理</span>
             </Link>
           </Menu.Item>
           <Menu.Item key="instance">

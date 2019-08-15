@@ -44,12 +44,13 @@ function workflowReducer(state: FlowNodesProps = initialState, action: any) {
         }
       }
 
-      targetNode.inputRuntime = {
-        [targetInput]: {
-          id: sourceId,
-          type: targetNode.model.inputs[targetInput].type,
-          name: sourceOutput,
-        }
+      if (!targetNode.inputRuntime) {
+        targetNode.inputRuntime = {};
+      }
+      targetNode.inputRuntime[targetInput] = {
+        id: sourceId,
+        type: targetNode.model.inputs[targetInput].type,
+        name: sourceOutput,
       }
 
       return newNodes;

@@ -96,8 +96,8 @@ const ProjectList: React.FC<Props> = (props) => {
           href="javascript:;"
           onClick={() => {
             Modal.confirm({
-              title: "删除项目",
-              content: <span>确定删除项目：<b>{row.projectName}</b> ？</span>,
+              title: "删除模板",
+              content: <span>确定删除模板：<b>{row.projectName}</b> ？</span>,
               onOk() {
                 handleDelete(row.projectID.toString());
               },
@@ -115,7 +115,7 @@ const ProjectList: React.FC<Props> = (props) => {
     <div>
       <div className="main-toolbar">
         <Link to="/project-detail">
-          <Button type="primary"><Icon type="plus-square" /> 新增项目</Button>
+          <Button type="primary"><Icon type="plus-square" /> 新增模板</Button>
         </Link>
         {/* <Button>
           <Icon type="delete" /> 批量删除
@@ -131,7 +131,7 @@ const ProjectList: React.FC<Props> = (props) => {
         // rowSelection={rowSelection}
         dataSource={filter(list)}
         loading={loading}
-        locale={{ emptyText: filterVal ? `当前列表搜索不到包含 “${filterVal}” 的项目..` : '暂无数据' }}
+        locale={{ emptyText: filterVal ? `当前列表搜索不到包含 “${filterVal}” 的模板..` : '暂无数据' }}
         pagination={{
           size: "small",
           total: list.length,

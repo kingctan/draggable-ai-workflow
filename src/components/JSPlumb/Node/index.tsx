@@ -173,7 +173,10 @@ export default class Node extends PureComponent<NodeProps & NodePropsFData & Cus
           title={label}
           content={
             <div style={{ maxWidth: 240 }}>
-              <Descriptions title="" column={1} size="small">
+              <Descriptions title="" column={1} size="small" bordered>
+                <Descriptions.Item label="ID">
+                  <Tag>{id}</Tag>
+                </Descriptions.Item>
                 <Descriptions.Item label="输入">
                   {model && model.inputs && Object.keys(model.inputs).map((key: string) => <Tag >{key} ({model.inputs[key].type})</Tag>)}
                 </Descriptions.Item>

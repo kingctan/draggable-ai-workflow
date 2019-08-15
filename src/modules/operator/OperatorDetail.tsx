@@ -127,7 +127,7 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
           setFieldsValue({
             ...values,
             directory: values.directory ? values.directory.slice(values.directory.lastIndexOf('/') + 1) : '',
-            code: PRESET_CODE,
+            // code: PRESET_CODE,
           });
           values.code && axios.get(values.code).then((res) => {
             setFieldsValue({
@@ -138,6 +138,12 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
       }).catch(() => {
         message.error('服务器被吃了..');
       });
+  };
+
+  const handleCodeTemplate = () => {
+    setFieldsValue({
+      code: PRESET_CODE,
+    });
   };
 
   const handelSubmit = () => {
@@ -237,7 +243,7 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
         </Button>
         {
           componentId &&
-          <Button type="danger" onClick={handleDelete}>
+          <Button type="danger" ghost onClick={handleDelete}>
             <Icon type="delete" /> 删除
           </Button>
         }
@@ -252,6 +258,10 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
         {
           tab === 'param' &&
           <Button onClick={handleAddParam}><Icon type="plus-square" /> 新增参数</Button>
+        }
+        {
+          tab === 'code' &&
+          <Button onClick={handleCodeTemplate}><Icon type="profile" /> 使用代码模板</Button>
         }
       </div>
       <Form onSubmit={() => { }}>
@@ -446,7 +456,7 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
             </Form.Item>
             <Form.Item label="CPU数" required {...formItemLayout}>
               {getFieldDecorator(`container.cpuNumber`, {
-                initialValue: 1,
+                initialValue: 4,
                 rules: [
                   { required: true, message: '请填写CPU数' },
                 ],
@@ -466,12 +476,12 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
             </Form.Item>
             <Form.Item label="内存(MB)" required {...formItemLayout}>
               {getFieldDecorator(`container.memoryMB`, {
-                initialValue: 8192,
+                initialValue: 4056,
                 rules: [
                   { required: true, message: '请填写内存' },
                 ],
               })(
-                <InputNumber min={8192} style={{ width: '100%' }} />
+                <InputNumber min={1024} style={{ width: '100%' }} />
               )}
             </Form.Item>
 
@@ -531,8 +541,8 @@ const styles = {
   }
 };
 
-const PRESET_CODE = `
-# -*- coding: utf-8 -*-
+const PRESET_CODE =
+  `# -*- coding: utf-8 -*-
 # 规则：
 # runner函数为固定入口，请勿修改
 # kwargs参数会传入组件的Param和Inputs，字典形式存储
@@ -544,8 +554,7 @@ def runner(**kwargs):
     print("Got kwargs: {}".format(kwargs))
     #  开始书写您的代码
 
-    return {}
-`;
+    return {}`;
 
 export default Form.create<OperatorDetailProps>({
   name: 'OperatorDetail',

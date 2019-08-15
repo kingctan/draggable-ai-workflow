@@ -30,6 +30,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
   const [loadingForRun, setLoadingForRun] = useState(false);
 
   const [visibilityOfModal, setVisibilityOfModal] = useState(false);
+  const [modalContentDisabled, setModelContentDisabled] = useState(false);
   const [connectionConfig, setConnectionConfig] = useState<ConnectionConfigProps | null>(null);
 
   const [scale, setScale] = useState<number>(1);
@@ -94,6 +95,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
   const handleClickLabel = (sourceId: string, targetId: string) => {
     if (sourceId && targetId) {
       setConnectionConfig({ sourceId, targetId });
+      setModelContentDisabled(true);
       setVisibilityOfModal(true);
     }
   };
@@ -146,6 +148,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
       return true;
 
     } else {
+      setModelContentDisabled(false);
       setConnectionConfig({ sourceId, targetId });
       setVisibilityOfModal(true);
       return false;
@@ -153,7 +156,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
 
   };
 
-  const handleSave = async () => {
+  const handleSave = async (mode: 0 | 1) => {
     console.log(`nodes: `, nodes);
 
     if (Object.keys(nodes).length === 0) return message.warning('未制作工作流..');
@@ -195,7 +198,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
       .then((res) => {
         setLoadingForSave(false);
         if (res.data.code === 200) {
-          return message.success('已保存');
+          return message.success(`已保存${mode ? '，即将运行..' : ''}`);
         } else {
           return message.error('保存失败');
         }
@@ -209,7 +212,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
     if (Object.keys(nodes).length === 0) return message.warning('未制作工作流..');
 
     setLoadingForRun(true);
-    await handleSave();
+    await handleSave(1);
 
     axios.post(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/job/create`, {
       projectID: projectId,
@@ -389,7 +392,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
         <div className="stage-toolbar">
           <Button.Group>
             <Tooltip placement="top" title="保存">
-              <Button onClick={handleSave}>
+              <Button onClick={() => handleSave(0)}>
                 {loadingForSave ? <Icon type="loading" /> : <Icon type="save" theme="filled" />} 保存
               </Button>
             </Tooltip>
@@ -455,6 +458,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
         //@ts-ignore
         <ModalConnections
           visible={visibilityOfModal}
+          modalContentDisabled={modalContentDisabled}
           config={connectionConfig}
           handleOK={handleMakeConnection}
           handleCancel={() => setVisibilityOfModal(false)}
