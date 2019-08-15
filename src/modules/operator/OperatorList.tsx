@@ -29,7 +29,7 @@ const OperatorList: React.FC<Props> = (props) => {
 
   const getList = () => {
     setLoading(true);
-    axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/component/list?path=/${currentPath}`)
+    axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/component/list?path=%2F${currentPath}`)
       .then((res) => {
         if (res.data.code === 200) {
           console.log(res.data.data);

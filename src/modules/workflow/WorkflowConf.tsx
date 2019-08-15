@@ -6,7 +6,7 @@ import { useMappedState } from 'redux-react-hook';
 
 type Props = {
   selectedNodeId: string
-  onChangeParam: (nodeId: string, paramKey: string, paramValue: string) => void
+  onChangeParam: (nodeId: string, paramKey: string, paramValue: string | number) => void
 };
 
 type NodeParamConfigProps = {
