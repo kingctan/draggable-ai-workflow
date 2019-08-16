@@ -198,7 +198,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
       .then((res) => {
         setLoadingForSave(false);
         if (res.data.code === 200) {
-          return message.success(`已保存${mode ? '，即将运行..' : ''}`);
+          return message.success(`已保存${mode ? '，即将运行' : ''}`);
         } else {
           return message.error('保存失败');
         }

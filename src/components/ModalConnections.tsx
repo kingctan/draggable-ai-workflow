@@ -73,31 +73,31 @@ const ModalConnections: SFC<Props & ConnectionConfigFormProps> = (props) => {
       render: (text: string, record: string, index: number) => {
         let disabled = false;
         let initialValue = '*';
-        let nodeId = config!.sourceId;
+        let sourceNodeId = config!.sourceId;
         const targetInputRuntime = nodes[config!.targetId].inputRuntime;
         if (targetInputRuntime && targetInputRuntime[record]) {
           disabled = true;
           initialValue = targetInputRuntime[record].name;
-          nodeId = targetInputRuntime[record].id;
+          sourceNodeId = targetInputRuntime[record].id;
         }
         return (
           <div style={{ position: 'relative' }}>
-            <p style={styles.P}>{nodeId}</p>
+            <p style={styles.P}>{sourceNodeId}</p>
             <Form.Item className="table-small-form-item">
 
               {getFieldDecorator(disabled ? `output-disabled-[${index}]` : `output[${index}]`, {
                 initialValue: initialValue,
               })(
                 <Select style={{ width: '100%' }} disabled={modalContentDisabled || disabled}>
-                  {Object.keys(nodes[config!.sourceId].model.outputs).map((outputKey: string) => (
+                  {Object.keys(nodes[sourceNodeId].model.outputs).map((outputKey: string) => (
                     <Select.Option
                       value={outputKey}
                       key={outputKey}
-                      disabled={nodes[config!.sourceId].model.outputs[outputKey].type !== nodes[config!.targetId].model.inputs[record].type}
+                      disabled={nodes[sourceNodeId].model.outputs[outputKey].type !== nodes[config!.targetId].model.inputs[record].type}
                     >
                       {outputKey}
                       {` `}
-                      ({nodes[config!.sourceId].model.outputs[outputKey].type})
+                      ({nodes[sourceNodeId].model.outputs[outputKey].type})
                   </Select.Option>
                   ))}
                   <Select.Option value="*" key="*">
