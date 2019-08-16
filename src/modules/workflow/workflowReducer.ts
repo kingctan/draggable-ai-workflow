@@ -25,7 +25,7 @@ function workflowReducer(state: FlowNodesProps = initialState, action: any) {
       const { nodeId, paramKey, paramValue } = action;
       const newNodes = { ...state };
 
-      newNodes[nodeId].model.params[paramKey].default = paramValue;
+      newNodes[nodeId].model.params[paramKey].default = paramValue.toString();
 
       return newNodes;
     }
