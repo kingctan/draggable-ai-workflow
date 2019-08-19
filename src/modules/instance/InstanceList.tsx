@@ -4,6 +4,7 @@ import { Button, Icon, Table, Input, Badge } from 'antd';
 
 import { InstanceProps } from './InstanceProps';
 import { formatDate } from '../../utils/formatHelper';
+import { Link } from 'react-router-dom';
 
 type Props = {};
 
@@ -47,15 +48,9 @@ const InstanceList: React.FC<Props> = (props) => {
     key: 'jobName',
     dataIndex: 'jobName',
     render: (text: string, row: InstanceProps) => (
-      <span className="table-column-link">
-        <a
-          target="_blank"
-          href={`http://39.108.232.245:8081/workflows/default/${row.jobName}`}
-          style={{ whiteSpace: 'nowrap' }}
-        >
-          {text}
-        </a>
-      </span>
+      <Link to={`/instance-detail/${row.jobID}`} className="table-column-link">
+        {text}
+      </Link>
     )
   }, {
     title: '描述',

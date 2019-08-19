@@ -57,6 +57,7 @@ export const Routes = () =>
       <LayoutRoute path="/workflow/:projectId" exact navmark="project" component={WorkflowDetail} />
       <LayoutRoute path="/instance-list" exact navmark="instance" component={InstanceList} />
       <LayoutRoute path="/instance-detail" exact navmark="instance" component={InstanceDetail} />
+      <LayoutRoute path="/instance-detail/:jobId" exact navmark="instance" component={InstanceDetail} />
       <LayoutRoute path="/operator-list" exact navmark="operator" component={OperatorList} />
       <LayoutRoute path="/operator-list/:currentPath" exact navmark="operator" component={OperatorList} />
       <LayoutRoute path="/operator-detail" exact navmark="operator" component={OperatorDetail} />

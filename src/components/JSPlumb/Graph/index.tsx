@@ -14,6 +14,7 @@ import Close from '../Close';
 const PanAndZoom = panAndZoomHoc('div');
 
 type customProps = {
+  disableEdit?: boolean
   onBeforeDrop: (sourceId: string, targetId: string) => void
   onClickLabel: (sourceId: string, targetId: string) => void
 };
@@ -111,7 +112,7 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
   }
 
   public componentDidMount() {
-    const { onClickLabel } = this.props;
+    const { onClickLabel, disableEdit } = this.props;
     this.jsPlumb.ready(() => {
       // @ts-ignore
       // this.jsPlumb.endpointAnchorClass = 'rja_';
@@ -136,7 +137,7 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
               }
             },
           }]);
-        connection.addOverlay([
+        !disableEdit && connection.addOverlay([
           "Label", {
             location: 0.6,
             label: '<span class="delete-icon-connect iconfont icon-delete"></span>',

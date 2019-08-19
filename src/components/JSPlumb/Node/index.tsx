@@ -65,6 +65,7 @@ type CustomNodeProps = {
   selectedActive: boolean
   model: OperatorModelProps
   style: CSSProperties
+  disableEdit?: boolean
   onSelect: (selectedNode: FlowNodeProps) => void
   onDelete: (nodeId: string) => void
 };
@@ -144,7 +145,7 @@ export default class Node extends PureComponent<NodeProps & NodePropsFData & Cus
   }
 
   public render() {
-    const { children, className, diagramId, id, style, styleName, type, label, icon, model, onDelete } = this.props;
+    const { children, className, diagramId, id, style, styleName, type, label, icon, model, disableEdit, onDelete } = this.props;
     // const { drag } = this.state;
 
     return (
@@ -178,13 +179,13 @@ export default class Node extends PureComponent<NodeProps & NodePropsFData & Cus
                   <Tag>{id}</Tag>
                 </Descriptions.Item>
                 <Descriptions.Item label="输入">
-                  {model && model.inputs && Object.keys(model.inputs).map((key: string) => <Tag >{key} ({model.inputs[key].type})</Tag>)}
+                  {model && model.inputs && Object.keys(model.inputs).map((key: string) => <Tag>{key} ({model.inputs[key].type})</Tag>)}
                 </Descriptions.Item>
                 <Descriptions.Item label="输出">
-                  {model && model.outputs && Object.keys(model.outputs).map((key: string) => <Tag >{key} ({model.outputs[key].type})</Tag>)}
+                  {model && model.outputs && Object.keys(model.outputs).map((key: string) => <Tag>{key} ({model.outputs[key].type})</Tag>)}
                 </Descriptions.Item>
                 <Descriptions.Item label="操作">
-                  <Button type="danger" size="small" onClick={() => onDelete(id)}>删除</Button>
+                  <Button type="danger" size="small" onClick={() => onDelete(id)} disabled={disableEdit}>删除</Button>
                 </Descriptions.Item>
               </Descriptions>
             </div>
