@@ -3,14 +3,12 @@ import { AutoSizer } from 'react-virtualized';
 import { debounce } from 'lodash';
 import { v4 } from 'uuid';
 import axios from 'axios';
-import { useDrop, DropTargetMonitor } from 'react-dnd'
 import { Graph, Node } from '../../components/JSPlumb';
-import { FlowNodeProps, FlowNodesProps, FlowConnectionProps, OutputRuntimeProps, ConnectionConfigProps, ProgressProps } from './WorkflowProps';
-import { XYCoord } from 'dnd-core';
+import { FlowNodeProps, FlowNodesProps, FlowConnectionProps, ConnectionConfigProps, ProgressProps } from './WorkflowProps';
 import { useMappedState, useDispatch } from 'redux-react-hook';
-import { Button, Icon, Tooltip, message, Spin } from 'antd';
-import { generateNodeId, generateConnectionId } from '../../components/JSPlumb/util';
-import { ADD_NODE, REMOVE_NODE, NEW_CONNECTION, UPDATE_NODE_STYLE, REMOVE_CONNECTION, CLEAR_NODES } from './workflowReducer';
+import { Spin } from 'antd';
+import { generateConnectionId } from '../../components/JSPlumb/util';
+import { ADD_NODE, CLEAR_NODES } from './workflowReducer';
 import ModalConnections from '../../components/ModalConnections';
 
 type Props = {
@@ -26,6 +24,8 @@ const MY_GRAPH_ID = 'simpleDiagram';
 
 const WorkflowStageForLog: React.FC<Props> = (props) => {
   const { jobId, selectedNodeId, onSelectNode } = props;
+
+  const interValTimerSet: any = {}; // 轮询的timer集
 
   const [visibilityOfModal, setVisibilityOfModal] = useState(false);
   const [modalContentDisabled, setModelContentDisabled] = useState(false);
@@ -96,26 +96,29 @@ const WorkflowStageForLog: React.FC<Props> = (props) => {
   };
 
   const generateStatusIcon = (nodeId: string) => {
-    const style = { fontSize: 20 };
-    let StatusIcon = <Icon type="question" style={style} />;
+    const style = { fontSize: 18 };
+    const colorGreen = '#7ED321';
+    const colorRed = 'rgb(255, 85, 0)';
+    const colorGray = '#c4c4c4';
+    let StatusIcon = <i className="iconfont icon-wait" style={{ ...style, color: colorGray }} />;
 
     if (progress[nodeId]) {
       const status = progress[nodeId].status;
       switch (status) {
         case 'Succeeded':
-          StatusIcon = <Icon type="check" style={style} />;
+          StatusIcon = <i className="iconfont icon-success" style={{ ...style, color: colorGreen }} />;
           break;
         case 'Error':
-          StatusIcon = <Icon type="close" style={style} />;
+          StatusIcon = <i className="iconfont icon-error" style={{ ...style, color: colorRed }} />;
           break;
         case 'Failed':
-          StatusIcon = <Icon type="close" style={style} />;
+          StatusIcon = <i className="iconfont icon-error" style={{ ...style, color: colorRed }} />;
           break;
         case 'Pending':
-          StatusIcon = <Spin size="small" style={style} />;
+          StatusIcon = <Spin size="small" />;
           break;
         case 'Running':
-          StatusIcon = <Spin size="small" style={style} />;
+          StatusIcon = <Spin size="small" />;
           break;
         default:
           break;
@@ -168,13 +171,29 @@ const WorkflowStageForLog: React.FC<Props> = (props) => {
     });
   };
 
+  const getProgress = () => {
+    axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/job/get?jobID=${jobId}`, {
+      withCredentials: true
+    }).then((res) => {
+      if (res.data.code === 200) {
+        setProgress(res.data.data.progress.components);
+      }
+    }).catch((err) => {
+      console.error(err);
+    });
+  };
+
   useEffect(() => {
     if (jobId) {
       getJobInfo();
+      interValTimerSet[v4()] = setInterval(getProgress, 1000);
     }
     return () => {
+      Object.keys(interValTimerSet).forEach((key) => {
+        clearInterval(interValTimerSet[key]);
+      });
       dispatch({ type: CLEAR_NODES });
-    }
+    };
   }, []);
 
   return (
@@ -210,7 +229,7 @@ const WorkflowStageForLog: React.FC<Props> = (props) => {
                 <Node
                   id={id}
                   className="node"
-                  selectedActive={id === selectedNodeId}
+                  selectedActive={id === selectedNodeId || (progress[id] && ['Succeeded', 'Running', 'Pending'].includes(progress[id].status))}
                   key={id}
                   type={nodes[id].type}
                   editMode

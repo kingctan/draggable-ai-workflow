@@ -124,7 +124,7 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
           "Label", {
             location: 0.5,
             id: "label-connector",
-            label: `<span class="error-icon-connect green-icon ${editMode ? 'small-label' : ''}">i</span>`,
+            label: `<span class="error-icon-connect ${editMode ? 'blue-icon' : 'green-icon'}">i</span>`,
             cssClass: "workflow-node-label",
             visible: false,
             events: {
@@ -137,28 +137,41 @@ export default class Graph extends PureComponent<GraphProps & customProps, Graph
               }
             },
           }]);
-        !editMode && connection.addOverlay([
-          "Label", {
-            location: 0.6,
-            label: `<span class="delete-icon-connect iconfont icon-delete"></span>`,
-            id: "delete-connector",
-            cssClass: "workflow-node-delete",
-            visible: false,
-            events: {
-              tap: function (e: any) {
-                //@ts-ignore
-                JSplumb.deleteConnection(this.component);
-              }
-            },
-          }]);
+        if (!editMode) {
+          connection.addOverlay([
+            "Label", {
+              location: 0.6,
+              label: `<span class="delete-icon-connect iconfont icon-delete"></span>`,
+              id: "delete-connector",
+              cssClass: "workflow-node-delete",
+              visible: false,
+              events: {
+                tap: function (e: any) {
+                  //@ts-ignore
+                  JSplumb.deleteConnection(this.component);
+                }
+              },
+            }
+          ]);
+        }
         setTimeout(() => {
-          connection.getOverlay("label-connector").show();
+          if (!editMode) {
+            connection.getOverlay("label-connector").show();
+          }
         }, 0);
         connection.bind("mouseover", function (conn: any) {
-          connection.getOverlay("delete-connector").show();
+          if (editMode) {
+            connection.getOverlay("label-connector").show();
+          } else {
+            connection.getOverlay("delete-connector").show();
+          }
         });
         connection.bind("mouseout", function (conn: any) {
-          connection.getOverlay("delete-connector").hide();
+          if (editMode) {
+            connection.getOverlay("label-connector").hide();
+          } else {
+            connection.getOverlay("delete-connector").hide();
+          }
         });
         this.handleNewConnection(info, e);
       });

@@ -47,6 +47,7 @@ const InstanceDetail: React.FC<Props> = (props) => {
             selectedNodeId ?
               //@ts-ignore
               <WorkflowConf
+                editMode
                 selectedNodeId={selectedNodeId}
               /> :
               <div style={{ padding: 10 }}>未选择节点</div>
