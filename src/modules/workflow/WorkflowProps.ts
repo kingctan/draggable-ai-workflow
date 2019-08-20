@@ -51,3 +51,11 @@ export type ConnectionConfigProps = {
   sourceId: string
   targetId: string
 };
+
+export type ProgressProps = {
+  [nodeId: string]: {
+    finishedAt: string
+    startedAt: string
+    status: 'Succeeded' | 'Pending' | 'Running' | 'Skipped' | 'Failed' | 'Error'
+  }
+};

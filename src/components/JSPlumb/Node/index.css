@@ -85,6 +85,16 @@
   bottom: -4px;
 }
 
+.node .node-status {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  left: -20px;
+  top: 50%;
+  margin-top: -10px;
+  /* color: red; */
+}
+
 .node .jtk-endpoint {
   opacity: 0.3;
   z-index: 21;
