@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import React, {
   CSSProperties,
-  PureComponent
+  PureComponent,
+  ReactElement
 } from 'react';
 import { generateNodeId } from '../util';
 import './index.css';
@@ -65,7 +66,8 @@ type CustomNodeProps = {
   selectedActive: boolean
   model: OperatorModelProps
   style: CSSProperties
-  disableEdit?: boolean
+  editMode?: boolean
+  StatusIcon?: any
   onSelect: (selectedNode: FlowNodeProps) => void
   onDelete: (nodeId: string) => void
 };
@@ -145,7 +147,21 @@ export default class Node extends PureComponent<NodeProps & NodePropsFData & Cus
   }
 
   public render() {
-    const { children, className, diagramId, id, style, styleName, type, label, icon, model, disableEdit, onDelete } = this.props;
+    const {
+      children,
+      className,
+      diagramId,
+      id,
+      style,
+      styleName,
+      type,
+      label,
+      icon,
+      model,
+      editMode,
+      StatusIcon,
+      onDelete
+    } = this.props;
     // const { drag } = this.state;
 
     return (
@@ -185,7 +201,7 @@ export default class Node extends PureComponent<NodeProps & NodePropsFData & Cus
                   {model && model.outputs && Object.keys(model.outputs).map((key: string) => <Tag>{key} ({model.outputs[key].type})</Tag>)}
                 </Descriptions.Item>
                 <Descriptions.Item label="操作">
-                  <Button type="danger" size="small" onClick={() => onDelete(id)} disabled={disableEdit}>删除</Button>
+                  <Button type="danger" size="small" onClick={() => onDelete(id)} disabled={editMode}>删除</Button>
                 </Descriptions.Item>
               </Descriptions>
             </div>
@@ -195,6 +211,11 @@ export default class Node extends PureComponent<NodeProps & NodePropsFData & Cus
             ...
           </span>
         </Popover>
+        {
+          <div className="node-status">
+            {StatusIcon}
+          </div>
+        }
       </div>
 
     );

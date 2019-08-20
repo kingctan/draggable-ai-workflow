@@ -12,7 +12,13 @@ const statusColorMap: any = {
   Succeeded: 'green',
   Failed: 'red',
   Running: 'orange',
-}
+};
+
+const statusTextMap: any = {
+  Succeeded: '成功',
+  Failed: '失败',
+  Running: '运行中..',
+};
 
 const InstanceList: React.FC<Props> = (props) => {
   // const { } = props;
@@ -56,12 +62,17 @@ const InstanceList: React.FC<Props> = (props) => {
     title: '描述',
     key: 'note',
     dataIndex: 'note',
+    render: (text: string) => (
+      <span className="table-column-desc">
+        {text}
+      </span>
+    )
   },
-  //  {
-  //   title: '所属项目',
-  //   key: 'projectName',
-  //   dataIndex: 'projectName',
-  // },
+  {
+    title: '所属项目',
+    key: 'projectName',
+    dataIndex: 'projectName',
+  },
   {
     title: '创建时间',
     key: 'createTime',
@@ -72,7 +83,9 @@ const InstanceList: React.FC<Props> = (props) => {
     key: 'status',
     dataIndex: 'status',
     render: (text: string) => (
-      <Badge color={statusColorMap[text]} text={text} />
+      <span style={{ whiteSpace: 'nowrap' }}>
+        <Badge color={statusColorMap[text]} text={statusTextMap[text]} />
+      </span>
     )
   }, {
     title: '操作',
@@ -84,9 +97,7 @@ const InstanceList: React.FC<Props> = (props) => {
         href={`http://39.108.232.245:8081/workflows/default/${row.jobName}`}
         style={{ whiteSpace: 'nowrap' }}
       >
-        <p style={{ display: 'inline-block', margin: 0 }}>
-          日志
-          </p>
+        日志
       </a>
     ),
   }];

@@ -63,6 +63,11 @@ const ProjectList: React.FC<Props> = (props) => {
     title: '描述',
     key: 'note',
     dataIndex: 'note',
+    render: (text: string) => (
+      <span className="table-column-desc">
+        {text}
+      </span>
+    )
   }, {
     title: '管理员',
     key: 'admin',

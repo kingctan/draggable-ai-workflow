@@ -5,10 +5,10 @@ import { v4 } from 'uuid';
 import axios from 'axios';
 import { useDrop, DropTargetMonitor } from 'react-dnd'
 import { Graph, Node } from '../../components/JSPlumb';
-import { FlowNodeProps, FlowNodesProps, FlowConnectionProps, OutputRuntimeProps, ConnectionConfigProps } from './WorkflowProps';
+import { FlowNodeProps, FlowNodesProps, FlowConnectionProps, OutputRuntimeProps, ConnectionConfigProps, ProgressProps } from './WorkflowProps';
 import { XYCoord } from 'dnd-core';
 import { useMappedState, useDispatch } from 'redux-react-hook';
-import { Button, Icon, Tooltip, message } from 'antd';
+import { Button, Icon, Tooltip, message, Spin } from 'antd';
 import { generateNodeId, generateConnectionId } from '../../components/JSPlumb/util';
 import { ADD_NODE, REMOVE_NODE, NEW_CONNECTION, UPDATE_NODE_STYLE, REMOVE_CONNECTION, CLEAR_NODES } from './workflowReducer';
 import ModalConnections from '../../components/ModalConnections';
@@ -27,13 +27,11 @@ const MY_GRAPH_ID = 'simpleDiagram';
 const WorkflowStageForLog: React.FC<Props> = (props) => {
   const { jobId, selectedNodeId, onSelectNode } = props;
 
-  const [loadingForSave, setLoadingForSave] = useState(false);
-  const [loadingForRun, setLoadingForRun] = useState(false);
-
   const [visibilityOfModal, setVisibilityOfModal] = useState(false);
   const [modalContentDisabled, setModelContentDisabled] = useState(false);
   const [connectionConfig, setConnectionConfig] = useState<ConnectionConfigProps | null>(null);
 
+  const [progress, setProgress] = useState<ProgressProps>({});
   const [scale, setScale] = useState<number>(1);
   const [width, setWidth] = useState<number>(500);
   const [height, setHeight] = useState<number>(500);
@@ -97,6 +95,35 @@ const WorkflowStageForLog: React.FC<Props> = (props) => {
     )
   };
 
+  const generateStatusIcon = (nodeId: string) => {
+    const style = { fontSize: 20 };
+    let StatusIcon = <Icon type="question" style={style} />;
+
+    if (progress[nodeId]) {
+      const status = progress[nodeId].status;
+      switch (status) {
+        case 'Succeeded':
+          StatusIcon = <Icon type="check" style={style} />;
+          break;
+        case 'Error':
+          StatusIcon = <Icon type="close" style={style} />;
+          break;
+        case 'Failed':
+          StatusIcon = <Icon type="close" style={style} />;
+          break;
+        case 'Pending':
+          StatusIcon = <Spin size="small" style={style} />;
+          break;
+        case 'Running':
+          StatusIcon = <Spin size="small" style={style} />;
+          break;
+        default:
+          break;
+      }
+    }
+    return StatusIcon;
+  };
+
   const getJobInfo = () => {
     axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/job/get?jobID=${jobId}`, {
       withCredentials: true
@@ -134,6 +161,7 @@ const WorkflowStageForLog: React.FC<Props> = (props) => {
           });
         });
         setConnections(tmpConnections);
+        setProgress(res.data.data.progress.components);
       }
     }).catch((err) => {
       console.error(err);
@@ -157,7 +185,7 @@ const WorkflowStageForLog: React.FC<Props> = (props) => {
       <div id="drop-stage">
         <Graph
           connections={connections}
-          disableEdit
+          editMode
           height={height}
           id={MY_GRAPH_ID}
           maxScale={MAX_SCALE}
@@ -185,13 +213,14 @@ const WorkflowStageForLog: React.FC<Props> = (props) => {
                   selectedActive={id === selectedNodeId}
                   key={id}
                   type={nodes[id].type}
-                  disableEdit
+                  editMode
                   icon={nodes[id].icon}
                   label={nodes[id].label}
                   model={nodes[id].model}
                   onDrop={() => null}
                   //@ts-ignore
                   onSelect={handleSelectNode}
+                  StatusIcon={generateStatusIcon(id)}
                   onDelete={() => null}
                   style={nodes[id].style}
                 >
