@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Button, Icon, Table, Input, Badge } from 'antd';
+import { v4 } from 'uuid';
 
 import { InstanceProps } from './InstanceProps';
 import { formatDate } from '../../utils/formatHelper';
@@ -25,28 +26,43 @@ const InstanceList: React.FC<Props> = (props) => {
 
   const [list, setList] = useState<InstanceProps[]>([]);
   const [filterVal, setFilterVal] = useState(''); // 搜索框值
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const getList = () => {
-    setLoading(true);
-    axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/job/list`, {
-      withCredentials: true
-    }).then((res) => {
-      if (res.data.code === 200) {
-        setList(res.data.data);
-        setLoading(false);
-      }
-    }).catch((err) => {
-      console.error(err);
+  const interValTimerSet: any = {}; // 轮询的timer集
+
+  const getList = async () => {
+    return new Promise((resolve, reject) => {
+      axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/job/list`, {
+        withCredentials: true
+      }).then((res) => {
+        if (res.data.code === 200) {
+          setList(res.data.data);
+          resolve();
+        }
+      }).catch((err) => {
+        console.error(err);
+        reject();
+      });
     });
   };
 
   const filter = (list: InstanceProps[]) => list.filter((item: InstanceProps) => item.jobName.includes(filterVal));
 
-  const handleRefresh = () => getList();
+  const handleRefresh = () => {
+    setLoading(true);
+    getList().then(() => {
+      setLoading(false);
+    });
+  };
 
   useEffect(() => {
-    getList();
+    getList().then(() => setLoading(false));
+    interValTimerSet[v4()] = setInterval(getList, 3000);
+    return () => {
+      Object.keys(interValTimerSet).forEach((key) => {
+        clearInterval(interValTimerSet[key]);
+      });
+    };
   }, []);
 
   const columns = [{

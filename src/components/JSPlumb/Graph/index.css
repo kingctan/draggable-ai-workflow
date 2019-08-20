@@ -25,17 +25,13 @@
 .container .error-icon-connect.green-icon {
   background: #7ED321;
 }
-.container .error-icon-connect.small-label {
-  width: 14px;
-  height: 14px;
-  line-height: 14px;
-  font-size: 12px;
-   color: #fff;
+.container .error-icon-connect.blue-icon {
+  right: 0px;
+  color: #fff;
   background: #5C87FF;
 }
 
 .container .delete-icon-connect {
- 
   border-radius: 50%;
   font-size: 12px;
   cursor: pointer;

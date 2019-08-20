@@ -5,6 +5,7 @@ import { FlowNodeProps, FlowNodesProps } from './WorkflowProps';
 import { useMappedState } from 'redux-react-hook';
 
 type Props = {
+  editMode?: boolean
   selectedNodeId: string
   onChangeParam: (nodeId: string, paramKey: string, paramValue: string | number) => void
 };
@@ -20,7 +21,7 @@ type NodeParamConfigProps = {
 interface WorkflowConfProps extends FormComponentProps { }
 
 const WorkflowConf: React.FC<Props & WorkflowConfProps> = (props) => {
-  const { selectedNodeId } = props;
+  const { editMode, selectedNodeId } = props;
 
   const [nodeInfo, setNodeInfo] = useState<FlowNodeProps | null>(null);
   const [paramConfigs, setParamConfigs] = useState<NodeParamConfigProps | null>(null);
@@ -72,8 +73,8 @@ const WorkflowConf: React.FC<Props & WorkflowConfProps> = (props) => {
                   }],
                 })(
                   (paramConfigs[key].type === 'int' || paramConfigs[key].type === 'float') ?
-                    <InputNumber style={{ width: '100%' }} /> :
-                    <Input />
+                    <InputNumber disabled={editMode} style={{ width: '100%' }} /> :
+                    <Input disabled={editMode} />
                 )}
               </Form.Item>
             ))
