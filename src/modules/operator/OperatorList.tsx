@@ -29,7 +29,9 @@ const OperatorList: React.FC<Props> = (props) => {
 
   const getList = () => {
     setLoading(true);
-    axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/component/list?path=%2F${currentPath}`)
+    axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/component/list?path=%2F${currentPath}`, {
+      withCredentials: true
+    })
       .then((res) => {
         if (res.data.code === 200) {
           console.log(res.data.data);
@@ -96,16 +98,8 @@ const OperatorList: React.FC<Props> = (props) => {
         {
           loading ? <Spin tip="加载中..." className="spin" style={{ color: '#fff' }} /> :
             (
-              filter(list).length === 0 ? <NotFound content={`Oops.. 找不到名字包含 “${filterVal}” 的文件`} /> :
+              filter(list).length === 0 ? (filterVal && <NotFound content={`Oops.. 找不到名字包含 “${filterVal}” 的文件`} />) :
                 filter(list).map((item: OperatorProps, index: number) => (
-                  // <Link
-                  //   to={
-                  //     item.model ?
-                  //       `/operator-detail/${item.model.componentID}` :
-                  //       `/operator-list/${item.model ? encodeURIComponent(currentPath) : encodeURIComponent(item.path)}`
-                  //   }
-                  //   key={index}
-                  // >
                   <div className="operator" onClick={() => handleToDetail(item)}>
                     <div className="operator-icon">
                       {

@@ -24,14 +24,13 @@ const ProjectDetail: React.FC<Props & ProjectDetailProps> = (props) => {
       const formValues = getFieldsValue();
       const finalObj: any = {
         ...formValues,
-        admin: {
-          'root': 'root',
-        },
       };
 
       if (projectId) { // 更新模板
         finalObj.projectId = Number(projectId);
-        axios.put(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/project/update`, finalObj)
+        axios.put(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/project/update`, finalObj, {
+          withCredentials: true
+        })
           .then((res) => {
             if (res.data.code === 200) {
               message.success('已更新');
@@ -41,7 +40,9 @@ const ProjectDetail: React.FC<Props & ProjectDetailProps> = (props) => {
             message.error('服务器被吃了..');
           });
       } else { // 新增模板
-        axios.post(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/project/create`, finalObj)
+        axios.post(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/project/create`, finalObj, {
+          withCredentials: true
+        })
           .then((res) => {
             if (res.data.code === 200) {
               message.success('新增成功');
@@ -56,7 +57,9 @@ const ProjectDetail: React.FC<Props & ProjectDetailProps> = (props) => {
 
   const getProjectInfo = () => {
     setLoading(true);
-    axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/project/get?projectID=${projectId}`)
+    axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/project/get?projectID=${projectId}`, {
+      withCredentials: true
+    })
       .then((res) => {
         if (res.data.code === 200) {
           setLoading(false);

@@ -176,6 +176,11 @@ const WorkflowStageForLog: React.FC<Props> = (props) => {
       withCredentials: true
     }).then((res) => {
       if (res.data.code === 200) {
+        if (res.data.data.progress.status === 'Succeeded') {
+          return Object.keys(interValTimerSet).forEach((key) => {
+            clearInterval(interValTimerSet[key]);
+          });
+        }
         setProgress(res.data.data.progress.components);
       }
     }).catch((err) => {
@@ -186,7 +191,7 @@ const WorkflowStageForLog: React.FC<Props> = (props) => {
   useEffect(() => {
     if (jobId) {
       getJobInfo();
-      interValTimerSet[v4()] = setInterval(getProgress, 1000);
+      interValTimerSet[v4()] = setInterval(getProgress, 3000);
     }
     return () => {
       Object.keys(interValTimerSet).forEach((key) => {
@@ -229,7 +234,7 @@ const WorkflowStageForLog: React.FC<Props> = (props) => {
                 <Node
                   id={id}
                   className="node"
-                  selectedActive={id === selectedNodeId || (progress[id] && ['Succeeded', 'Running', 'Pending'].includes(progress[id].status))}
+                  selectedActive={id === selectedNodeId}
                   key={id}
                   type={nodes[id].type}
                   editMode

@@ -68,11 +68,6 @@ const ProjectList: React.FC<Props> = (props) => {
         {text}
       </span>
     )
-  }, {
-    title: '管理员',
-    key: 'admin',
-    dataIndex: 'admin',
-    render: (text: { [k: string]: string }) => text.root || '',
   },
   {
     title: '更新时间',

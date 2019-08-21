@@ -32,6 +32,8 @@
 }
 
 .container .delete-icon-connect {
+  color: #5C87FF;
+  background: #fff;
   border-radius: 50%;
   font-size: 12px;
   cursor: pointer;

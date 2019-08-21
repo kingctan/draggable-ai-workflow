@@ -1,8 +1,7 @@
 import React, { SFC, useEffect, CSSProperties } from 'react';
-import { Modal, Button, Form, Icon, Tag, Table, Input, Row, Col, Select, message } from 'antd';
+import { Modal, Button, Form, Icon, Tag, Table, Select, message } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
 import { FlowNodesProps, ConnectionConfigProps } from '../modules/workflow/WorkflowProps';
-import { formItemLayout, formItemLayoutForWorkFlowConfig } from '../utils/FormLayout';
 import { useMappedState, useDispatch } from 'redux-react-hook';
 import { NEW_CONNECTION } from '../modules/workflow/workflowReducer';
 
@@ -19,7 +18,7 @@ interface ConnectionConfigFormProps extends FormComponentProps { };
 const ModalConnections: SFC<Props & ConnectionConfigFormProps> = (props) => {
   const { visible, config, modalContentDisabled, handleOK, handleCancel } = props;
 
-  const { getFieldDecorator, validateFields, getFieldsValue, setFieldsValue } = props.form;
+  const { getFieldDecorator, getFieldsValue } = props.form;
 
   const nodes: FlowNodesProps = useMappedState(state => state.workflowReducer);
   const dispatch = useDispatch();
