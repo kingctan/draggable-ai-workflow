@@ -88,7 +88,9 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
   };
 
   const getOperatorInfo = () => {
-    axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/component/get?componentID=${componentId}`)
+    axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/component/get?componentID=${componentId}`, {
+      withCredentials: true
+    })
       .then((res) => {
         if (res.data.code === 200) {
           const values = res.data.data;
@@ -176,7 +178,6 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
       const finalObj: any = {
         ...formValues,
         directory: `/自定义/${formValues.directory}`,
-        admin: { root: 'root' },
         inputs,
         outputs,
         params,
@@ -184,7 +185,9 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
 
       if (componentId) { // 更新算子
         finalObj.componentID = Number(componentId);
-        axios.put(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/component/update`, finalObj)
+        axios.put(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/component/update`, finalObj, {
+          withCredentials: true
+        })
           .then((res) => {
             if (res.data.code === 200) {
               message.success('已更新');
@@ -194,7 +197,9 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
             message.error('服务器被吃了..');
           });
       } else { // 新增算子
-        axios.post(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/component/create`, finalObj)
+        axios.post(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/component/create`, finalObj, {
+          withCredentials: true
+        })
           .then((res) => {
             if (res.data.code === 200) {
               message.success('新增成功');
@@ -212,7 +217,9 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
       title: '注意',
       content: `确定删除算子：${getFieldValue('componentName')}？`,
       onOk: () => {
-        axios.delete(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/component/delete?componentID=${componentId}`)
+        axios.delete(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/component/delete?componentID=${componentId}`, {
+          withCredentials: true
+        })
           .then((res) => {
             if (res.data.code === 200) {
               message.success('删除成功');

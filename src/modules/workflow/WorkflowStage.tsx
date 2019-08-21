@@ -194,7 +194,9 @@ const WorkflowStage: React.FC<Props> = (props) => {
         version: "v1.0",
         graph,
       }
-    })
+    }, {
+        withCredentials: true
+      })
       .then((res) => {
         setLoadingForSave(false);
         if (res.data.code === 200) {
@@ -216,7 +218,9 @@ const WorkflowStage: React.FC<Props> = (props) => {
 
     axios.post(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/job/create`, {
       projectID: projectId,
-    })
+    }, {
+        withCredentials: true
+      })
       .then((res) => {
         if (res.data.code === 200) {
           setLoadingForRun(false);
@@ -336,41 +340,45 @@ const WorkflowStage: React.FC<Props> = (props) => {
   };
 
   const getWorkflowInfo = () => {
-    axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/project/get?projectID=${projectId}`)
+    axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/project/get?projectID=${projectId}`, {
+      withCredentials: true
+    })
       .then((res) => {
         if (res.data.code === 200) {
-          const graph = res.data.data.graph.graph;
-          const tmpConnections: FlowConnectionProps[] = [];
-          graph.forEach((item: any) => {
-            if (item.deps) {
-              item.deps.forEach((depNodeId: string) => {
-                tmpConnections.push({
-                  id: generateConnectionId(MY_GRAPH_ID, v4()),
-                  source: depNodeId,
-                  target: item.id,
+          if (res.data.data.graph) {
+            const graph = res.data.data.graph.graph;
+            const tmpConnections: FlowConnectionProps[] = [];
+            graph.forEach((item: any) => {
+              if (item.deps) {
+                item.deps.forEach((depNodeId: string) => {
+                  tmpConnections.push({
+                    id: generateConnectionId(MY_GRAPH_ID, v4()),
+                    source: depNodeId,
+                    target: item.id,
+                  });
                 });
-              });
-            }
-            dispatch({
-              type: ADD_NODE,
-              nodeId: item.id,
-              nodeInfo: {
-                id: item.id,
-                label: item.name,
-                icon: 'icon-code1',
-                type: generateNodeType(item),
-                model: item.model,
-                deps: item.deps,
-                style: {
-                  left: item.fe.left || 0,
-                  top: item.fe.top || 0,
-                },
-                outputRuntime: item.outputs,
-                inputRuntime: item.inputs,
               }
+              dispatch({
+                type: ADD_NODE,
+                nodeId: item.id,
+                nodeInfo: {
+                  id: item.id,
+                  label: item.name,
+                  icon: 'icon-code1',
+                  type: generateNodeType(item),
+                  model: item.model,
+                  deps: item.deps,
+                  style: {
+                    left: item.fe.left || 0,
+                    top: item.fe.top || 0,
+                  },
+                  outputRuntime: item.outputs,
+                  inputRuntime: item.inputs,
+                }
+              });
             });
-          });
-          setConnections(tmpConnections);
+            setConnections(tmpConnections);
+          }
         }
       }).catch((err) => {
         // message.error('服务器被吃了..');

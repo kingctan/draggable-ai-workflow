@@ -103,16 +103,19 @@ const WorkflowOperator: React.FC<Props> = (props) => {
   };
 
   const getOperators = () => {
-    axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/component/tree`)
+    axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/component/tree`, {
+      withCredentials: true
+    })
       .then((res) => {
         if (res.data.code === 200) {
-          const newNodes = [...formatData(res.data.data), ...nodes];
-          setNodes(newNodes);
-          dataList = [];
-          generateList(newNodes);
-          // console.log(dataList);
+          if (res.data.data) {
+            const newNodes = [...formatData(res.data.data), ...nodes];
+            setNodes(newNodes);
+            dataList = [];
+            generateList(newNodes);
+          }
         }
-      }).catch((err) => {
+      }).catch(() => {
         message.error('服务器被吃了..');
       });
   };
