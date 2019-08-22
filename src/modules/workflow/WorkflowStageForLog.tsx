@@ -1,43 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { AutoSizer } from 'react-virtualized';
-import { debounce } from 'lodash';
-import { v4 } from 'uuid';
-import axios from 'axios';
 import { Graph, Node } from '../../components/JSPlumb';
 import { FlowNodeProps, FlowNodesProps, FlowConnectionProps, ConnectionConfigProps, ProgressProps } from './WorkflowProps';
 import { useMappedState, useDispatch } from 'redux-react-hook';
 import { Spin } from 'antd';
-import { generateConnectionId } from '../../components/JSPlumb/util';
-import { ADD_NODE, CLEAR_NODES } from './workflowReducer';
+import { CLEAR_NODES } from './workflowReducer';
 import ModalConnections from '../../components/ModalConnections';
 
 type Props = {
-  jobId: number | null
+  graphId: string
   selectedNodeId: string
+  connections: FlowConnectionProps[]
+  progress: ProgressProps
   onSelectNode: (nodeId: string) => void
 };
 
 const MAX_SCALE = 2;
 const MIN_SCALE = 0.5;
-const MY_GRAPH_ID = 'simpleDiagram';
-
 
 const WorkflowStageForLog: React.FC<Props> = (props) => {
-  const { jobId, selectedNodeId, onSelectNode } = props;
-
-  const interValTimerSet: any = {}; // 轮询的timer集
+  const { graphId, selectedNodeId, connections, progress, onSelectNode } = props;
 
   const [visibilityOfModal, setVisibilityOfModal] = useState(false);
   const [modalContentDisabled, setModelContentDisabled] = useState(false);
   const [connectionConfig, setConnectionConfig] = useState<ConnectionConfigProps | null>(null);
 
-  const [progress, setProgress] = useState<ProgressProps>({});
   const [scale, setScale] = useState<number>(1);
   const [width, setWidth] = useState<number>(500);
   const [height, setHeight] = useState<number>(500);
   const [xOffset, setXOffset] = useState<number>(0.0);
   const [yOffset, setYOffset] = useState<number>(0.0);
-  const [connections, setConnections] = useState<FlowConnectionProps[]>([]);
 
   const nodes: FlowNodesProps = useMappedState(state => state.workflowReducer);
   const dispatch = useDispatch();
@@ -61,29 +52,6 @@ const WorkflowStageForLog: React.FC<Props> = (props) => {
 
   const handleSelectNode = (selectedNode: FlowNodeProps) => {
     onSelectNode(selectedNode.id);
-  };
-
-  const generateNodeType = (node: FlowNodeProps) => {
-    let type: 'both' | 'source' | 'target' = 'both';
-    if (node.model) {
-      if (!(node.model.inputs && Object.keys(node.model.inputs).length > 0)) {
-        type = 'source';
-      } else if (!(node.model.outputs && Object.keys(node.model.outputs).length > 0)) {
-        type = 'target';
-      }
-    }
-    return type;
-  };
-
-
-  const handleMakeConnection = (sourceId: string, targetId: string) => {
-    setConnections(
-      [...connections, {
-        id: generateConnectionId(MY_GRAPH_ID, v4()),
-        source: sourceId,
-        target: targetId,
-      }]
-    )
   };
 
   const generateStatusIcon = (nodeId: string) => {
@@ -118,76 +86,8 @@ const WorkflowStageForLog: React.FC<Props> = (props) => {
     return StatusIcon;
   };
 
-  const getJobInfo = () => {
-    axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/job/get?jobID=${jobId}`, {
-      withCredentials: true
-    }).then((res) => {
-      if (res.data.code === 200) {
-        const graph = res.data.data.graph.graph;
-        const tmpConnections: FlowConnectionProps[] = [];
-        graph.forEach((item: any) => {
-          if (item.deps) {
-            item.deps.forEach((depNodeId: string) => {
-              tmpConnections.push({
-                id: generateConnectionId(MY_GRAPH_ID, v4()),
-                source: depNodeId,
-                target: item.id,
-              });
-            });
-          }
-          dispatch({
-            type: ADD_NODE,
-            nodeId: item.id,
-            nodeInfo: {
-              id: item.id,
-              label: item.name,
-              icon: 'icon-code1',
-              type: generateNodeType(item),
-              model: item.model,
-              deps: item.deps,
-              style: {
-                left: item.fe.left || 0,
-                top: item.fe.top || 0,
-              },
-              outputRuntime: item.outputs,
-              inputRuntime: item.inputs,
-            }
-          });
-        });
-        setConnections(tmpConnections);
-        setProgress(res.data.data.progress.components);
-      }
-    }).catch((err) => {
-      console.error(err);
-    });
-  };
-
-  const getProgress = () => {
-    axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/job/get?jobID=${jobId}`, {
-      withCredentials: true
-    }).then((res) => {
-      if (res.data.code === 200) {
-        if (res.data.data.progress.status === 'Succeeded') {
-          return Object.keys(interValTimerSet).forEach((key) => {
-            clearInterval(interValTimerSet[key]);
-          });
-        }
-        setProgress(res.data.data.progress.components);
-      }
-    }).catch((err) => {
-      console.error(err);
-    });
-  };
-
   useEffect(() => {
-    if (jobId) {
-      getJobInfo();
-      interValTimerSet[v4()] = setInterval(getProgress, 3000);
-    }
     return () => {
-      Object.keys(interValTimerSet).forEach((key) => {
-        clearInterval(interValTimerSet[key]);
-      });
       dispatch({ type: CLEAR_NODES });
     };
   }, []);
@@ -199,7 +99,7 @@ const WorkflowStageForLog: React.FC<Props> = (props) => {
           connections={connections}
           editMode
           height={height}
-          id={MY_GRAPH_ID}
+          id={graphId}
           maxScale={MAX_SCALE}
           minScale={MIN_SCALE}
           // onSelect={handleSelectNode}
@@ -249,7 +149,7 @@ const WorkflowStageForLog: React.FC<Props> = (props) => {
           visible={visibilityOfModal}
           modalContentDisabled={modalContentDisabled}
           config={connectionConfig}
-          handleOK={handleMakeConnection}
+          handleOK={() => null}
           handleCancel={() => setVisibilityOfModal(false)}
         />
       }

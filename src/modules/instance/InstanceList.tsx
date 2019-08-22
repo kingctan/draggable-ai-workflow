@@ -12,12 +12,16 @@ type Props = {};
 export const statusColorMap: any = {
   Succeeded: 'green',
   Failed: 'red',
+  Error: 'red',
   Running: 'orange',
+  Pending: 'orange',
 };
 
 export const statusTextMap: any = {
   Succeeded: '成功',
   Failed: '失败',
+  Error: '失败',
+  Pending: '准备运行..',
   Running: '运行中..',
 };
 
