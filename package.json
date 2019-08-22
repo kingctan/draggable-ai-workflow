@@ -34,9 +34,9 @@
   },
   "scripts": {
     "start": "react-app-rewired start",
-    "start:prod": "env-cmd -f .env.production react-app-rewired start",
+    "start:prod": "env-cmd -f .env.production.local react-app-rewired start",
     "build": "react-app-rewired build && npm run zip",
-    "build:dev": "env-cmd -f .env.development react-app-rewired build",
+    "build:dev": "env-cmd -f .env.development.local react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject",
     "cz": "git-cz",
