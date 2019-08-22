@@ -1,14 +1,13 @@
 .workflow {
   display: flex;
-
-  > div {
-    height: 'calc(100vh - %s - 2*%s)' % (header-height main-padding);
-    overflow-y: hidden;
-  }
+  clearfix();
+  height: 'calc(100vh - %s - 2*%s)' % (header-height main-padding);
+  overflow-y: hidden;
 
   .workflow-operator {
     flex: 1;
     min-width: 260px;
+    height: 100%;
     border: 1px solid #eee;
 
     .tree {
@@ -37,7 +36,9 @@
   .workflow-stage {
     flex: 3;
     border: 1px solid #eee;
+    height: 100%;
     background: #fff;
+    overflow: hidden;
     background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2UwZTBlMCIgb3BhY2l0eT0iMC4yIiBzdHJva2Utd2lkdGg9IjEiLz48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=');
 
     #drop-stage {
@@ -58,6 +59,7 @@
   .workflow-conf {
     flex: 1;
     padding: 20px;
+    height: 100%;
     max-width: 280px;
     min-width: 180px;
     border: 1px solid #eee;
@@ -65,6 +67,7 @@
 
   .workflow-log {
     flex: 1.5;
+    height: 100%;
     border: 1px solid #eee;
     min-width: 280px;
     max-width: 380px;
