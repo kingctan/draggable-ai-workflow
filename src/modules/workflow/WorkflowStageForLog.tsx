@@ -203,9 +203,6 @@ const WorkflowStageForLog: React.FC<Props> = (props) => {
 
   return (
     <div className="workflow-stage">
-      <AutoSizer onResize={handleResize}>
-        {() => null}
-      </AutoSizer>
       <div id="drop-stage">
         <Graph
           connections={connections}

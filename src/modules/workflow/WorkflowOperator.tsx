@@ -6,6 +6,12 @@ import { useDrag, DragSourceMonitor } from 'react-dnd';
 
 type Props = {};
 
+export type NodeData = {
+  title: string
+  key?: string
+  children?: NodeData[]
+};
+
 const formatData = (nodeData: NodeData[], prevKey?: string) => {
   for (let i = 0; i < nodeData.length; i += 1) {
     const title = nodeData[i].title;
@@ -16,7 +22,6 @@ const formatData = (nodeData: NodeData[], prevKey?: string) => {
   }
   return nodeData;
 };
-const gData = formatData(nodeData);
 
 //@ts-ignore
 const getParentKey = (key: string, tree: NodeData[]) => {
@@ -45,7 +50,6 @@ const generateList = (data: any) => {
     }
   }
 };
-generateList(gData);
 
 const DraggableItem: React.SFC<any> = (props) => {
   const { data, title } = props;
@@ -76,7 +80,7 @@ const DraggableItem: React.SFC<any> = (props) => {
 const WorkflowOperator: React.FC<Props> = (props) => {
   const { } = props;
 
-  const [nodes, setNodes] = useState<NodeData[]>(gData);
+  const [nodes, setNodes] = useState<NodeData[]>([]);
   const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
   const [autoExpandParent, setAutoExpandParent] = useState(true);
   const [searchValue, setSearchValue] = useState('');
