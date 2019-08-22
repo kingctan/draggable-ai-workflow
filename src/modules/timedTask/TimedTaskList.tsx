@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { findIndex } from 'lodash';
 import axios from 'axios';
-import { Button, Icon, Table, Modal, Divider, Input, message, Badge } from 'antd';
+import { Button, Icon, Table, Modal, Divider, Input, message, Badge, Menu, Dropdown } from 'antd';
 
 import { formatDate } from '../../utils/formatHelper';
 import { TimedTaskProps } from './TimedTaskProps';
@@ -48,8 +49,29 @@ const TimedTaskList: React.FC<Props> = (props) => {
 
   const handleRefresh = () => getList();
 
-  const handleDelete = (projectId: string) => {
-    axios.delete(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/project/delete?projectID=${projectId}`, {
+  const handleStop = (row: TimedTaskProps) => {
+    Modal.confirm({
+      title: "停止定时任务",
+      content: <span>确定停止定时任务：<b>{row.projectName}</b> ？</span>,
+      onOk() {
+        axios.post(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/cronjob/stop`, {
+          cronjobID: row.ID,
+        }, {
+            withCredentials: true
+          }).then((res) => {
+            if (res.data.code === 200) {
+              message.success('已停止');
+              getList();
+            }
+          }).catch((err) => {
+            console.error(err);
+          });
+      },
+    });
+  };
+
+  const handleDelete = (ID: number) => {
+    axios.delete(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/cronjob/delete?cronjobID=${ID}`, {
       withCredentials: true
     }).then((res) => {
       if (res.data.code === 200) {
@@ -65,8 +87,32 @@ const TimedTaskList: React.FC<Props> = (props) => {
     getList();
   }, []);
 
+
+  const MyMenu = (row: TimedTaskProps) => (
+    <Menu>
+      <Menu.Item key="task-stop" disabled={row.status !== 'Running'} onClick={() => handleStop(row)}>
+        <span><Icon type="poweroff" /> 停止</span >
+      </Menu.Item>
+      <Menu.Item
+        key="task-delete"
+        disabled={row.status === 'Running'}
+        onClick={() => {
+          Modal.confirm({
+            title: "删除定时任务",
+            content: <span>确定删除定时任务：<b>{row.projectName}</b> ？</span>,
+            onOk() {
+              handleDelete(row.ID);
+            },
+          });
+        }}
+      >
+        <span><Icon type="delete" /> 删除</span >
+      </Menu.Item>
+    </Menu>
+  );
+
   const columns = [{
-    title: '模板名称',
+    title: '快照名称',
     key: 'projectName',
     dataIndex: 'projectName',
   }, {
@@ -123,27 +169,17 @@ const TimedTaskList: React.FC<Props> = (props) => {
           href="javascript:;"
           onClick={() => {
             setVisibilityJobModal(true);
-            setSelectedCronjobID(row.ID)
+            setSelectedCronjobID(row.ID);
           }}
         >
           查看实例
           </a>
         <Divider type="vertical" />
-        <a
-          href="javascript:;"
-          onClick={() => {
-            Modal.confirm({
-              title: "删除定时任务",
-              content: <span>确定删除定时任务：<b>{row.projectName}</b> ？</span>,
-              onOk() {
-                // handleDelete(row.projectID.toString());
-              },
-            });
-          }}
-        >
-          {/* <Icon type="delete" />  */}
-          删除
-        </a>
+        <Dropdown overlay={MyMenu(row)} placement="bottomCenter" trigger={['click']}>
+          <Button size="small">
+            <Icon type="more" />
+          </Button>
+        </Dropdown>
       </span>
     ),
   }];
@@ -176,6 +212,7 @@ const TimedTaskList: React.FC<Props> = (props) => {
       {
         visibilityJobModal &&
         <ModalTimedJobs
+          title={list[findIndex(list, { ID: selectedCronjobID! })].projectName}
           cronJobId={selectedCronjobID}
           visible={visibilityJobModal}
           handleCancel={() => setVisibilityJobModal(false)}

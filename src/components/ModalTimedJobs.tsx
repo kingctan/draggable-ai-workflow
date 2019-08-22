@@ -7,13 +7,14 @@ import { Link } from 'react-router-dom';
 import { InstanceProps } from '../modules/instance/InstanceProps';
 
 type Props = {
+  title: string
   cronJobId: number | null
   visible: boolean
   handleCancel: () => void
 };
 
 const ModalTimedJobs: SFC<Props> = (props) => {
-  const { cronJobId, visible, handleCancel } = props;
+  const { title, cronJobId, visible, handleCancel } = props;
 
   const [loading, setLoading] = useState(false);
   const [list, setList] = useState<InstanceProps[]>([]);
@@ -24,7 +25,7 @@ const ModalTimedJobs: SFC<Props> = (props) => {
 
   const getList = () => {
     setLoading(true);
-    axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/job/list`, {
+    axios.get(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/cronjob/jobs?cronjobID=${cronJobId}`, {
       withCredentials: true
     }).then((res) => {
       if (res.data.code === 200) {
@@ -47,24 +48,10 @@ const ModalTimedJobs: SFC<Props> = (props) => {
     key: 'jobName',
     dataIndex: 'jobName',
     render: (text: string, row: InstanceProps) => (
-      <Link to={`/instance-detail/${row.jobID}`} className="table-column-link" style={{ maxWidth: 100, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+      <Link to={`/instance-detail/${row.jobID}`} className="table-column-link" >
         {text}
       </Link>
     )
-  }, {
-    title: '描述',
-    key: 'note',
-    dataIndex: 'note',
-    render: (text: string) => (
-      <span className="table-column-desc">
-        {text}
-      </span>
-    )
-  },
-  {
-    title: '所属项目',
-    key: 'projectName',
-    dataIndex: 'projectName',
   },
   {
     title: '创建时间',
@@ -84,9 +71,9 @@ const ModalTimedJobs: SFC<Props> = (props) => {
 
   return (
     <Modal
-      width={820}
+      width={680}
       visible={visible}
-      title="定时实例列表"
+      title={`${title} 实例列表`}
       onCancel={handleCancel}
       footer={[
         <Button key="back" onClick={handleCancel}>
