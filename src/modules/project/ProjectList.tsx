@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { Button, Icon, Table, Modal, Divider, Input, message } from 'antd';
+import { Button, Icon, Table, Modal, Divider, Input, message, Menu, Dropdown } from 'antd';
 
 import { ProjectProps } from './ProjectProps';
 import { formatDate } from '../../utils/formatHelper';
@@ -29,6 +29,24 @@ const ProjectList: React.FC<Props> = (props) => {
     });
   };
 
+  const handlePlay = async (projectID: number) => {
+    axios.post(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/job/create`, {
+      projectID,
+    }, {
+        withCredentials: true
+      })
+      .then((res) => {
+        if (res.data.code === 200) {
+          message.success('已运行');
+          (props as any).history.push('/instance-list');
+        } else {
+          message.error('运行失败');
+        }
+      }).catch((err) => {
+        return message.error('服务器被吃了..');
+      });
+  };
+
   const filter = (list: ProjectProps[]) => list.filter((item: ProjectProps) => item.projectName.includes(filterVal));
 
   const handleRefresh = () => getList();
@@ -49,6 +67,30 @@ const ProjectList: React.FC<Props> = (props) => {
   useEffect(() => {
     getList();
   }, []);
+
+  const MyMenu = (row: ProjectProps) => (
+    <Menu>
+      <Menu.Item key="project-edit">
+        <Link to={`/project-detail/${row.projectID}`}>
+          <span><Icon type="edit" /> 修改</span >
+        </Link>
+      </Menu.Item>
+      <Menu.Item
+        key="project-delete"
+        onClick={() => {
+          Modal.confirm({
+            title: "删除模板",
+            content: <span>确定删除模板：<b>{row.projectName}</b> ？</span>,
+            onOk() {
+              handleDelete(row.projectID.toString());
+            },
+          });
+        }}
+      >
+        <span><Icon type="delete" /> 删除</span >
+      </Menu.Item>
+    </Menu>
+  );
 
   const columns = [{
     title: '名称',
@@ -81,32 +123,21 @@ const ProjectList: React.FC<Props> = (props) => {
     render: (text: string, row: ProjectProps) => (
       <span style={{ whiteSpace: 'nowrap' }}>
         <Link to={`/workflow/${row.projectID}`}>
-          <p style={{ display: 'inline-block', margin: 0 }}>
-            工作流
-          </p>
-        </Link>
-        <Divider type="vertical" />
-        <Link to={`/project-detail/${row.projectID}`}>
-          <p style={{ display: 'inline-block', margin: 0 }}>
-            修改
-          </p>
+          工作流
         </Link>
         <Divider type="vertical" />
         <a
           href="javascript:;"
-          onClick={() => {
-            Modal.confirm({
-              title: "删除模板",
-              content: <span>确定删除模板：<b>{row.projectName}</b> ？</span>,
-              onOk() {
-                handleDelete(row.projectID.toString());
-              },
-            });
-          }}
+          onClick={() => row.graph ? handlePlay(row.projectID) : message.warning('该项目未创建工作流')}
         >
-          {/* <Icon type="delete" />  */}
-          删除
+          快速运行
         </a>
+        <Divider type="vertical" />
+        <Dropdown overlay={MyMenu(row)} placement="bottomCenter" trigger={['click']}>
+          <Button size="small">
+            <Icon type="more" />
+          </Button>
+        </Dropdown>
       </span>
     ),
   }];

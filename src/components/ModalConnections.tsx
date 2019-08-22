@@ -9,14 +9,14 @@ type Props = {
   visible: boolean
   config: ConnectionConfigProps | null
   modalContentDisabled: boolean
-  handleOK: (sourceId: string, targetId: string) => void
+  handleOk: (sourceId: string, targetId: string) => void
   handleCancel: () => void
 };
 
 interface ConnectionConfigFormProps extends FormComponentProps { };
 
 const ModalConnections: SFC<Props & ConnectionConfigFormProps> = (props) => {
-  const { visible, config, modalContentDisabled, handleOK, handleCancel } = props;
+  const { visible, config, modalContentDisabled, handleOk, handleCancel } = props;
 
   const { getFieldDecorator, getFieldsValue } = props.form;
 
@@ -36,11 +36,8 @@ const ModalConnections: SFC<Props & ConnectionConfigFormProps> = (props) => {
       return message.warning(<span>请保证当前组件 <b>{nodes[sourceId].label}</b> 至少有一个输出</span>);
     }
 
-
-
     for (let i = 0; i < values.output.length; i += 1) {
       const sourceOutput = values.output[i];
-      console.log('🌺', values);
       if (sourceOutput && sourceOutput !== '*') {
         isModify = true;
 
@@ -52,17 +49,11 @@ const ModalConnections: SFC<Props & ConnectionConfigFormProps> = (props) => {
           targetInput: values.input[i],
         });
 
-        handleOK(sourceId, targetId);
+        handleOk(sourceId, targetId);
         handleCancel();
       }
     }
-
-
   };
-
-  useEffect(() => {
-
-  }, []);
 
   const columns = [
     {

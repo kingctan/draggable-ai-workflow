@@ -100,7 +100,7 @@ const OperatorList: React.FC<Props> = (props) => {
             (
               filter(list).length === 0 ? (filterVal && <NotFound content={`Oops.. 找不到名字包含 “${filterVal}” 的文件`} />) :
                 filter(list).map((item: OperatorProps, index: number) => (
-                  <div className="operator" onClick={() => handleToDetail(item)}>
+                  <div className="operator" key={item.path} onClick={() => handleToDetail(item)}>
                     <div className="operator-icon">
                       {
                         !!item.model ?

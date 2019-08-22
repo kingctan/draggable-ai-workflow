@@ -34,6 +34,12 @@ const LayoutSidebar: SFC<Props> = (props) => {
               <span>模板管理</span>
             </Link>
           </Menu.Item>
+          <Menu.Item key="timed">
+            <Link to="/timed-list">
+              <Icon type="clock-circle" />
+              <span>定时任务</span>
+            </Link>
+          </Menu.Item>
           <Menu.Item key="instance">
             <Link to="/instance-list">
               <Icon type="pie-chart" />

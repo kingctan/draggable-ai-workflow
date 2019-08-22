@@ -12,6 +12,7 @@ import { Button, Icon, Tooltip, message } from 'antd';
 import { generateNodeId, generateConnectionId } from '../../components/JSPlumb/util';
 import { ADD_NODE, REMOVE_NODE, NEW_CONNECTION, UPDATE_NODE_STYLE, REMOVE_CONNECTION } from './workflowReducer';
 import ModalConnections from '../../components/ModalConnections';
+import ModalTimedConfig from '../../components/ModalTimedConfig';
 
 type Props = {
   projectId: number | null
@@ -29,7 +30,8 @@ const WorkflowStage: React.FC<Props> = (props) => {
   const [loadingForSave, setLoadingForSave] = useState(false);
   const [loadingForRun, setLoadingForRun] = useState(false);
 
-  const [visibilityOfModal, setVisibilityOfModal] = useState(false);
+  const [visibilityOfConnModal, setVisibilityOfConnModal] = useState(false);
+  const [visibilityOfTimedModal, setVisibilityOfTimedModal] = useState(false);
   const [modalContentDisabled, setModelContentDisabled] = useState(false);
   const [connectionConfig, setConnectionConfig] = useState<ConnectionConfigProps | null>(null);
 
@@ -96,7 +98,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
     if (sourceId && targetId) {
       setConnectionConfig({ sourceId, targetId });
       setModelContentDisabled(true);
-      setVisibilityOfModal(true);
+      setVisibilityOfConnModal(true);
     }
   };
 
@@ -150,7 +152,7 @@ const WorkflowStage: React.FC<Props> = (props) => {
     } else {
       setModelContentDisabled(false);
       setConnectionConfig({ sourceId, targetId });
-      setVisibilityOfModal(true);
+      setVisibilityOfConnModal(true);
       return false;
     }
 
@@ -227,6 +229,27 @@ const WorkflowStage: React.FC<Props> = (props) => {
           return message.success('已运行，可前往实例列表查看任务');
         } else {
           return message.error('运行失败');
+        }
+      }).catch((err) => {
+        setLoadingForRun(false);
+        return message.error('服务器被吃了..');
+      });
+  };
+
+  const handlePlayCycle = (formValues: any) => {
+    axios.post(`${process.env.REACT_APP_GO_WORKFLOW_SERVER}/cronjob/create`, {
+      projectID: projectId,
+      ...formValues,
+    }, {
+        withCredentials: true
+      })
+      .then((res) => {
+        if (res.data.code === 200) {
+          setLoadingForRun(false);
+          setVisibilityOfTimedModal(false);
+          return message.success('已运行定时任务，可前往定时任务列表查看');
+        } else {
+          return message.error('运行定时任务失败');
         }
       }).catch((err) => {
         setLoadingForRun(false);
@@ -405,8 +428,13 @@ const WorkflowStage: React.FC<Props> = (props) => {
               </Button>
             </Tooltip>
             <Tooltip placement="top" title="保存并运行">
-              <Button onClick={handlePlay} >
+              <Button disabled={loadingForRun} onClick={handlePlay} >
                 {loadingForRun ? <Icon type="loading" /> : <Icon type="play-circle" theme="filled" />} 运行
+              </Button>
+            </Tooltip>
+            <Tooltip placement="top" title="保存并定时运行">
+              <Button onClick={() => setVisibilityOfTimedModal(true)} >
+                <i className="iconfont icon-wait" style={{ fontSize: 14, marginRight: 8 }} /> 定时
               </Button>
             </Tooltip>
             <Tooltip placement="top" title="缩放重置">
@@ -462,14 +490,23 @@ const WorkflowStage: React.FC<Props> = (props) => {
         </Graph>
       </div>
       {
-        visibilityOfModal &&
+        visibilityOfConnModal &&
         //@ts-ignore
         <ModalConnections
-          visible={visibilityOfModal}
+          visible={visibilityOfConnModal}
           modalContentDisabled={modalContentDisabled}
           config={connectionConfig}
-          handleOK={handleMakeConnection}
-          handleCancel={() => setVisibilityOfModal(false)}
+          handleOk={handleMakeConnection}
+          handleCancel={() => setVisibilityOfConnModal(false)}
+        />
+      }
+      {
+        visibilityOfTimedModal &&
+        //@ts-ignore
+        <ModalTimedConfig
+          visible={visibilityOfTimedModal}
+          handleOk={handlePlayCycle}
+          handleCancel={() => setVisibilityOfTimedModal(false)}
         />
       }
     </div>

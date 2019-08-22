@@ -64,7 +64,7 @@ const WorkflowConf: React.FC<Props & WorkflowConfProps> = (props) => {
           }
           {
             paramConfigs && Object.keys(paramConfigs).map((key: string) => (
-              <Form.Item label={paramConfigs[key].name}>
+              <Form.Item label={paramConfigs[key].name} key={key}>
                 {getFieldDecorator(`${key}`, {
                   initialValue: paramConfigs[key].default,
                   rules: [{
