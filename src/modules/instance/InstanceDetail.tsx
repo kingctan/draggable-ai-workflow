@@ -115,7 +115,7 @@ const InstanceDetail: React.FC<Props> = (props) => {
           });
         });
         setConnections(tmpConnections);
-        setProgress(res.data.data.progress.components);
+        setProgress(res.data.data.progress.components || {});
       }
     }).catch((err) => {
       console.error(err);

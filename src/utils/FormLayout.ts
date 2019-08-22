@@ -59,11 +59,12 @@ export const tailFormItemLayout = {
   },
 };
 
-export const formItemLayoutForWorkFlowConfig = {
+export const formItemLayoutForModal = {
   labelCol: {
     span: 5
   },
   wrapperCol: {
-    span: 19
+    span: 18,
+    offset: 1
   }
 };

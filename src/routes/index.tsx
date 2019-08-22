@@ -8,6 +8,7 @@ import InstanceDetail from '../modules/instance/InstanceDetail';
 import OperatorList from '../modules/operator/OperatorList';
 import OperatorDetail from '../modules/operator/OperatorDetail';
 import WorkflowDetail from '../modules/project/WorkflowDetail';
+import TimedTaskList from '../modules/timedTask/TimedTaskList';
 
 const isAuthenticated = () => {
   return true;
@@ -55,6 +56,7 @@ export const Routes = () =>
       <LayoutRoute path="/project-detail/:projectId" exact navmark="project" component={ProjectDetail} />
       <LayoutRoute path="/workflow" exact navmark="project" component={WorkflowDetail} />
       <LayoutRoute path="/workflow/:projectId" exact navmark="project" component={WorkflowDetail} />
+      <LayoutRoute path="/timed-list" exact navmark="timed" component={TimedTaskList} />
       <LayoutRoute path="/instance-list" exact navmark="instance" component={InstanceList} />
       <LayoutRoute path="/instance-detail" exact navmark="instance" component={InstanceDetail} />
       <LayoutRoute path="/instance-detail/:jobId" exact navmark="instance" component={InstanceDetail} />

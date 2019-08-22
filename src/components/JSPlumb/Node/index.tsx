@@ -195,10 +195,10 @@ export default class Node extends PureComponent<NodeProps & NodePropsFData & Cus
                   <Tag>{id}</Tag>
                 </Descriptions.Item>
                 <Descriptions.Item label="输入">
-                  {model && model.inputs && Object.keys(model.inputs).map((key: string) => <Tag>{key} ({model.inputs[key].type})</Tag>)}
+                  {model && model.inputs && Object.keys(model.inputs).map((key: string) => <Tag key={key}>{key} ({model.inputs[key].type})</Tag>)}
                 </Descriptions.Item>
                 <Descriptions.Item label="输出">
-                  {model && model.outputs && Object.keys(model.outputs).map((key: string) => <Tag>{key} ({model.outputs[key].type})</Tag>)}
+                  {model && model.outputs && Object.keys(model.outputs).map((key: string) => <Tag key={key}>{key} ({model.outputs[key].type})</Tag>)}
                 </Descriptions.Item>
                 <Descriptions.Item label="操作">
                   <Button type="danger" size="small" onClick={() => onDelete(id)} disabled={editMode}>删除</Button>
