@@ -42,15 +42,6 @@ const WorkflowStageForLog: React.FC<Props> = (props) => {
   const nodes: FlowNodesProps = useMappedState(state => state.workflowReducer);
   const dispatch = useDispatch();
 
-  const handleResize = debounce(
-    ({ height, width }: { height: number, width: number }) => {
-      setHeight(height);
-      setWidth(width);
-    },
-    400,
-    { trailing: true }
-  );
-
   const handlePanEnd = (xOffset?: number, yOffset?: number) => {
     xOffset && setXOffset(xOffset);
     yOffset && setYOffset(yOffset);

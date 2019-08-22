@@ -1,29 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import SplitPane from 'react-split-pane';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { useDispatch, useMappedState } from 'redux-react-hook';
-import { FlowNodesProps } from '../workflow/WorkflowProps';
+import { FlowNodesProps, ProgressProps } from '../workflow/WorkflowProps';
 import WorkflowConf from '../workflow/WorkflowConf';
-import { Tabs, Form, message } from 'antd';
+import { Tabs, Form, message, Drawer, Descriptions, Button, Tag, Badge } from 'antd';
 import WorkflowStageForLog from '../workflow/WorkflowStageForLog';
+import { statusTextMap, statusColorMap } from './InstanceList';
+import { formatDate } from '../../utils/formatHelper';
 
 type Props = {};
-
-const Log: React.FC<{
-  content: string
-}> = ({ content }) => {
-
-  return (
-    <div style={{ background: '#000', color: '#fff', height: 400, overflowY: 'scroll' }}>
-      <pre style={{ wordBreak: 'break-all', whiteSpace: 'pre-wrap', padding: 10 }}>
-        <code>
-          {content}
-        </code>
-      </pre>
-    </div>
-  );
-};
 
 const InstanceDetail: React.FC<Props> = (props) => {
   // const { } = props;
@@ -33,6 +19,8 @@ const InstanceDetail: React.FC<Props> = (props) => {
   const [selectedNodeId, setSelectedNodeId] = useState<string>('');
   const [jobName, setJobName] = useState<string>('');
   const [log, setLog] = useState<string>('');
+  const [progress, setProgress] = useState<ProgressProps>({});
+  const [isVisibleForLog, setIsVisibleForLog] = useState<boolean>(false);
 
   const nodes: FlowNodesProps = useMappedState(state => state.workflowReducer);
   const dispatch = useDispatch();
@@ -74,6 +62,7 @@ const InstanceDetail: React.FC<Props> = (props) => {
     }).then((res) => {
       if (res.data.code === 200) {
         setJobName(res.data.data.jobName);
+        setProgress(res.data.data.progress.components);
       }
     }).catch((err) => {
       console.error(err);
@@ -88,48 +77,66 @@ const InstanceDetail: React.FC<Props> = (props) => {
 
   return (
     <div className="workflow">
-      <SplitPane
-        split="vertical"
-        minSize={400}
-        maxSize={1000}
-        defaultSize={Math.trunc((window.innerWidth - 220) * 0.7)}
-      >
-        <WorkflowStageForLog
-          selectedNodeId={selectedNodeId}
-          onSelectNode={handleSelectNode}
-          jobId={jobId}
-        />
-        <Tabs className="workflow-log" defaultActiveKey="1" onChange={handleChangeTab}>
-          <Tabs.TabPane tab="运行信息" key="1">
-            <div style={{ padding: 10 }}>
-              {
-                selectedNodeId ?
-                  <Form.Item>
-                    <h3>{nodes[selectedNodeId].label || ''}</h3>
-                  </Form.Item>
-                  : '未选择节点'
-              }
-              {
-                log &&
-                <Form.Item label="日志">
-                  <Log content={log} />
-                </Form.Item>
-              }
-            </div>
-          </Tabs.TabPane>
-          <Tabs.TabPane tab="节点配置" key="2">
+      <WorkflowStageForLog
+        selectedNodeId={selectedNodeId}
+        onSelectNode={handleSelectNode}
+        jobId={jobId}
+      />
+      <Tabs className="workflow-log" defaultActiveKey="1" onChange={handleChangeTab}>
+        <Tabs.TabPane tab="运行信息" key="1">
+          <div style={{ padding: 10 }}>
             {
               selectedNodeId ?
-                //@ts-ignore
-                <WorkflowConf
-                  editMode
-                  selectedNodeId={selectedNodeId}
-                /> :
-                <div style={{ padding: 10 }}>未选择节点</div>
+                <Descriptions title={nodes[selectedNodeId].label} size="middle" bordered column={1}>
+                  <Descriptions.Item label="状态">
+                    <Badge
+                      color={statusColorMap[progress[selectedNodeId].status]}
+                      text={statusTextMap[progress[selectedNodeId].status]}
+                    />
+                  </Descriptions.Item>
+                  <Descriptions.Item label="开始时间">
+                    <span>
+                      {formatDate(new Date(progress[selectedNodeId].startedAt), 'MM/dd/yyyy, hh:mm:ss')}
+                    </span>
+                  </Descriptions.Item>
+                  <Descriptions.Item label="结束时间">
+                    <span>
+                      {formatDate(new Date(progress[selectedNodeId].finishedAt), 'MM/dd/yyyy, hh:mm:ss')}
+                    </span>
+                  </Descriptions.Item>
+                  <Descriptions.Item label="日志">
+                    <Button type="primary" onClick={() => setIsVisibleForLog(true)}>查看日志</Button>
+                  </Descriptions.Item>
+                </Descriptions> : '未选择节点'
             }
-          </Tabs.TabPane>
-        </Tabs>
-      </SplitPane>
+            <Drawer
+              title={`${selectedNodeId && nodes[selectedNodeId].label}（${selectedNodeId}）`}
+              width="60%"
+              placement="right"
+              closable={false}
+              onClose={() => setIsVisibleForLog(false)}
+              visible={isVisibleForLog}
+            >
+              <pre className="drawer-log">
+                <code>
+                  {log}
+                </code>
+              </pre>
+            </Drawer>
+          </div>
+        </Tabs.TabPane>
+        <Tabs.TabPane tab="可调参数" key="2">
+          {
+            selectedNodeId ?
+              //@ts-ignore
+              <WorkflowConf
+                editMode
+                selectedNodeId={selectedNodeId}
+              /> :
+              <div style={{ padding: 10 }}>未选择节点</div>
+          }
+        </Tabs.TabPane>
+      </Tabs>
     </div>
   );
 };

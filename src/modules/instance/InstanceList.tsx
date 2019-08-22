@@ -9,13 +9,13 @@ import { Link } from 'react-router-dom';
 
 type Props = {};
 
-const statusColorMap: any = {
+export const statusColorMap: any = {
   Succeeded: 'green',
   Failed: 'red',
   Running: 'orange',
 };
 
-const statusTextMap: any = {
+export const statusTextMap: any = {
   Succeeded: '成功',
   Failed: '失败',
   Running: '运行中..',
