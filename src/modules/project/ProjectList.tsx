@@ -70,6 +70,12 @@ const ProjectList: React.FC<Props> = (props) => {
 
   const MyMenu = (row: ProjectProps) => (
     <Menu>
+      <Menu.Item
+        key="project-edit"
+        onClick={() => row.graph ? handlePlay(row.projectID) : message.warning('该项目未创建工作流')}
+      >
+        <span><Icon type="play-circle" theme="filled" /> 运行</span>
+      </Menu.Item>
       <Menu.Item key="project-edit">
         <Link to={`/project-detail/${row.projectID}`}>
           <span><Icon type="edit" /> 修改</span >
@@ -126,13 +132,13 @@ const ProjectList: React.FC<Props> = (props) => {
           工作流
         </Link>
         <Divider type="vertical" />
-        <a
+        {/* <a
           href="javascript:;"
           onClick={() => row.graph ? handlePlay(row.projectID) : message.warning('该项目未创建工作流')}
         >
           快速运行
         </a>
-        <Divider type="vertical" />
+        <Divider type="vertical" /> */}
         <Dropdown overlay={MyMenu(row)} placement="bottomCenter" trigger={['click']}>
           <Button size="small">
             <Icon type="more" />

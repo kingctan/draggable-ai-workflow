@@ -192,6 +192,8 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
             if (res.data.code === 200) {
               message.success('已更新');
               (props as any).history.push(`/operator-list/${encodeURIComponent(`自定义/${formValues.directory}`)}`);
+            } else {
+              message.warning(res.data.msg);
             }
           }).catch(() => {
             message.error('服务器被吃了..');
@@ -204,6 +206,8 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
             if (res.data.code === 200) {
               message.success('新增成功');
               (props as any).history.push(`/operator-list/${encodeURIComponent(`自定义/${formValues.directory}`)}`);
+            } else {
+              message.warning(res.data.msg);
             }
           }).catch(() => {
             message.error('服务器被吃了..');
@@ -224,6 +228,8 @@ const OperatorDetail: React.FC<Props & OperatorDetailProps> = (props) => {
             if (res.data.code === 200) {
               message.success('删除成功');
               (props as any).history.push(`/operator-list/${encodeURIComponent(sessionStorage.getItem('OperatorListCurrentPath') || '')}`);
+            } else {
+              message.warning(res.data.msg);
             }
           }).catch((err) => {
             message.error('服务器被吃了..');
