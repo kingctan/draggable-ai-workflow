@@ -1,7 +1,6 @@
 import React, { useState, BaseSyntheticEvent, useEffect } from 'react';
 import { Tree, Input, Icon, message } from 'antd';
 import axios from 'axios';
-import { nodeData, NodeData } from './gData';
 import { useDrag, DragSourceMonitor } from 'react-dnd';
 
 type Props = {};

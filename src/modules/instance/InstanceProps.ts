@@ -5,7 +5,7 @@ export type InstanceProps = {
   createTime: number
   projectID: number
   projectName: string
-  status: string
+  status: 'Pending' | 'Running' | 'Succeeded' | 'Skipped' | 'Failed' | 'Error'
   admin: {
     [k: string]: string
   }
