@@ -59,7 +59,9 @@ const InstanceDetail: React.FC<Props> = (props) => {
 
   const handleSelectNode = (nodeId: string) => {
     setSelectedNodeId(nodeId);
-    getLog(nodeId);
+    if (progress && progress[nodeId]) {
+      getLog(nodeId);
+    }
   };
 
   const handleChangeTab = () => {
@@ -127,7 +129,7 @@ const InstanceDetail: React.FC<Props> = (props) => {
       withCredentials: true
     }).then((res) => {
       if (res.data.code === 200) {
-        setProgress(res.data.data.progress.components);
+        setProgress(res.data.data.progress.components || {});
         if (res.data.data.progress.status === 'Succeeded') {
           return Object.keys(interValTimerSetForJob).forEach((key) => {
             clearInterval(interValTimerSetForJob[key]);
@@ -145,7 +147,7 @@ const InstanceDetail: React.FC<Props> = (props) => {
         const ele: any = document.querySelector('.drawer-log');
         ele.scrollTop = ele.scrollHeight;
       }, 0);
-      interValTimerSetForLog[v4()] = setInterval(() => getLog(selectedNodeId), 1000);
+      interValTimerSetForLog[v4()] = setInterval(() => { getLog(selectedNodeId) }, 1000);
     }
     return () => {
       Object.keys(interValTimerSetForLog).forEach((key) => {
