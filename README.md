@@ -1,7 +1,16 @@
-# draggable-pai-workflow
+# draggable-ai-workflow
 AI platform workflow with draggable components.
 
 ## Features
+
+* 🚀 UI: simple to use, yet powerful
+* 📐 DAG graph scheduling: Draggable-ai-workflow supports DAG workflow execution
+* 💡 Parameterization: stage (unit of execution) can be parameterized to maximize configuration reuse
+* 🛠 External integration: external systems like docker registry, Ali Cloud can be integrated with
+* 🖥 Multi-cluster: workflow can be executed in different clusters
+* 🙂 Multi-tenancy: resource manifests and workflow executions are grouped and isolated per tenant
+* ... and many more
+
 ![](https://res.cloudinary.com/dpgih25fj/image/upload/v1566475716/%E5%B7%A5%E4%BD%9C%E6%B5%811.png)
 ![](https://res.cloudinary.com/dpgih25fj/image/upload/v1565840135/%E5%B7%A5%E4%BD%9C%E6%B5%812.png)
 
@@ -35,7 +44,7 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 * __Slack:__ Join [Our Community](https://ai-workflow.slack.com) for discussions, posting questions and contributions. If you are not yet a member of ai-workflow, you may sign up [here](https://join.slack.com/t/ai-workflow/shared_invite/enQtNjkyODgyNDYxMDEwLTI0ZTk0ZmMwNzAzMjFlZTYxMGJlNmM2NjEzMzZiMzc3NjNhNmI1YzBjMDIyYjcyNjdmMGY2ZTI0YzI2NTg0Yzk).
 
 ## Contributing
-If you are interested in contributing to draggable-pai-workflow, please checkout CONTRIBUTING.md. We welcome any code or non-code contribution!
+If you are interested in contributing to draggable-ai-workflow, please checkout CONTRIBUTING.md. We welcome any code or non-code contribution!
 
 ## Licensing
-Draggable-pai-workflow is licensed under the MIT License. See [LICENSE](https://github.com/ivc369/draggable-pai-workflow/blob/master/LICENSE) for the full license text.
+Draggable-ai-workflow is licensed under the MIT License. See [LICENSE](https://github.com/ivc369/draggable-ai-workflow/blob/master/LICENSE) for the full license text.

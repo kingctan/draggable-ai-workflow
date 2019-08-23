@@ -89,7 +89,8 @@ const ModalTimedConfig: SFC<Props & TimedConfigFormProps> = (props) => {
                 { required: true, message: '请填写周期' },
                 {
                   validator: (rule: any, value: number, callback: any) => {
-                    if (value.toString() === '0') callback("此处不能填0")
+                    if (timedUnit === 'minute' && value < 10) callback("不能小于10分钟");
+                    if (value.toString() === '0') callback("此处不能填0");
                     callback();
                   }
                 }]

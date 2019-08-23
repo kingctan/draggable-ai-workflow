@@ -112,13 +112,9 @@ const InstanceList: React.FC<Props> = (props) => {
     key: 'operate',
     align: 'center',
     render: (text: string, row: InstanceProps) => (
-      <a
-        target="_blank"
-        href={`http://39.108.232.245:8081/workflows/default/${row.jobName}`}
-        style={{ whiteSpace: 'nowrap' }}
-      >
+      <Link to={`/instance-detail/${row.jobID}`}>
         日志
-      </a>
+      </Link>
     ),
   }];
 
